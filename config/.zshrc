@@ -90,46 +90,7 @@ _fzf_compgen_dir() {
 # Development Tools
 # ===============================================
 
-# Search Tools
-hg() {
-    grep -Ern "$1" --color=always "$2" | less -r
-}
-
-hig() {
-    grep -Eirn "$1" --color=always "$2" | less -r
-}
-alias hig='hig'
-
-hrg() {
-    rg -e "$1" --color=always "$2" | less -r
-}
-alias hrg='hrg'
-
-hirg() {
-    rg -ie "$1" --color=always "$2" | less -r
-}
-alias hirg='hirg'
-
-# Network Proxy
-alias proxy="
-    export http_proxy=http://127.0.0.1:7890;
-    export https_proxy=http://127.0.0.1:7890;
-    export all_proxy=http://127.0.0.1:7890;
-    export no_proxy=http://127.0.0.1:7890;
-    export HTTP_PROXY=http://127.0.0.1:7890;
-    export HTTPS_PROXY=http://127.0.0.1:7890;
-    export ALL_PROXY=http://127.0.0.1:7890;
-    export NO_PROXY='localhost, 127.0.0.1,*.local';"
-
-alias unproxy="
-    unset http_proxy;
-    unset https_proxy;
-    unset all_proxy;
-    unset no_proxy;
-    unset HTTP_PROXY;
-    unset HTTPS_PROXY;
-    unset ALL_PROXY;
-    unset NO_PROXY"
+# Search Tools and Network Proxy functions are loaded from ~/.zsh/functions/
 
 # CUDA & TensorRT
 export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
@@ -142,28 +103,14 @@ export PATH=/usr/local/cuda-11.1/bin/:$PATH
 # Custom Functions
 # ===============================================
 
-# Safe ZSH Configuration Reload
-reload_zsh() {
-    echo "🔄 重新加载 zsh 配置..."
-    source ~/.zshrc
-    echo "✅ zsh 配置加载完成"
-    echo "🎨 当前主题: robbyrussell 风格"
-}
-
-# Environment Detection
-check_environment() {
-    if [[ -f "/.dockerenv" ]]; then
-        echo "🐳 当前在 Docker 容器环境中"
-        echo "   容器名: $(hostname)"
-        echo "   用户: $(whoami)"
-        echo "   镜像: $(cat /etc/image_version 2>/dev/null || echo "未知")"
-    else
-        echo "🖥️  当前在物理主机环境中"
-        echo "   主机名: $(hostname)"
-        echo "   用户: $(whoami)"
-        echo "   系统: $(uname -a)"
-    fi
-}
+# Load custom functions from ~/.zsh/functions
+if [[ -d "$HOME/.zsh/functions" ]]; then
+    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+        if [[ -f "$function_file" ]]; then
+            source "$function_file"
+        fi
+    done
+fi
 
 # ===============================================
 # Additional Aliases

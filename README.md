@@ -1,6 +1,6 @@
 # Development Environment (dev-env)
 
-**项目版本**: 1.0
+**项目版本**: 1.1
 **创建日期**: 2025-10-15
 **维护者**: Development Team
 
@@ -8,11 +8,12 @@
 
 ## 📋 项目概述
 
-本项目是一个完整的开发环境配置管理系统，主要专注于 ZSH Shell 环境的配置、管理和优化。提供了标准化的开发环境配置，支持多种开发工具和环境管理。
+本项目是一个完整的开发环境配置管理系统，主要专注于 ZSH Shell 环境的配置、管理和优化。提供了标准化的开发环境配置，支持多种开发工具、模块化函数管理和环境适配。
 
 ### 🎯 **主要特性**
 
 - ✅ **ZSH 配置管理**: 完整的 ZSH 配置文件和插件管理
+- ✅ **模块化函数**: 环境检测、搜索增强、工具函数模块化管理
 - ✅ **自动化工具**: 一键安装、备份、恢复脚本
 - ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
 - ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
@@ -36,7 +37,10 @@ dev-env/
 │   ├── README.md              # 项目说明文档
 │   ├── ZSH_CONFIG_ANALYSIS.md # 详细配置分析报告
 │   └── ZSH_CONFIG_TEMPLATE.md # 配置模板和使用指南
-├── zsh-functions/             # 自定义 ZSH 函数目录
+├── zsh-functions/             # 模块化自定义函数目录
+│   ├── environment.zsh        # 环境检测和配置重载函数
+│   ├── search.zsh             # 搜索增强函数 (hg, hig, hrg, hirg)
+│   └── utils.zsh              # 实用工具函数 (proxy, unproxy)
 ├── examples/                  # 配置示例目录
 ├── .gitignore                 # Git 忽略文件
 └── README.md                  # 项目主文档
@@ -188,23 +192,34 @@ proxy                  # 启用代理
 unproxy               # 禁用代理
 ```
 
-### 🔧 **自定义函数**
+### 🔧 **模块化函数系统**
 
-#### 环境检测
+#### 环境检测模块 (environment.zsh)
 ```bash
 check_environment
 # 输出:
 # 🖥️  当前在物理主机环境中
 #    主机名: hostname
 #    用户: username
-```
 
-#### 安全重载
-```bash
 reload_zsh
 # 输出:
 # 🔄 重新加载 zsh 配置...
 # ✅ zsh 配置加载完成
+```
+
+#### 搜索增强模块 (search.zsh)
+```bash
+hg "pattern" directory      # 递归搜索，区分大小写
+hig "pattern" directory     # 递归搜索，忽略大小写
+hrg "pattern" directory     # 使用 ripgrep 搜索
+hirg "pattern" directory    # 使用 ripgrep 忽略大小写搜索
+```
+
+#### 工具函数模块 (utils.zsh)
+```bash
+proxy                      # 启用代理
+unproxy                   # 禁用代理
 ```
 
 ---
@@ -321,6 +336,7 @@ exec zsh
 
 - **[配置分析报告](docs/ZSH_CONFIG_ANALYSIS.md)**: 详细的配置架构分析
 - **[配置模板指南](docs/ZSH_CONFIG_TEMPLATE.md)**: 完整的配置模板和使用说明
+- **[调试指南](docs/TROUBLESHOOTING_DEBUG_GUIDE.md)**: 问题诊断和修复过程记录
 
 ### 🔗 **外部资源**
 
@@ -376,6 +392,30 @@ git push origin feature/new-feature
 ---
 
 ## 🔄 版本历史
+
+### v1.3 (2025-10-16)
+- ✨ 新增详细性能分析系统 (performance.zsh)
+- ✅ 实现高精度分段式性能测试 (benchmark-detailed 命令)
+- ✅ 提供性能评分和优化建议系统
+- ✅ 添加插件性能分析和内存使用分析
+- ✅ 兼容 ZSH 和 Bash 环境的性能测试
+- ⚡ 支持毫秒级精度的启动时间分析
+
+### v1.2 (2025-10-16)
+- ✨ 新增统一命令帮助系统 (help.zsh)
+- ✅ 为所有自定义命令添加 --help / -h 参数支持
+- ✅ 改进参数检查和错误提示机制
+- ✅ 增强命令发现和分类显示功能
+- 📚 创建详细的调试指南和故障排除文档
+- 🧪 集成详细性能分析和帮助系统验证功能
+
+### v1.1 (2025-10-15)
+- 🐛 修复安装脚本路径问题
+- ✨ 实现模块化函数管理系统
+- ✅ 新增环境检测函数模块
+- ✅ 新增搜索增强函数模块
+- ✅ 新增实用工具函数模块
+- 📚 完善文档和使用指南
 
 ### v1.0 (2025-10-15)
 - ✨ 初始版本发布

@@ -228,8 +228,8 @@ install_config_files() {
     local project_dir="$(dirname "$script_dir")"
 
     # 复制 .zshrc
-    if [[ -f "$project_dir/.zshrc" ]]; then
-        cp "$project_dir/.zshrc" "$HOME/.zshrc"
+    if [[ -f "$project_dir/config/.zshrc" ]]; then
+        cp "$project_dir/config/.zshrc" "$HOME/.zshrc"
         log_success "已安装 .zshrc"
     else
         log_warn "未找到 .zshrc 模板文件"

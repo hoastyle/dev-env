@@ -42,14 +42,15 @@ show_help() {
     echo "用法: $0 <命令> [选项]"
     echo ""
     echo "命令:"
-    echo "  validate     验证 ZSH 配置"
-    echo "  backup       备份 ZSH 配置"
-    echo "  restore      恢复 ZSH 配置"
-    echo "  update       更新 Antigen 插件"
-    echo "  clean        清理插件缓存"
-    echo "  benchmark    性能基准测试"
-    echo "  doctor       系统诊断"
-    echo "  reset        重置配置到默认状态"
+    echo "  validate          验证 ZSH 配置"
+    echo "  backup            备份 ZSH 配置"
+    echo "  restore           恢复 ZSH 配置"
+    echo "  update            更新 Antigen 插件"
+    echo "  clean             清理插件缓存"
+    echo "  benchmark         性能基准测试"
+    echo "  benchmark-detailed 详细性能分析"
+    echo "  doctor            系统诊断"
+    echo "  reset             重置配置到默认状态"
     echo ""
     echo "选项:"
     echo "  -h, --help   显示帮助信息"
@@ -417,6 +418,41 @@ benchmark_performance() {
     fi
 }
 
+# 详细性能分析
+benchmark_detailed() {
+    log_header "详细性能分析"
+
+    # 检查依赖
+    if ! command -v bc &> /dev/null; then
+        log_error "缺少依赖工具: bc (用于数学计算)"
+        log_info "安装方法: sudo apt install bc / brew install bc"
+        return 1
+    fi
+
+    # 检查性能函数文件
+    local perf_func_file="$HOME/.zsh/functions/performance.zsh"
+    if [[ ! -f "$perf_func_file" ]]; then
+        log_error "性能分析函数文件不存在: $perf_func_file"
+        log_info "请确保性能模块已正确安装"
+        return 1
+    fi
+
+    log_info "加载性能分析模块..."
+
+    # 在子shell中加载并执行性能分析
+    (
+        source "$perf_func_file"
+        performance_detailed
+    )
+
+    if [[ $? -eq 0 ]]; then
+        log_success "详细性能分析完成"
+    else
+        log_error "性能分析过程中出现错误"
+        return 1
+    fi
+}
+
 # 系统诊断
 run_doctor() {
     log_header "系统诊断"
@@ -592,6 +628,9 @@ main() {
             ;;
         "benchmark")
             benchmark_performance
+            ;;
+        "benchmark-detailed")
+            benchmark_detailed
             ;;
         "doctor")
             run_doctor
