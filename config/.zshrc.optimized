@@ -1,0 +1,121 @@
+# ===============================================
+# Optimized ZSH Configuration - Development Environment
+# ===============================================
+# Version: 1.0 (Performance Optimized)
+# Maintainer: dev-env project
+# ===============================================
+
+# Antigen Plugin Manager
+source "$HOME/.antigen.zsh"
+
+# Antigen Configuration
+antigen use oh-my-zsh
+
+# Core Plugins Only - Optimized for Performance
+antigen bundle git
+
+# Essential plugins with minimal overhead
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-completions
+
+# Theme Configuration
+antigen theme robbyrussell
+
+# Apply Antigen Settings
+antigen apply
+
+# ===============================================
+# Python Environment
+# ===============================================
+
+# Use Python 3 by default
+alias python=python3
+alias pip=pip3
+
+# Conda Environment - Optimized Loading
+if [[ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]]; then
+    # Only activate conda when explicitly needed
+    export CONDA_EXE="/home/hao/anaconda3/bin/conda"
+    export _CONDA_ROOT="/home/hao/anaconda3"
+    alias conda-init='eval "$(/home/hao/anaconda3/bin/conda shell.zsh hook)" && conda activate base'
+fi
+
+# NVM (Node Version Manager) - Lazy Loading
+export NVM_DIR="$HOME/.nvm"
+lazy_load_nvm() {
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+}
+alias nvm-lazy='lazy_load_nvm'
+
+# ===============================================
+# FZF Configuration
+# ===============================================
+
+# Enable FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# FZF Configuration - Simplified for performance
+export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home'
+export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:up --border'
+
+# ===============================================
+# Development Tools
+# ===============================================
+
+# Search Tools and Network Proxy functions are loaded from ~/.zsh/functions/
+
+# CUDA & TensorRT
+export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
+export PATH=/usr/local/cuda-11.1/bin/:$PATH
+
+# Autojump - Lazy Loading
+lazy_load_autojump() {
+    [[ -s /home/hao/.autojump/etc/profile.d/autojump.sh ]] && source /home/hao/.autojump/etc/profile.d/autojump.sh
+}
+alias autojump-lazy='lazy_load_autojump'
+
+# ===============================================
+# Custom Functions
+# ===============================================
+
+# Load custom functions from ~/.zsh/functions
+if [[ -d "$HOME/.zsh/functions" ]]; then
+    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+        if [[ -f "$function_file" ]]; then
+            source "$function_file"
+        fi
+    done
+fi
+
+# ===============================================
+# Additional Aliases
+# ===============================================
+
+# Point Cloud Tools
+alias pm="pcl_viewer -use_point_picking -ax 4 -multiview 1"
+alias pa="pcl_viewer -ax 4 -use_point_picking"
+
+# ===============================================
+# Environment Variables
+# ===============================================
+
+# Google Cloud Project
+export GOOGLE_CLOUD_PROJECT="gen-lang-client-0165913056"
+
+# ZSH Completion
+autoload -U compinit && compinit -u
+
+# ===============================================
+# Performance Optimizations
+# ===============================================
+
+# Enable lazy loading for heavy operations
+zsh_add_file() {
+    [ -f "$1" ] && source "$1"
+}
+
+# ===============================================
+# Configuration Complete
+# ===============================================
+echo "🚀 Optimized Development Environment ZSH Configuration Loaded"

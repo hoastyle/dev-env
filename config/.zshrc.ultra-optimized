@@ -1,0 +1,171 @@
+# ===============================================
+# Ultra-Optimized ZSH Configuration - Development Environment
+# ===============================================
+# Version: 2.0 (Ultra Performance Optimized)
+# Maintainer: dev-env project
+# ===============================================
+
+# ===============================================
+# Performance Optimizations First
+# ===============================================
+
+# Skip compinit for faster startup - will be loaded on demand
+SKIP_COMPINIT=true
+
+# Fast startup mode
+if [[ "$1" == "--fast" ]]; then
+    echo "🚀 Fast mode enabled - skipping heavy initialization"
+    FAST_MODE=true
+else
+    FAST_MODE=false
+fi
+
+# ===============================================
+# Antigen Plugin Manager - Lazy Loading
+# ===============================================
+
+# Only load Antigen if not in fast mode
+if [[ "$FAST_MODE" != "true" ]]; then
+    source "$HOME/.antigen.zsh"
+    antigen use oh-my-zsh
+
+    # Core Plugins Only
+    antigen bundle git
+
+    # Apply settings
+    antigen theme robbyrussell
+    antigen apply
+else
+    # Fast mode - minimal setup
+   autoload -U colors && colors
+    PROMPT="%{$fg[green]%}%n@%m%{$reset_color%}:%{$fg[blue]%}%~%{$reset_color%}$ "
+fi
+
+# ===============================================
+# Python Environment
+# ===============================================
+
+# Use Python 3 by default
+alias python=python3
+alias pip=pip3
+
+# Conda Environment - Lazy Loading
+if [[ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]]; then
+    export CONDA_EXE="/home/hao/anaconda3/bin/conda"
+    export _CONDA_ROOT="/home/hao/anaconda3"
+    alias conda-init='eval "$(/home/hao/anaconda3/bin/conda shell.zsh hook)" && conda activate base'
+fi
+
+# NVM - Lazy Loading
+export NVM_DIR="$HOME/.nvm"
+alias nvm-lazy='[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+
+# ===============================================
+# FZF Configuration
+# ===============================================
+
+# Enable FZF
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# FZF Configuration - Simplified
+export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home'
+export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:up --border'
+
+# ===============================================
+# Development Tools
+# ===============================================
+
+# CUDA & TensorRT
+export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
+export PATH=/usr/local/cuda-11.1/bin/:$PATH
+
+# Autojump - Lazy Loading
+alias autojump-lazy='[[ -s /home/hao/.autojump/etc/profile.d/autojump.sh ]] && source /home/hao/.autojump/etc/profile.d/autojump.sh'
+
+# ===============================================
+# Custom Functions
+# ===============================================
+
+# Load custom functions from ~/.zsh/functions
+if [[ -d "$HOME/.zsh/functions" ]]; then
+    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+        if [[ -f "$function_file" ]]; then
+            source "$function_file"
+        fi
+    done
+fi
+
+# ===============================================
+# Completion System - Lazy Loading
+# ===============================================
+
+# Function to enable completion on demand
+enable_completion() {
+    if [[ -z "$COMPLETION_ENABLED" ]]; then
+        echo "🔄 Enabling ZSH completion system..."
+        autoload -U compinit && compinit -u
+        COMPLETION_ENABLED=true
+
+        # Load Antigen completion plugins if available
+        if [[ "$FAST_MODE" != "true" ]] && command -v antigen &>/dev/null; then
+            antigen bundle zsh-users/zsh-completions
+            antigen bundle zsh-users/zsh-syntax-highlighting
+            antigen apply
+        fi
+        echo "✅ Completion system enabled"
+    fi
+}
+
+# Auto-enable completion when first tab is pressed
+lazy_completion() {
+    enable_completion
+    zle expand-or-complete
+}
+zle -N lazy_completion
+
+# Bind tab to lazy completion only if completion not enabled
+if [[ -z "$COMPLETION_ENABLED" ]]; then
+    bindkey '^I' lazy_completion
+fi
+
+# ===============================================
+# Additional Aliases
+# ===============================================
+
+# Point Cloud Tools
+alias pm="pcl_viewer -use_point_picking -ax 4 -multiview 1"
+alias pa="pcl_viewer -ax 4 -use_point_picking"
+
+# Quick completion enable
+alias comp-enable='enable_completion'
+
+# ===============================================
+# Environment Variables
+# ===============================================
+
+# Google Cloud Project
+export GOOGLE_CLOUD_PROJECT="gen-lang-client-0165913056"
+
+# ===============================================
+# Performance Monitoring
+# ===============================================
+
+# Function to measure startup time
+zsh_benchmark() {
+    local start_time=$(date +%s.%N)
+    zsh -i -c 'exit' 2>/dev/null
+    local end_time=$(date +%s.%N)
+    local duration=$(echo "$end_time - $start_time" | bc -l)
+    echo "ZSH startup time: ${duration}s"
+}
+
+# ===============================================
+# Configuration Complete
+# ===============================================
+
+if [[ "$FAST_MODE" == "true" ]]; then
+    echo "⚡ Ultra-Fast ZSH Configuration Loaded (Fast Mode)"
+else
+    echo "🚀 Ultra-Optimized ZSH Configuration Loaded"
+    echo "💡 Type 'comp-enable' to enable command completion"
+fi
