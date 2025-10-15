@@ -1,0 +1,100 @@
+# ===============================================
+# Git Ignore File for dev-env Project
+# ===============================================
+
+# OS and System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sass-cache/
+.sublime-project
+.sublime-workspace
+
+# ZSH Specific Files
+.zsh_history
+.zsh_sessions
+.zcompdump*
+.zshrc.backup.*
+
+# Antigen Files
+.antigen/.cache/
+.antigen/.tmp/
+.antigen/init.zsh.old
+
+# Backup Files
+*.backup
+*.bak
+*.old
+.zsh-backup-*/
+.zsh_last_backup
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Log Files
+*.log
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Configuration Files (Personal)
+.env.local
+.env.*.local
+personal-config.zsh
+local-config.zsh
+
+# Build Outputs
+dist/
+build/
+out/
+
+# Test Coverage
+coverage/
+.nyc_output/
+.coverage
+
+# Documentation Build
+docs/_build/
+docs/build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache and Temporary Directories
+.cache/
+.parcel-cache/
+.eslintcache
