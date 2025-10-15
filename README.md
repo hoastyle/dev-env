@@ -59,34 +59,116 @@ dev-env/
 
 ## 🚀 快速开始
 
-### ⚡ **极速启动模式** (推荐)
+### 📋 **两种使用方式**
 
-```bash
-# 克隆项目
-git clone <repository-url>
-cd dev-env/scripts
+本项目提供 **两种使用方式**，根据需求选择：
 
-# 极速模式启动 (2ms启动时间)
-./zsh_minimal.sh
-
-# 或使用多模式启动器
-./zsh_launcher.sh minimal    # 极速模式 (99.9%性能提升)
-./zsh_launcher.sh fast       # 快速模式 (61%性能提升)
-./zsh_launcher.sh normal     # 标准模式 (完整功能)
-```
-
-### 📦 **自动化安装**
+#### 🔧 **方式一：完整安装 (推荐日常使用)**
 
 ```bash
 # 克隆项目
 git clone <repository-url>
 cd dev-env
 
-# 运行安装脚本
+# 运行安装脚本 (一次性设置)
 ./scripts/install_zsh_config.sh
 
 # 应用配置
 exec zsh
+```
+
+**完整安装的优势**：
+- ✅ 系统级集成，配置永久生效
+- ✅ 所有依赖工具自动安装
+- ✅ 自定义函数完全可用
+- ✅ 日常使用无需额外步骤
+- ✅ 支持完整的开发环境
+
+#### ⚡ **方式二：直接启动 (临时使用)**
+
+```bash
+# 克隆项目
+git clone <repository-url>
+cd dev-env/scripts
+
+# 直接使用启动器 (无需安装)
+./zsh_launcher.sh minimal    # 极速模式 (99.9%性能提升)
+./zsh_launcher.sh fast       # 快速模式 (61%性能提升)
+./zsh_launcher.sh normal     # 标准模式 (完整功能)
+
+# 或使用极简启动器
+./zsh_minimal.sh              # 一键极速启动
+```
+
+**直接启动的优势**：
+- ⚡ 即开即用，无需安装
+- ⚡ 临时环境，不影响现有配置
+- ⚡ 适合测试和快速体验
+- ⚡ 支持性能测试和对比
+- ⚡ 可在不同模式间快速切换
+
+### 📊 **两种方式对比**
+
+| 特性 | 完整安装 | 直接启动 |
+|------|---------|----------|
+| **设置时间** | 一次性安装 | 即开即用 |
+| **持久性** | 永久生效 | 当前会话 |
+| **依赖工具** | 自动安装 | 需手动安装 |
+| **自定义函数** | 完全支持 | 部分支持 |
+| **系统影响** | 替换现有配置 | 无影响 |
+| **适用场景** | 日常开发 | 测试/临时使用 |
+
+### ⚠️ **直接启动的限制和依赖**
+
+直接使用 `zsh_launcher.sh` 时，需要注意以下限制：
+
+#### 🔧 **必需依赖**
+```bash
+# 需要预先安装以下工具：
+# Ubuntu/Debian:
+sudo apt-get install fzf fd-find ripgrep
+
+# macOS:
+brew install fzf fd ripgrep
+```
+
+#### 📋 **功能限制**
+- ❌ `./scripts/zsh_tools.sh` 部分功能不可用
+- ❌ 自定义函数模块 (如 `zsh_help`) 需要手动加载
+- ❌ 系统级配置验证功能受限
+- ❌ 插件更新和管理功能不可用
+
+#### ✅ **可用功能**
+- ✅ 三种启动模式 (minimal/fast/normal)
+- ✅ 性能对比测试 (`./scripts/zsh_launcher.sh benchmark`)
+- ✅ 详细性能分析 (`./scripts/zsh_launcher.sh benchmark-detailed`)
+- ✅ 基础命令帮助 (启动器内置)
+- ✅ 配置切换和恢复功能
+
+### 🎯 **使用建议**
+
+#### **选择完整安装**，如果：
+- 需要日常开发环境
+- 需要完整的自定义函数支持
+- 希望配置永久生效
+- 需要插件管理和更新功能
+
+#### **选择直接启动**，如果：
+- 只是临时测试环境
+- 需要快速体验性能优化效果
+- 不想影响现有系统配置
+- 需要在多个配置间切换测试
+
+#### **混合使用策略**
+```bash
+# 1. 先用直接启动体验效果
+./scripts/zsh_launcher.sh benchmark
+
+# 2. 满意后再进行完整安装
+./scripts/install_zsh_config.sh
+
+# 3. 仍可使用启动器进行性能测试
+./scripts/zsh_launcher.sh benchmark
 ```
 
 ### 🔧 **手动安装**
