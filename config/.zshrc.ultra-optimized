@@ -5,6 +5,17 @@
 # Maintainer: dev-env project
 # ===============================================
 
+# Collapse nested launcher shells by exiting the previous instance when reopened.
+if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
+    trap 'builtin exit' USR1
+    if [[ -n "$ZSH_LAUNCHER_PREV_PID" && "$ZSH_LAUNCHER_PREV_PID" != "$$" ]]; then
+        if kill -0 "$ZSH_LAUNCHER_PREV_PID" 2>/dev/null; then
+            kill -USR1 "$ZSH_LAUNCHER_PREV_PID" 2>/dev/null || true
+        fi
+        unset ZSH_LAUNCHER_PREV_PID
+    fi
+fi
+
 # ===============================================
 # Performance Optimizations First
 # ===============================================

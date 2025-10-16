@@ -126,6 +126,16 @@ switch_to_mode() {
 launch_zsh() {
     local mode="$1"
     local project_root="/home/hao/Workspace/MM/utility/dev-env"
+    local parent_pid="$PPID"
+
+    # Mark launcher-managed shells so we can collapse nested sessions.
+    if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
+        export ZSH_LAUNCHER_PREV_PID="$parent_pid"
+    else
+        unset ZSH_LAUNCHER_PREV_PID
+    fi
+    export ZSH_LAUNCHER_ACTIVE=1
+    export ZSH_LAUNCHER_MODE="$mode"
 
     case "$mode" in
         "normal")
