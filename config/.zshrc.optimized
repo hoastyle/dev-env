@@ -148,7 +148,5 @@ zsh_add_file() {
 # Configuration Complete
 # ===============================================
 
-# Only show welcome message if instant prompt is not active
-if [[ -z "${_p9k_instant_prompt_active}" ]]; then
-    echo "🚀 Optimized Development Environment ZSH Configuration Loaded"
-fi
+# Welcome message disabled to support Powerlevel10k instant prompt
+# echo "🚀 Optimized Development Environment ZSH Configuration Loaded"

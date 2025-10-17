@@ -54,15 +54,8 @@ antigen theme romkatv/powerlevel10k
 # Apply Antigen Settings
 antigen apply
 
-# Ensure theme loads properly
-sleep 0.5
-
-# Fallback theme loading
+# Fallback theme loading (without sleep to support instant prompt)
 if [[ -z "$PROMPT" ]]; then
-    # Suppress output during instant prompt
-    if [[ -z "${_p9k_instant_prompt_active}" ]]; then
-        echo "🎨 重新加载 Antigen 主题..."
-    fi
     antigen theme romkatv/powerlevel10k
     antigen apply
 fi
@@ -172,8 +165,7 @@ autoload -U compinit && compinit -u
 # Configuration Complete
 # ===============================================
 
-# Only show welcome message if instant prompt is not active
-# This prevents console output warnings in Powerlevel10k
-if [[ -z "${_p9k_instant_prompt_active}" ]]; then
-    echo "🎉 Development Environment ZSH Configuration Loaded"
-fi
+# Welcome message disabled to support Powerlevel10k instant prompt
+# The theme provides its own visual feedback
+# To re-enable, uncomment the following line:
+# echo "🎉 Development Environment ZSH Configuration Loaded"

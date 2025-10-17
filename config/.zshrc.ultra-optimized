@@ -194,12 +194,11 @@ fi
 # Configuration Complete
 # ===============================================
 
-# Only show welcome message if instant prompt is not active
-if [[ -z "${_p9k_instant_prompt_active}" ]]; then
-    if [[ "$FAST_MODE" == "true" ]]; then
-        echo "⚡ Ultra-Fast ZSH Configuration Loaded (Fast Mode)"
-    else
-        echo "🚀 Ultra-Optimized ZSH Configuration Loaded"
-        echo "💡 Type 'comp-enable' to enable command completion"
-    fi
-fi
+# Welcome message disabled to support Powerlevel10k instant prompt
+# Uncomment to re-enable:
+# if [[ "$FAST_MODE" == "true" ]]; then
+#     echo "⚡ Ultra-Fast ZSH Configuration Loaded (Fast Mode)"
+# else
+#     echo "🚀 Ultra-Optimized ZSH Configuration Loaded"
+#     echo "💡 Type 'comp-enable' to enable command completion"
+# fi
