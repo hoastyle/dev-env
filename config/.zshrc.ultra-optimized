@@ -6,7 +6,12 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt (only in normal mode)
+# Note: In tmux, use quiet mode to avoid "bad tcgets" errors
 if [[ "$FAST_MODE" != "true" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  # Set to quiet mode in tmux to suppress warnings
+  if [[ -n "$TMUX" ]]; then
+    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  fi
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -189,9 +194,12 @@ fi
 # Configuration Complete
 # ===============================================
 
-if [[ "$FAST_MODE" == "true" ]]; then
-    echo "⚡ Ultra-Fast ZSH Configuration Loaded (Fast Mode)"
-else
-    echo "🚀 Ultra-Optimized ZSH Configuration Loaded"
-    echo "💡 Type 'comp-enable' to enable command completion"
+# Only show welcome message if instant prompt is not active
+if [[ -z "${_p9k_instant_prompt_active}" ]]; then
+    if [[ "$FAST_MODE" == "true" ]]; then
+        echo "⚡ Ultra-Fast ZSH Configuration Loaded (Fast Mode)"
+    else
+        echo "🚀 Ultra-Optimized ZSH Configuration Loaded"
+        echo "💡 Type 'comp-enable' to enable command completion"
+    fi
 fi

@@ -6,7 +6,12 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Note: In tmux, use quiet mode to avoid "bad tcgets" errors
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  # Set to quiet mode in tmux to suppress warnings
+  if [[ -n "$TMUX" ]]; then
+    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  fi
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -142,4 +147,8 @@ zsh_add_file() {
 # ===============================================
 # Configuration Complete
 # ===============================================
-echo "🚀 Optimized Development Environment ZSH Configuration Loaded"
+
+# Only show welcome message if instant prompt is not active
+if [[ -z "${_p9k_instant_prompt_active}" ]]; then
+    echo "🚀 Optimized Development Environment ZSH Configuration Loaded"
+fi

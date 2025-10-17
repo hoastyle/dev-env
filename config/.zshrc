@@ -8,7 +8,13 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
+#
+# Note: In tmux, use quiet mode to avoid "bad tcgets" errors
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  # Set to quiet mode in tmux to suppress warnings
+  if [[ -n "$TMUX" ]]; then
+    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  fi
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -53,7 +59,10 @@ sleep 0.5
 
 # Fallback theme loading
 if [[ -z "$PROMPT" ]]; then
-    echo "🎨 重新加载 Antigen 主题..."
+    # Suppress output during instant prompt
+    if [[ -z "${_p9k_instant_prompt_active}" ]]; then
+        echo "🎨 重新加载 Antigen 主题..."
+    fi
     antigen theme romkatv/powerlevel10k
     antigen apply
 fi
@@ -162,4 +171,9 @@ autoload -U compinit && compinit -u
 # ===============================================
 # Configuration Complete
 # ===============================================
-echo "🎉 Development Environment ZSH Configuration Loaded"
+
+# Only show welcome message if instant prompt is not active
+# This prevents console output warnings in Powerlevel10k
+if [[ -z "${_p9k_instant_prompt_active}" ]]; then
+    echo "🎉 Development Environment ZSH Configuration Loaded"
+fi
