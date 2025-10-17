@@ -49,18 +49,26 @@ init_help_database() {
     # 实用工具命令
     COMMAND_CATEGORIES[proxy]="实用工具"
     COMMAND_CATEGORIES[unproxy]="实用工具"
+    COMMAND_CATEGORIES[check_proxy]="实用工具"
+    COMMAND_CATEGORIES[proxy_status]="实用工具"
     COMMAND_CATEGORIES[jdev]="实用工具"
 
-    COMMAND_DESCRIPTIONS[proxy]="启用网络代理"
+    COMMAND_DESCRIPTIONS[proxy]="启用网络代理（支持自定义地址和验证）"
     COMMAND_DESCRIPTIONS[unproxy]="禁用网络代理"
+    COMMAND_DESCRIPTIONS[check_proxy]="检查代理是否已启用"
+    COMMAND_DESCRIPTIONS[proxy_status]="显示详细的代理状态和可用性"
     COMMAND_DESCRIPTIONS[jdev]="快速跳转到开发目录（需要autojump）"
 
-    COMMAND_USAGES[proxy]="proxy"
+    COMMAND_USAGES[proxy]="proxy [host:port] [--verify]"
     COMMAND_USAGES[unproxy]="unproxy"
+    COMMAND_USAGES[check_proxy]="check_proxy [--status|-s]"
+    COMMAND_USAGES[proxy_status]="proxy_status"
     COMMAND_USAGES[jdev]="jdev [directory_name]"
 
-    COMMAND_EXAMPLES[proxy]="proxy"
+    COMMAND_EXAMPLES[proxy]="proxy 127.0.0.1:7890 --verify"
     COMMAND_EXAMPLES[unproxy]="unproxy"
+    COMMAND_EXAMPLES[check_proxy]="check_proxy --status"
+    COMMAND_EXAMPLES[proxy_status]="proxy_status"
     COMMAND_EXAMPLES[jdev]="jdev workspace"
 
     # 将所有命令添加到主数据库
@@ -156,6 +164,8 @@ show_help_overview() {
     echo "🛠️  实用工具 ($util_count 个命令)"
     echo "   proxy            - 启用网络代理"
     echo "   unproxy          - 禁用网络代理"
+    echo "   check_proxy      - 检查代理状态"
+    echo "   proxy_status     - 显示代理详细信息"
     if command -v autojump &> /dev/null; then
         echo "   jdev             - 快速目录跳转"
     fi
@@ -260,9 +270,38 @@ show_command_help() {
                 echo "📦 安装: apt install ripgrep / brew install ripgrep"
             fi
             ;;
-        proxy|unproxy)
-            echo "🌐 代理设置: http://127.0.0.1:7890"
-            echo "⚙️  可在 utils.zsh 中修改代理地址"
+        proxy)
+            echo "🌐 功能: 启用网络代理，支持自定义地址"
+            echo "📁 配置文件: ~/.proxy_config"
+            echo "⚙️  选项:"
+            echo "    <host:port>  - 指定自定义代理地址"
+            echo "    --verify,-v  - 验证代理连接可用性"
+            echo ""
+            echo "📋 示例:"
+            echo "    proxy                           # 使用默认配置启用"
+            echo "    proxy 192.168.1.1:1080          # 指定自定义代理"
+            echo "    proxy 127.0.0.1:7890 --verify   # 启用并验证"
+            ;;
+        unproxy)
+            echo "🌐 功能: 清除所有代理环境变量"
+            echo "📝 清除变量: http_proxy, https_proxy, all_proxy 等"
+            echo "   支持大小写版本: HTTP_PROXY, HTTPS_PROXY 等"
+            ;;
+        check_proxy)
+            echo "🔍 功能: 快速检查代理是否已启用"
+            echo "📋 选项:"
+            echo "    --status,-s  - 显示详细状态信息"
+            echo ""
+            echo "📝 输出: ✅ 代理已启用 / ❌ 代理未启用"
+            echo "         (可选) 显示当前代理配置"
+            ;;
+        proxy_status)
+            echo "📊 功能: 显示完整的代理配置和状态"
+            echo "📋 信息包括:"
+            echo "    - 当前代理状态 (已启用/未启用)"
+            echo "    - 代理地址信息"
+            echo "    - 默认配置信息"
+            echo "    - 代理服务可用性检测"
             ;;
         jdev)
             if command -v autojump &> /dev/null; then

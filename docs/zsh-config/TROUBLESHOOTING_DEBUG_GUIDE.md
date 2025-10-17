@@ -387,8 +387,8 @@ echo "🏁 测试完成"
 ## 📖 相关文档
 
 - [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
-- [项目配置文档](../CLAUDE.md)
-- [函数模块文档](../zsh-functions/README.md)
+- [项目配置文档](../../CLAUDE.md)
+- [函数模块文档](../../zsh-functions/README.md)
 - [安装配置指南](../README.md)
 
 ---

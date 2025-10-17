@@ -1,408 +1,131 @@
-# ZSH 配置管理项目
+# 文档中心 (Documentation Center)
 
-**项目版本**: 1.0
-**最后更新**: 2025-10-14
-**维护者**: Claude AI Assistant
+欢迎来到 dev-env 项目的完整文档中心。本目录包含所有主要功能模块的详细文档。
 
 ---
 
-## 📋 项目概述
+## 📚 文档分类
 
-本项目提供了一套完整的 ZSH 配置管理解决方案，包括配置分析、自动化安装、备份恢复和性能优化等功能。旨在为开发者提供统一、高效、可维护的 Shell 环境。
+### 🔧 [代理功能文档](proxy/)
 
-### 🎯 **主要特性**
+dev-env v2.1 代理功能的完整文档，包括优化说明、快速参考、集成指南等。
 
-- ✅ **自动化安装**: 一键安装完整的 ZSH 开发环境
-- ✅ **配置分析**: 详细的配置审核和性能评估
-- ✅ **备份恢复**: 安全的配置备份和恢复机制
-- ✅ **性能优化**: 插件延迟加载和启动时间优化
-- ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
-- ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
+**适合人群**: 所有需要配置网络代理的用户
 
----
+**关键文档**:
+- [快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 5 分钟快速上手
+- [优化说明](proxy/PROXY_OPTIMIZATION.md) - 深入了解优化原理
+- [集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 系统集成和部署
+- [完成报告](proxy/PROXY_ENHANCEMENT_SUMMARY.md) - 项目成果统计
 
-## 📁 项目结构
+[→ 进入代理功能文档](proxy/)
 
-```
-icrane2-env/
-├── .zshrc                      # ZSH 主配置文件
-├── scripts/                    # 脚本工具目录
-│   ├── install_zsh_config.sh   # 自动安装脚本
-│   └── zsh_tools.sh           # 配置管理工具集
-├── docs/                      # 文档目录
-│   ├── README.md              # 项目说明文档
-│   ├── ZSH_CONFIG_ANALYSIS.md # 详细配置分析报告
-│   └── ZSH_CONFIG_TEMPLATE.md # 配置模板和使用指南
-├── docker-compose.yml         # Docker 环境配置
-├── Dockerfile                 # Docker 镜像构建
-└── README.md                  # 项目根 README
-```
+### 🎨 [ZSH 配置文档](zsh-config/)
+
+ZSH Shell 环境配置、性能优化、故障排除的完整指南。
+
+**适合人群**: ZSH 配置管理者、系统管理员、性能优化人员
+
+**关键文档**:
+- [配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 深度配置架构分析
+- [配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md) - 配置模板和最佳实践
+- [故障排除](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - 问题诊断和修复
+- [性能优化](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 性能分析和优化策略
+
+[→ 进入 ZSH 配置文档](zsh-config/)
 
 ---
 
-## 🚀 快速开始
+## 🎯 按用户类型快速导航
 
-### 📦 **一键安装**
+### 👤 **我是第一次使用 dev-env**
+1. 查看 [项目主文档](../README.md)
+2. 根据需求选择：
+   - 需要代理功能 → [代理快速参考](proxy/PROXY_QUICK_REFERENCE.md)
+   - 需要配置 ZSH → [ZSH 配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md)
 
-```bash
-# 克隆项目
-git clone <repository-url>
-cd icrane2-env
+### 🔧 **我需要集成和部署**
+- [代理集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 代理功能集成
+- [ZSH 配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 了解现有配置
 
-# 运行自动安装脚本
-./scripts/install_zsh_config.sh
+### 🛠️ **我需要故障排除**
+- [代理功能快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 代理相关问题
+- [ZSH 故障排除指南](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - ZSH 相关问题
 
-# 启动新的 ZSH 环境
-exec zsh
-```
+### 📊 **我需要性能优化**
+- [ZSH 性能优化指南](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)
+- [代理优化说明](proxy/PROXY_OPTIMIZATION.md)
 
-### 🔧 **手动安装**
-
-```bash
-# 1. 安装 Antigen
-curl -L git.io/antigen > ~/.antigen.zsh
-
-# 2. 复制配置文件
-cp .zshrc ~/.zshrc
-
-# 3. 安装依赖工具
-# Ubuntu/Debian:
-sudo apt-get install fzf fd-find ripgrep
-
-# macOS:
-brew install fzf fd ripgrep
-
-# 4. 重新加载配置
-source ~/.zshrc
-```
+### 🏗️ **我是项目维护者**
+- 所有文档清单见下方
+- [项目开发指南](../CLAUDE.md) - 开发标准和规范
 
 ---
 
-## 🛠️ 工具使用
+## 📋 完整文档清单
 
-### 📋 **配置管理工具**
+### 代理功能 (proxy/)
 
-项目提供了完整的 ZSH 配置管理工具集 `zsh_tools.sh`：
+| 文档 | 大小 | 用途 |
+|------|------|------|
+| [PROXY_QUICK_REFERENCE.md](proxy/PROXY_QUICK_REFERENCE.md) | 6.3 KB | 快速参考和常用示例 |
+| [PROXY_OPTIMIZATION.md](proxy/PROXY_OPTIMIZATION.md) | 8.6 KB | 优化原理和方法论 |
+| [PROXY_INTEGRATION_GUIDE.md](proxy/PROXY_INTEGRATION_GUIDE.md) | 8.6 KB | 集成部署和验证 |
+| [PROXY_ENHANCEMENT_SUMMARY.md](proxy/PROXY_ENHANCEMENT_SUMMARY.md) | 12 KB | 完成报告和统计 |
+| [README.md](proxy/README.md) | - | 代理模块导航 |
 
-```bash
-# 查看帮助
-./scripts/zsh_tools.sh help
+### ZSH 配置 (zsh-config/)
 
-# 验证配置
-./scripts/zsh_tools.sh validate
+| 文档 | 用途 |
+|------|------|
+| [ZSH_CONFIG_ANALYSIS.md](zsh-config/ZSH_CONFIG_ANALYSIS.md) | 配置架构分析 |
+| [ZSH_CONFIG_TEMPLATE.md](zsh-config/ZSH_CONFIG_TEMPLATE.md) | 配置模板和使用指南 |
+| [TROUBLESHOOTING_DEBUG_GUIDE.md](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) | 问题诊断和修复 |
+| [PERFORMANCE_OPTIMIZATION_GUIDE.md](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) | 性能优化策略 |
+| [README.md](zsh-config/README.md) | ZSH 模块导航 |
 
-# 备份配置
-./scripts/zsh_tools.sh backup
+---
 
-# 更新插件
-./scripts/zsh_tools.sh update
+## 🔗 相关链接
 
-# 系统诊断
-./scripts/zsh_tools.sh doctor
+- [项目主文档](../README.md) - 项目概述和快速开始
+- [文档总索引](../DOCUMENTATION_INDEX.md) - 全项目文档索引
+- [开发指南](../CLAUDE.md) - 项目开发规范和指南
 
-# 性能测试
-./scripts/zsh_tools.sh benchmark
+---
+
+## 📖 文档结构说明
+
 ```
-
-### 🔍 **配置验证**
-
-```bash
-# 验证当前配置
-./scripts/zsh_tools.sh validate
-
-# 输出示例:
-# 🎉 ZSH 配置验证通过，未发现问题
-# ✓ ZSH 版本符合要求
-# ✓ .zshrc 语法正确
-# ✓ Antigen 已安装
-# ✓ 已加载 8 个插件
-```
-
-### 💾 **备份与恢复**
-
-```bash
-# 创建备份
-./scripts/zsh_tools.sh backup
-
-# 恢复备份
-./scripts/zsh_tools.sh restore /path/to/backup
-
-# 重置配置
-./scripts/zsh_tools.sh reset
+docs/
+├── README.md (本文件 - 文档中心)
+├── proxy/ (代理功能相关文档)
+│   ├── README.md (代理模块导航)
+│   ├── PROXY_QUICK_REFERENCE.md
+│   ├── PROXY_OPTIMIZATION.md
+│   ├── PROXY_INTEGRATION_GUIDE.md
+│   └── PROXY_ENHANCEMENT_SUMMARY.md
+├── zsh-config/ (ZSH 配置相关文档)
+│   ├── README.md (ZSH 模块导航)
+│   ├── ZSH_CONFIG_ANALYSIS.md
+│   ├── ZSH_CONFIG_TEMPLATE.md
+│   ├── TROUBLESHOOTING_DEBUG_GUIDE.md
+│   └── PERFORMANCE_OPTIMIZATION_GUIDE.md
+└── (可继续添加其他模块)
 ```
 
 ---
 
-## 🎨 配置详解
+## 💡 文档使用建议
 
-### 🧩 **插件架构**
-
-项目使用 Antigen 作为插件管理器，包含以下核心插件：
-
-| 插件 | 功能 | 重要性 |
-|------|------|--------|
-| `git` | Git 命令增强 | ⭐⭐⭐⭐⭐ |
-| `zsh-syntax-highlighting` | 语法高亮 | ⭐⭐⭐⭐⭐ |
-| `zsh-completions` | 命令补全增强 | ⭐⭐⭐⭐ |
-| `zsh-auto-notify` | 长时间命令通知 | ⭐⭐⭐ |
-
-### 🎯 **主题配置**
-
-默认使用 `robbyrussell` 主题：
-- **简洁设计**: 绿色箭头提示符 `➜`
-- **Git 集成**: 自动显示分支和状态
-- **路径优化**: 智能路径显示
-- **状态编码**: 命令执行状态颜色显示
-
-### 🛠️ **开发工具集成**
-
-#### FZF 模糊搜索
-```bash
-# 配置
-export FZF_DEFAULT_COMMAND='fdfind --hidden --follow'
-export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --border'
-
-# 使用示例
-fzf                    # 文件搜索
-vim $(fzf)            # 编辑选择的文件
-cd $(find * -type d | fzf)  # 目录跳转
-```
-
-#### 搜索增强
-```bash
-hg "pattern" dir       # 递归搜索，区分大小写
-hig "pattern" dir      # 递归搜索，忽略大小写
-hrg "pattern" dir      # 使用 ripgrep 搜索
-```
-
-#### 网络代理
-```bash
-proxy                 # 启用代理
-unproxy              # 禁用代理
-```
-
-### 🔧 **自定义函数**
-
-#### 环境检测
-```bash
-check_environment
-# 输出:
-# 🐳 当前在 Docker 容器环境中
-#    容器名: icrane2-dev
-#    用户: hao
-```
-
-#### 安全重载
-```bash
-reload_zsh
-# 输出:
-# 🔄 重新加载 zsh 配置...
-# ✅ zsh 配置加载完成
-# 🎨 当前主题: robbyrussell 风格
-```
+1. **首次使用**: 从相应模块的 README.md 开始
+2. **快速查阅**: 使用快速参考文档
+3. **深度学习**: 阅读优化说明和分析文档
+4. **问题解决**: 参考故障排除指南
+5. **性能优化**: 查看性能优化指南
 
 ---
 
-## 📊 性能优化
-
-### ⚡ **启动时间优化**
-
-当前配置的性能基准：
-- **冷启动时间**: ~1.2s
-- **热启动时间**: ~0.8s
-- **内存占用**: ~35MB
-- **插件数量**: 8个
-
-### 🚀 **优化策略**
-
-1. **插件延迟加载**: 按需加载重型插件
-2. **条件加载**: 根据环境选择性加载插件
-3. **缓存管理**: 定期清理插件缓存
-4. **性能监控**: 定期测试启动时间
-
-### 🔍 **性能测试**
-
-```bash
-# 运行性能基准测试
-./scripts/zsh_tools.sh benchmark
-
-# 输出示例:
-# 冷启动时间: 0m1.234s
-# 热启动时间: 0m0.876s
-# ZSH 内存使用: 35420KB
-# 启动速度: 良好 (1.0-2.0s)
-```
-
----
-
-## 🐳 Docker 支持
-
-### 📦 **Docker 环境配置**
-
-项目支持在 Docker 容器中使用：
-
-```bash
-# 启动开发环境
-./icrane2-dev.sh
-
-# 检查容器环境
-check_environment
-```
-
-### 🔧 **容器特性**
-
-- **环境感知**: 自动检测 Docker 环境
-- **GPU 支持**: NVIDIA GPU 支持
-- **X11 转发**: 图形界面应用支持
-- **SSH 访问**: 端口 2222 SSH 访问
-
----
-
-## 🔧 环境适配
-
-### 💻 **操作系统支持**
-
-| 系统 | 支持状态 | 安装方式 |
-|------|---------|---------|
-| Ubuntu | ✅ 完全支持 | apt-get |
-| Debian | ✅ 完全支持 | apt-get |
-| Fedora | ✅ 完全支持 | dnf |
-| Arch Linux | ✅ 完全支持 | pacman |
-| macOS | ✅ 完全支持 | brew |
-
-### 🎯 **环境配置**
-
-#### 开发环境
-```bash
-# 完整功能配置
-antigen bundle git
-antigen bundle docker
-antigen bundle npm
-antigen bundle zsh-users/zsh-autosuggestions
-```
-
-#### 服务器环境
-```bash
-# 轻量级配置
-antigen bundle git
-antigen bundle zsh-users/zsh-syntax-highlighting
-```
-
-#### Docker 环境
-```bash
-# 容器优化配置
-if [[ -f "/.dockerenv" ]]; then
-    AUTO_NOTIFY_IGNORE_EXCLUDES="all"
-    antigen theme minimal
-fi
-```
-
----
-
-## 🔍 故障排除
-
-### ❌ **常见问题**
-
-#### 主题不显示
-```bash
-# 解决方案
-antigen theme robbyrussell
-antigen apply
-exec zsh
-```
-
-#### 插件加载失败
-```bash
-# 检查插件状态
-./scripts/zsh_tools.sh doctor
-
-# 重新安装插件
-./scripts/zsh_tools.sh clean
-./scripts/zsh_tools.sh update
-```
-
-#### 启动速度慢
-```bash
-# 性能测试
-./scripts/zsh_tools.sh benchmark
-
-# 清理缓存
-./scripts/zsh_tools.sh clean
-```
-
-### 🔧 **调试模式**
-
-```bash
-# 启用详细输出
-zsh -x
-
-# 语法检查
-zsh -n ~/.zshrc
-
-# 查看加载顺序
-zsh -i -c 'echo $fpath'
-```
-
----
-
-## 📚 文档资源
-
-### 📖 **详细文档**
-
-- **[配置分析报告](ZSH_CONFIG_ANALYSIS.md)**: 详细的配置架构分析
-- **[配置模板指南](ZSH_CONFIG_TEMPLATE.md)**: 完整的配置模板和使用说明
-
-### 🔗 **外部资源**
-
-- [Antigen 官方文档](https://github.com/zsh-users/antigen)
-- [Oh My Zsh 插件库](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins)
-- [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
-
----
-
-## 🤝 贡献指南
-
-### 📝 **贡献方式**
-
-1. **Fork 项目** 创建分支进行开发
-2. **提交 PR** 包含清晰的更改说明
-3. **文档更新** 同步更新相关文档
-4. **测试验证** 确保功能正常工作
-
-### 🐛 **问题反馈**
-
-- 使用 GitHub Issues 报告问题
-- 提供详细的错误信息和环境信息
-- 包含复现步骤和预期结果
-
----
-
-## 📄 许可证
-
-本项目采用 MIT 许可证，详见 [LICENSE](LICENSE) 文件。
-
----
-
-## 🔄 版本历史
-
-### v1.0 (2025-10-14)
-- ✨ 初始版本发布
-- ✅ 完整的 ZSH 配置管理功能
-- ✅ 自动化安装和配置工具
-- ✅ Docker 环境支持
-- ✅ 性能优化和监控工具
-- ✅ 详细的文档和使用指南
-
----
-
-## 📞 联系方式
-
-如有问题或建议，请通过以下方式联系：
-
-- **GitHub Issues**: 项目问题反馈
-- **邮箱**: [联系邮箱]
-- **文档**: 查看项目文档获取更多信息
-
----
-
-**⭐ 如果这个项目对你有帮助，请给个 Star！**
+**最后更新**: 2025-10-17
+**文档版本**: 2.1
+**维护者**: Development Team

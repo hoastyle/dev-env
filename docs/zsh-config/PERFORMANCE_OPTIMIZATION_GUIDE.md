@@ -752,8 +752,8 @@ git commit -m "Update ZSH configuration"
 
 ### 内部文档
 - [项目主文档](../README.md)
-- [模块配置文档](../CLAUDE.md)
-- [函数模块文档](../zsh-functions/README.md)
+- [模块配置文档](../../CLAUDE.md)
+- [函数模块文档](../../zsh-functions/README.md)
 - [调试指南](TROUBLESHOOTING_DEBUG_GUIDE.md)
 
 ### 外部资源
