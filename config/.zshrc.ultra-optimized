@@ -5,6 +5,11 @@
 # Maintainer: dev-env project
 # ===============================================
 
+# Enable Powerlevel10k instant prompt (only in normal mode)
+if [[ "$FAST_MODE" != "true" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # Collapse nested launcher shells by exiting the previous instance when reopened.
 if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
     trap 'builtin exit' USR1
@@ -44,7 +49,7 @@ if [[ "$FAST_MODE" != "true" ]]; then
     antigen bundle git
 
     # Apply settings
-    antigen theme robbyrussell
+    antigen theme romkatv/powerlevel10k
     antigen apply
 else
     # Fast mode - minimal setup
@@ -170,6 +175,15 @@ zsh_benchmark() {
     local duration=$(echo "$end_time - $start_time" | bc -l)
     echo "ZSH startup time: ${duration}s"
 }
+
+# ===============================================
+# Powerlevel10k Configuration
+# ===============================================
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+if [[ "$FAST_MODE" != "true" ]]; then
+    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+fi
 
 # ===============================================
 # Configuration Complete

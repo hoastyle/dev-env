@@ -5,6 +5,13 @@
 # Maintainer: dev-env project
 # ===============================================
 
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # Collapse nested launcher shells by exiting the previous instance when reopened.
 if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
     trap 'builtin exit' USR1
@@ -36,7 +43,7 @@ antigen bundle zpm-zsh/undollar
 antigen bundle mafredri/zsh-async
 
 # Theme Configuration
-antigen theme robbyrussell
+antigen theme romkatv/powerlevel10k
 
 # Apply Antigen Settings
 antigen apply
@@ -47,7 +54,7 @@ sleep 0.5
 # Fallback theme loading
 if [[ -z "$PROMPT" ]]; then
     echo "🎨 重新加载 Antigen 主题..."
-    antigen theme robbyrussell
+    antigen theme romkatv/powerlevel10k
     antigen apply
 fi
 
@@ -144,6 +151,13 @@ export GOOGLE_CLOUD_PROJECT="gen-lang-client-0165913056"
 
 # ZSH Completion
 autoload -U compinit && compinit -u
+
+# ===============================================
+# Powerlevel10k Configuration
+# ===============================================
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ===============================================
 # Configuration Complete

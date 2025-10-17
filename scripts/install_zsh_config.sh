@@ -108,6 +108,12 @@ backup_existing_config() {
         log_info "已备份 .zshrc"
     fi
 
+    # 备份 .p10k.zsh
+    if [[ -f "$HOME/.p10k.zsh" ]]; then
+        cp "$HOME/.p10k.zsh" "$backup_dir/"
+        log_info "已备份 .p10k.zsh"
+    fi
+
     # 备份 .antigen.zsh
     if [[ -f "$HOME/.antigen.zsh" ]]; then
         cp "$HOME/.antigen.zsh" "$backup_dir/"
@@ -235,6 +241,14 @@ install_config_files() {
         log_warn "未找到 .zshrc 模板文件"
     fi
 
+    # 复制 Powerlevel10k 配置文件
+    if [[ -f "$project_dir/config/.p10k.zsh" ]]; then
+        cp "$project_dir/config/.p10k.zsh" "$HOME/.p10k.zsh"
+        log_success "已安装 Powerlevel10k 配置文件 (.p10k.zsh)"
+    else
+        log_warn "未找到 .p10k.zsh 模板文件"
+    fi
+
     # 创建自定义函数目录
     mkdir -p "$HOME/.zsh/functions"
 
@@ -342,7 +356,8 @@ show_completion_info() {
     echo "📋 安装摘要:"
     echo "  • 配置文件: ~/.zshrc"
     echo "  • 插件管理: Antigen"
-    echo "  • 主题: robbyrussell"
+    echo "  • 主题: Powerlevel10k"
+    echo "  • 主题配置: ~/.p10k.zsh"
     echo "  • 开发工具: FZF, fd, ripgrep"
     echo ""
     echo "📚 立即可用的命令:"
@@ -358,6 +373,12 @@ show_completion_info() {
     echo "🚀 可选步骤:"
     echo "  • 运行 'exec zsh' 以完整加载新的 ZSH 环境"
     echo "  • 此时新函数已在当前 Shell 中可用！"
+    echo "  • 运行 'p10k configure' 重新配置 Powerlevel10k 主题"
+    echo ""
+    echo "💡 Powerlevel10k 提示:"
+    echo "  • 首次加载会自动安装 Powerlevel10k 主题"
+    echo "  • 推荐安装 Nerd Font 字体以获得最佳显示效果"
+    echo "  • 可随时运行 'p10k configure' 更改主题样式"
     echo ""
     echo "🔄 卸载方法:"
     echo "  • 恢复备份: cat ~/.zsh_backup_dir"

@@ -5,6 +5,11 @@
 # Maintainer: dev-env project
 # ===============================================
 
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # Collapse nested launcher shells by exiting the previous instance when reopened.
 if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
     trap 'builtin exit' USR1
@@ -31,7 +36,7 @@ antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 
 # Theme Configuration
-antigen theme robbyrussell
+antigen theme romkatv/powerlevel10k
 
 # Apply Antigen Settings
 antigen apply
@@ -126,6 +131,13 @@ autoload -U compinit && compinit -u
 zsh_add_file() {
     [ -f "$1" ] && source "$1"
 }
+
+# ===============================================
+# Powerlevel10k Configuration
+# ===============================================
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ===============================================
 # Configuration Complete
