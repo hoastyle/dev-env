@@ -6,14 +6,13 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Note: In tmux, filter "bad tcgets" error which is cosmetic
+# Note: Use quiet mode in tmux to suppress warnings about console output
+if [[ -n "$TMUX" ]]; then
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+fi
+
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  if [[ -n "$TMUX" ]]; then
-    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" 2> >(grep -v "bad tcgets" >&2)
-  else
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-  fi
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # Collapse nested launcher shells by exiting the previous instance when reopened.
@@ -45,7 +44,8 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen theme romkatv/powerlevel10k
 
 # Apply Antigen Settings
-antigen apply
+# Note: Suppress output to prevent instant prompt warnings
+antigen apply &>/dev/null
 
 # ===============================================
 # Python Environment

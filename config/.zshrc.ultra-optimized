@@ -6,12 +6,13 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt (only in normal mode)
-# Note: In tmux, filter "bad tcgets" error which is cosmetic
-if [[ "$FAST_MODE" != "true" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+# Note: Use quiet mode in tmux to suppress warnings about console output
+if [[ "$FAST_MODE" != "true" ]]; then
   if [[ -n "$TMUX" ]]; then
     typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" 2> >(grep -v "bad tcgets" >&2)
-  else
+  fi
+
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
 fi
@@ -56,7 +57,8 @@ if [[ "$FAST_MODE" != "true" ]]; then
 
     # Apply settings
     antigen theme romkatv/powerlevel10k
-    antigen apply
+    # Note: Suppress output to prevent instant prompt warnings
+    antigen apply &>/dev/null
 else
     # Fast mode - minimal setup
    autoload -U colors && colors
@@ -133,7 +135,7 @@ enable_completion() {
             antigen bundle zsh-users/zsh-completions
             antigen bundle zsh-users/zsh-autosuggestions
             antigen bundle zsh-users/zsh-syntax-highlighting
-            antigen apply
+            antigen apply &>/dev/null
         fi
         echo "✅ Completion system enabled"
     fi
