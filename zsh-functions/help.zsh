@@ -51,25 +51,41 @@ init_help_database() {
     COMMAND_CATEGORIES[unproxy]="实用工具"
     COMMAND_CATEGORIES[check_proxy]="实用工具"
     COMMAND_CATEGORIES[proxy_status]="实用工具"
+    COMMAND_CATEGORIES[comp-enable]="实用工具"
+    COMMAND_CATEGORIES[autojump-lazy]="实用工具"
+    COMMAND_CATEGORIES[nvm-lazy]="实用工具"
+    COMMAND_CATEGORIES[conda-init]="实用工具"
     COMMAND_CATEGORIES[jdev]="实用工具"
 
     COMMAND_DESCRIPTIONS[proxy]="启用网络代理（支持自定义地址和验证）"
     COMMAND_DESCRIPTIONS[unproxy]="禁用网络代理"
     COMMAND_DESCRIPTIONS[check_proxy]="检查代理是否已启用"
     COMMAND_DESCRIPTIONS[proxy_status]="显示详细的代理状态和可用性"
-    COMMAND_DESCRIPTIONS[jdev]="快速跳转到开发目录（需要autojump）"
+    COMMAND_DESCRIPTIONS[comp-enable]="启用按需补全系统（fast/minimal 模式）"
+    COMMAND_DESCRIPTIONS[autojump-lazy]="加载 Autojump（minimal 模式先执行以恢复 j/jdev）"
+    COMMAND_DESCRIPTIONS[nvm-lazy]="按需加载 NVM 及补全（minimal 模式）"
+    COMMAND_DESCRIPTIONS[conda-init]="按需激活 Conda 基础环境（minimal 模式）"
+    COMMAND_DESCRIPTIONS[jdev]="快速跳转到开发目录（需要autojump；minimal 模式先执行 autojump-lazy）"
 
     COMMAND_USAGES[proxy]="proxy [host:port] [--verify]"
     COMMAND_USAGES[unproxy]="unproxy"
     COMMAND_USAGES[check_proxy]="check_proxy [--status|-s]"
     COMMAND_USAGES[proxy_status]="proxy_status"
+    COMMAND_USAGES[comp-enable]="comp-enable"
+    COMMAND_USAGES[autojump-lazy]="autojump-lazy"
+    COMMAND_USAGES[nvm-lazy]="nvm-lazy"
+    COMMAND_USAGES[conda-init]="conda-init"
     COMMAND_USAGES[jdev]="jdev [directory_name]"
 
     COMMAND_EXAMPLES[proxy]="proxy 127.0.0.1:7890 --verify"
     COMMAND_EXAMPLES[unproxy]="unproxy"
     COMMAND_EXAMPLES[check_proxy]="check_proxy --status"
     COMMAND_EXAMPLES[proxy_status]="proxy_status"
-    COMMAND_EXAMPLES[jdev]="jdev workspace"
+    COMMAND_EXAMPLES[comp-enable]="comp-enable"
+    COMMAND_EXAMPLES[autojump-lazy]="autojump-lazy && jdev workspace"
+    COMMAND_EXAMPLES[nvm-lazy]="nvm-lazy && node -v"
+    COMMAND_EXAMPLES[conda-init]="conda-init && conda info"
+    COMMAND_EXAMPLES[jdev]="autojump-lazy && jdev workspace"
 
     # 将所有命令添加到主数据库
     for cmd in "${(@k)COMMAND_CATEGORIES}"; do
@@ -161,14 +177,25 @@ show_help_overview() {
     echo "   hirg             - ripgrep搜索（忽略大小写）"
     echo ""
 
-    echo "🛠️  实用工具 ($util_count 个命令)"
+    local minimal_hint=""
+    if [[ "$ZSH_LAUNCHER_MODE" == "minimal" ]]; then
+        minimal_hint="（Minimal 模式按需启用功能）"
+    fi
+
+    echo "🛠️  实用工具 ($util_count 个命令) $minimal_hint"
     echo "   proxy            - 启用网络代理"
     echo "   unproxy          - 禁用网络代理"
     echo "   check_proxy      - 检查代理状态"
     echo "   proxy_status     - 显示代理详细信息"
-    if command -v autojump &> /dev/null; then
-        echo "   jdev             - 快速目录跳转"
+    echo "   comp-enable      - 启用按需补全系统"
+    echo "   autojump-lazy    - 加载 Autojump 并恢复 j/jdev"
+    echo "   nvm-lazy         - 加载 NVM 及补全"
+    echo "   conda-init       - 启动 Conda 基础环境"
+    local autojump_note=""
+    if ! command -v autojump &> /dev/null; then
+        autojump_note="（当前未检测到 autojump，可先运行 autojump-lazy）"
     fi
+    echo "   jdev             - 快速目录跳转${autojump_note}"
     echo ""
 
     echo "💡 使用方法:"

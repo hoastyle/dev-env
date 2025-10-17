@@ -312,6 +312,19 @@ dev-env             # 加载开发环境
 restore-zsh         # 恢复原始配置
 ```
 
+**功能可用性速查表 (Minimal Mode Feature Matrix)**
+
+| 功能/命令 Feature | 默认状态 Default | 启用步骤 Enable Step |
+|-------------------|------------------|----------------------|
+| Tab 补全 / Completion | ❌ 未启用 | 运行 `comp-enable` （调用 `enable_completion`） |
+| Autojump (`j`/`jdev`) | ❌ 未加载 | 运行 `autojump-lazy` 后即可使用 |
+| Conda 环境 | ❌ 未激活 | 运行 `conda-init` 激活基础环境 |
+| NVM / Node 版本管理 | ❌ 未加载 | 运行 `nvm-lazy` 加载 NVM 及补全 |
+| 自定义函数目录 (`~/.zsh/functions`) | ✅ 默认加载 | 无需操作 |
+| 代理工具 (`proxy`/`unproxy`) | ✅ 可用 | 无需操作 |
+
+> 💡 提示：Minimal 模式会跳过耗时初始化，以保持 2ms 启动速度。按需执行上表中的命令即可逐项恢复功能。
+
 #### 2. 快速模式 (Fast Mode)
 
 **特点**:
