@@ -13,6 +13,8 @@ CYAN='\033[0;36m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 # 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -87,6 +89,36 @@ analyze_performance() {
         log_warn "详细性能分析失败，运行基础测试"
         ./zsh_tools.sh benchmark
     fi
+
+    log_info "运行 zprof 启动剖析..."
+    local profiler_tmp_dir="$(mktemp -d 2>/dev/null || mktemp -d -t zprof)"
+    local profiler_cache_dir="$PROJECT_ROOT/.cache"
+    mkdir -p "$profiler_cache_dir"
+    local profiler_log="$profiler_cache_dir/zprof-$(date +%Y%m%d-%H%M%S).log"
+
+    cat > "$profiler_tmp_dir/.zshrc" <<'EOF'
+zmodload zsh/zprof 2>/dev/null
+export ZSH_PROFILING=1
+setopt prompt_subst
+builtin source "$HOME/.zshrc"
+zprof
+EOF
+
+    if ZDOTDIR="$profiler_tmp_dir" zsh -ic "exit" >"$profiler_log" 2>&1; then
+        local top_entries
+        top_entries=$(grep -E '^\s*[0-9]+\)' "$profiler_log" | head -n 5)
+        if [[ -n "$top_entries" ]]; then
+            log_info "zprof 耗时 Top 5:"
+            echo "$top_entries" | sed 's/^/    /'
+        else
+            log_warn "未能从 zprof 输出中解析耗时信息，请查看日志: $profiler_log"
+        fi
+        log_success "zprof 分析结果已保存: $profiler_log"
+    else
+        log_warn "zprof 分析执行失败，详细日志: $profiler_log"
+    fi
+
+    rm -rf "$profiler_tmp_dir"
 
     # 检查插件数量
     log_info "统计插件加载情况..."
