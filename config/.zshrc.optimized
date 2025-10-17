@@ -6,13 +6,14 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Note: Use quiet mode in tmux to suppress "bad tcgets" warnings
-if [[ -n "$TMUX" ]]; then
-  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
-fi
-
+# Note: In tmux, filter "bad tcgets" error which is cosmetic
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  if [[ -n "$TMUX" ]]; then
+    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" 2> >(grep -v "bad tcgets" >&2)
+  else
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  fi
 fi
 
 # Collapse nested launcher shells by exiting the previous instance when reopened.

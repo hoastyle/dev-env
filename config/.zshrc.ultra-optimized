@@ -6,13 +6,12 @@
 # ===============================================
 
 # Enable Powerlevel10k instant prompt (only in normal mode)
-# Note: Use quiet mode in tmux to suppress "bad tcgets" warnings
-if [[ "$FAST_MODE" != "true" ]]; then
+# Note: In tmux, filter "bad tcgets" error which is cosmetic
+if [[ "$FAST_MODE" != "true" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   if [[ -n "$TMUX" ]]; then
     typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
-  fi
-
-  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" 2> >(grep -v "bad tcgets" >&2)
+  else
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
   fi
 fi
