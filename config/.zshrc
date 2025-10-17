@@ -25,6 +25,7 @@ antigen use oh-my-zsh
 # Core Plugins
 antigen bundle git
 antigen bundle zsh-users/zsh-completions
+antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle srijanshetty/zsh-pip-completion
 antigen bundle MichaelAquilina/zsh-auto-notify
