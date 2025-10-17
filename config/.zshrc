@@ -9,9 +9,14 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 #
-# Note: Disable instant prompt in tmux to avoid "bad tcgets" I/O errors
-# Instant prompt has issues with terminal state detection in tmux
-if [[ -z "$TMUX" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+# Note: Use quiet mode in tmux to suppress "bad tcgets" warnings
+# The warnings are cosmetic and don't affect functionality
+if [[ -n "$TMUX" ]]; then
+  # In tmux: use quiet mode to suppress instant prompt warnings
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+fi
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 

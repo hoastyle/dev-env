@@ -5,10 +5,16 @@
 # Maintainer: dev-env project
 # ===============================================
 
-# Enable Powerlevel10k instant prompt (only in normal mode, not in tmux)
-# Note: Disable instant prompt in tmux to avoid "bad tcgets" I/O errors
-if [[ "$FAST_MODE" != "true" && -z "$TMUX" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# Enable Powerlevel10k instant prompt (only in normal mode)
+# Note: Use quiet mode in tmux to suppress "bad tcgets" warnings
+if [[ "$FAST_MODE" != "true" ]]; then
+  if [[ -n "$TMUX" ]]; then
+    typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  fi
+
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  fi
 fi
 
 # Collapse nested launcher shells by exiting the previous instance when reopened.
