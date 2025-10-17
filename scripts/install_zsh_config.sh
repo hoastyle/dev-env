@@ -319,6 +319,21 @@ verify_installation() {
     log_success "安装验证通过"
 }
 
+# 加载已安装的函数到当前 Shell
+load_functions_to_current_shell() {
+    log_step "加载函数到当前 Shell..."
+
+    if [[ -d "$HOME/.zsh/functions" ]]; then
+        for function_file in "$HOME/.zsh/functions"/*.zsh; do
+            if [[ -f "$function_file" ]]; then
+                # 使用 source 而不是 . 以确保兼容性
+                source "$function_file" 2>/dev/null || true
+            fi
+        done
+        log_success "函数已加载到当前 Shell"
+    fi
+}
+
 # 显示完成信息
 show_completion_info() {
     echo ""
@@ -330,19 +345,22 @@ show_completion_info() {
     echo "  • 主题: robbyrussell"
     echo "  • 开发工具: FZF, fd, ripgrep"
     echo ""
-    echo "🚀 下一步操作:"
-    echo "  1. 运行 'exec zsh' 启动新的 ZSH 环境"
-    echo "  2. 使用 'check_environment' 检查环境"
-    echo "  3. 使用 'reload_zsh' 重新加载配置"
+    echo "📚 立即可用的命令:"
+    echo "  • check_proxy - 检查代理状态"
+    echo "  • proxy_status - 显示详细代理信息"
+    echo "  • proxy [address] - 启用代理"
+    echo "  • unproxy - 禁用代理"
+    echo "  • check_environment - 检查系统环境"
+    echo "  • reload_zsh - 重新加载配置"
+    echo "  • hg 'pattern' - 搜索文件内容"
+    echo "  • zsh_help - 显示帮助信息"
     echo ""
-    echo "📚 常用命令:"
-    echo "  • check_environment - 检查当前环境"
-    echo "  • reload_zsh - 重新加载 ZSH 配置"
-    echo "  • hg 'pattern' dir - 递归搜索文件内容"
-    echo "  • fzf - 模糊文件搜索"
+    echo "🚀 可选步骤:"
+    echo "  • 运行 'exec zsh' 以完整加载新的 ZSH 环境"
+    echo "  • 此时新函数已在当前 Shell 中可用！"
     echo ""
     echo "🔄 卸载方法:"
-    echo "  • 恢复备份: 查看备份目录 cat ~/.zsh_backup_dir"
+    echo "  • 恢复备份: cat ~/.zsh_backup_dir"
     echo "  • 重置配置: rm ~/.zshrc ~/.antigen.zsh"
     echo ""
 }
@@ -363,6 +381,7 @@ main() {
     setup_fzf
     set_default_shell
     verify_installation
+    load_functions_to_current_shell
     show_completion_info
 }
 
