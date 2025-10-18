@@ -353,8 +353,14 @@ clean_cache() {
 
     # 清理 ZSH 缓存
     log_info "清理 ZSH 缓存..."
-    rm -f "$HOME/.zcompdump*" 2>/dev/null || true
-    log_success "已清理 ZSH 补全缓存"
+    rm -f "$HOME/.zcompdump"* 2>/dev/null || true
+
+    local comp_cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/dev-env"
+    if [[ -d "$comp_cache_root" ]]; then
+        rm -f "$comp_cache_root"/zcompdump-* 2>/dev/null || true
+    fi
+
+    log_success "已清理 ZSH 补全缓存 (含 ${comp_cache_root#${HOME}/})"
 
     # 清理 FZF 缓存
     if [[ -f "$HOME/.fzf.zsh" ]]; then

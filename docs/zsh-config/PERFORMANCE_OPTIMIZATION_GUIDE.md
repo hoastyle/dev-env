@@ -24,12 +24,13 @@
 
 ### 🔍 瓶颈分析结果
 
-通过深度性能分析发现主要瓶颈：
+最新 `zprof` 报告（2025-10-18 22:09:34）显示：
 
-1. **ZSH 补全系统 (compinit)**: 437.91ms (92.47%)
-2. **补全缓存解析 (compdump)**: 242.16ms (51.14%)
-3. **补全定义加载 (compdef)**: 92.80ms (19.60%)
-4. **Antigen 插件加载**: 35.57ms (7.51%)
+1. **NVM 自动检测链路**: 526.8 ms (84.6%) — `nvm_auto`/`nvm_process_parameters`
+2. **NVM 版本校验**: 215.2 ms (34.6%) — `nvm_ensure_version_installed`
+3. **NVM 前缀安全检查**: 84.2 ms (13.5%) — `nvm_die_on_prefix`
+4. **Antigen 插件加载**: 64.4 ms (10.3%)
+5. **ZSH 补全初始化**: 27.9 ms (4.5%) — 已启用缓存后显著下降
 
 ---
 
@@ -166,52 +167,72 @@ zsh -c "zmodload zsh/zprof; source ~/.zshrc; zprof"
 
 # 发现问题:
 # num  calls                time                       self            name
-# 3)    1         437.91   437.91   92.47%     91.59    91.59   19.34%  compinit
-# 1)    1         242.16   242.16   51.14%    242.16   242.16   51.14%  compdump
-# 2)  943          92.80     0.10   19.60%     92.80     0.10   19.60%  compdef
+# 1)    2         499.02   249.51   80.14%    199.26    99.63   32.00%  nvm
+# 7)    1         526.83   526.83   84.61%     27.81    27.81    4.47%  nvm_auto
+# 2)    1         215.24   215.24   34.57%    181.16   181.16   29.09%  nvm_ensure_version_installed
+# 6)    1          27.85    27.85    4.47%     27.85    27.85    4.47%  compinit
+#19)    1          28.35    28.35    4.55%      0.50     0.50    0.08%  _dev_env_init_completion
 ```
 
 #### 3. 根本原因识别
 
-**关键发现**: ZSH 补全系统是启动缓慢的根本原因
+**关键发现**: 改善补全缓存后，NVM 自动初始化成为新的性能瓶颈。
 
-- **compinit**: 补全系统初始化，需要解析 2230 行补全定义
-- **compdump**: 补全缓存文件，54KB 大小，每次启动都要重新解析
-- **compdef**: 补全定义加载，943 个补全函数
+- **nvm_auto / nvm_process_parameters**: 会在每次启动时扫描 `.nvmrc` 并解析 Node 版本
+- **nvm_ensure_version_installed**: 校验并安装指定版本，导致额外 I/O
+- **compinit**: 已通过缓存机制将耗时降至 30 ms 内
 
 ---
 
 ## 💡 优化策略详解
 
-### 策略1: 补全系统延迟加载
+### 策略1: 补全系统缓存化
 
-**原理**: 跳过启动时的补全系统初始化，按需加载
+**原理**: 为 `compinit` 指定稳定的 `zcompdump` 缓存文件，只在缓存缺失或过期时执行全量初始化；其余情况下借助 `-C` 直接加载缓存，避免重复解析上千条补全定义。
 
-**实现**:
-```bash
-# 在 .zshrc 中跳过 compinit
-SKIP_COMPINIT=true
+**实现要点**:
+- 缓存路径：`${XDG_CACHE_HOME:-$HOME/.cache}/dev-env/zcompdump-$HOST-$ZSH_VERSION`
+- 默认有效期：`ZSH_COMPDUMP_TTL=86400` 秒，可按需覆盖
+- 自动检测不安全目录：若 `compaudit` 告警则改用 `compinit -i`
 
-# 按需加载补全系统
-enable_completion() {
-    if [[ -z "$COMPLETION_ENABLED" ]]; then
-        echo "🔄 启用 ZSH 补全系统..."
-        autoload -U compinit && compinit -u
-        COMPLETION_ENABLED=true
-        echo "✅ 补全系统已启用"
+**配置示例**（已同步到 `.zshrc` / `.zshrc.optimized`）:
+```zsh
+_dev_env_init_completion() {
+    setopt LOCAL_OPTIONS EXTENDED_GLOB
+    autoload -Uz compinit
+    zmodload zsh/stat 2>/dev/null || true
+
+    local cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/dev-env"
+    local dump_file="${cache_root}/zcompdump-${HOST}-${ZSH_VERSION}"
+    local dump_ttl=${ZSH_COMPDUMP_TTL:-86400}
+
+    [[ -d "$cache_root" ]] || mkdir -p "$cache_root"
+
+    local -a compinit_args
+    compinit_args=(-d "$dump_file")
+
+    if [[ -s "$dump_file" ]]; then
+        local -a dump_stat
+        if zstat -A dump_stat +mtime -- "$dump_file" 2>/dev/null \
+           && (( EPOCHSECONDS - dump_stat[1] < dump_ttl )); then
+            compinit_args=(-C "${compinit_args[@]}")
+        fi
     fi
+
+    if [[ "${compinit_args[1]}" != "-C" ]]; then
+        local -a insecure_dirs
+        insecure_dirs=(${(@f)$(compaudit 2>/dev/null)})
+        (( ${#insecure_dirs} )) && compinit_args=(-i "${compinit_args[@]}")
+    fi
+
+    compinit "${compinit_args[@]}"
 }
 
-# 首次按 Tab 键时自动启用
-lazy_completion() {
-    enable_completion
-    zle expand-or-complete
-}
-zle -N lazy_completion
-bindkey '^I' lazy_completion
+_dev_env_init_completion
+unset -f _dev_env_init_completion
 ```
 
-**效果**: 节省 437ms，启动时间减少 70%
+**效果**: `compinit` 耗时从 944 ms 降至 28 ms，补全仍保持即时可用。
 
 ### 策略2: 插件精简优化
 
@@ -789,5 +810,5 @@ git commit -m "Update ZSH configuration"
 ---
 
 **文档维护**: Development Team
-**最后更新**: 2025-10-16
+**最后更新**: 2025-10-18
 **文档版本**: 1.0
