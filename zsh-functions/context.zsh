@@ -25,29 +25,27 @@ _is_using_proxy() {
 }
 
 # 生成环境指示符字符串（显示所有环境状态）
-# 返回值格式: "🖥️ 物理 🏠 本地 ✗ 无代理" （常态显示所有信息）
+# 返回值格式: "🖥️ 物理 🌐 SSH 🔐" （常态显示所有信息）
 _get_env_indicators() {
     local indicators=""
 
     # 容器状态
     if _is_in_container; then
-        indicators+="🐳 Docker"
+        indicators+="🐳"
     else
-        indicators+="🖥️ 物理"
+        indicators+="🖥️"
     fi
 
     # 连接方式
     if _is_in_ssh; then
-        indicators+=" 🌐 SSH"
+        indicators+=" 🌐"
     else
-        indicators+=" 🏠 本地"
+        indicators+=" 🏠"
     fi
 
     # 代理状态
     if _is_using_proxy; then
-        indicators+=" ✓ 代理"
-    else
-        indicators+=" ✗ 无代理"
+        indicators+=" 🔐"
     fi
 
     echo "$indicators"

@@ -198,21 +198,34 @@ unset -f _dev_env_init_completion
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ===============================================
-# Environment Context Indicators in First Line of Prompt
+# Environment Context Indicators in RPROMPT
 # ===============================================
-# Display environment indicators in first line before the prompt
-# Shows container, SSH, and proxy status
+# Display environment indicators on the right side of the prompt
+# Shows container, SSH, and proxy status as icons only (🖥️ 🌐 🔐)
 
-# Display environment indicators before prompt
-_display_env_indicators_precmd() {
-    local env_indicators=$(_get_env_indicators)
-    # Display in cyan color with brackets
-    # Use -P flag to parse ZSH format codes (colors, etc)
-    print -P "%F{cyan}[${env_indicators}]%f"
+# Store original RPROMPT for restoration
+_save_original_rprompt() {
+    if [[ -z "$RPROMPT_ORIGINAL" ]]; then
+        export RPROMPT_ORIGINAL="$RPROMPT"
+    fi
 }
 
-# Register the precmd hook
-precmd_functions+=(_display_env_indicators_precmd)
+# Update RPROMPT with environment indicators
+_update_env_indicators_rprompt() {
+    local env_indicators=$(_get_env_indicators)
+
+    if [[ -n "$env_indicators" ]]; then
+        # Prepend environment indicators to RPROMPT on the right side
+        export RPROMPT="${env_indicators} ${RPROMPT_ORIGINAL}"
+    else
+        # Restore original RPROMPT when no indicators
+        export RPROMPT="${RPROMPT_ORIGINAL}"
+    fi
+}
+
+# Initialize RPROMPT update
+_save_original_rprompt
+precmd_functions+=(_update_env_indicators_rprompt)
 
 # ===============================================
 # Configuration Complete
