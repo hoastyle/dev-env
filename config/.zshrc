@@ -204,15 +204,11 @@ unset -f _dev_env_init_completion
 # Shows container, SSH, and proxy status
 
 # Display environment indicators before prompt
-_display_env_indicators() {
+_display_env_indicators_precmd() {
     local env_indicators=$(_get_env_indicators)
     # Display in cyan color with brackets
-    print "%F{cyan}[${env_indicators}]%f"
-}
-
-# Hook to display indicators before each prompt
-_display_env_indicators_precmd() {
-    _display_env_indicators
+    # Use -P flag to parse ZSH format codes (colors, etc)
+    print -P "%F{cyan}[${env_indicators}]%f"
 }
 
 # Register the precmd hook
