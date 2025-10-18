@@ -51,11 +51,16 @@ _get_env_indicators() {
     echo "$indicators"
 }
 
-# 为 LPROMPT 生成环境指示符段（在提示符第一行显示）
-_get_env_indicators_prompt_segment() {
-    local indicators=$(_get_env_indicators)
-    # 添加颜色和间距
-    echo "%F{cyan}[${indicators}]%f "
+# Powerlevel10k 兼容的自定义段函数
+# 用于显示环境指示符在第一行右侧
+prompt_env_indicators() {
+    local env_indicators=$(_get_env_indicators)
+
+    # 只在有指示符时显示
+    if [[ -n "$env_indicators" ]]; then
+        # 直接返回指示符（由 p10k 处理格式）
+        echo "$env_indicators"
+    fi
 }
 
 # 查询命令：显示详细的环境状态

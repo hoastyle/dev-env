@@ -198,34 +198,15 @@ unset -f _dev_env_init_completion
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ===============================================
-# Environment Context Indicators in RPROMPT
+# Environment Context Indicators
 # ===============================================
-# Display environment indicators on the right side of the prompt
-# Shows container, SSH, and proxy status as icons only (🖥️ 🌐 🔐)
-
-# Store original RPROMPT for restoration
-_save_original_rprompt() {
-    if [[ -z "$RPROMPT_ORIGINAL" ]]; then
-        export RPROMPT_ORIGINAL="$RPROMPT"
-    fi
-}
-
-# Update RPROMPT with environment indicators
-_update_env_indicators_rprompt() {
-    local env_indicators=$(_get_env_indicators)
-
-    if [[ -n "$env_indicators" ]]; then
-        # Prepend environment indicators to RPROMPT on the right side
-        export RPROMPT="${env_indicators} ${RPROMPT_ORIGINAL}"
-    else
-        # Restore original RPROMPT when no indicators
-        export RPROMPT="${RPROMPT_ORIGINAL}"
-    fi
-}
-
-# Initialize RPROMPT update
-_save_original_rprompt
-precmd_functions+=(_update_env_indicators_rprompt)
+# Environment indicators are loaded from ~/.zsh/functions/context.zsh
+# and integrated into Powerlevel10k via the prompt_env_indicators segment
+#
+# To enable: Run: ./scripts/setup-p10k-env-indicators.sh
+# Or manually edit ~/.p10k.zsh and add 'env_indicators' to RIGHT_PROMPT_ELEMENTS
+#
+# See: docs/P10K_ENV_INDICATORS_SETUP.md for detailed setup instructions
 
 # ===============================================
 # Configuration Complete
