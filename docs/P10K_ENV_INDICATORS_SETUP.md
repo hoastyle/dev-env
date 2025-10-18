@@ -2,30 +2,42 @@
 
 本指南说明如何在 Powerlevel10k 提示符中显示环境指示符（🖥️ 🌐 🔐）在第一行右侧。
 
+## ⚡ 重要更新
+
+**环境指示符现已自动集成到安装脚本中！**
+
+如果你使用 `install_zsh_config.sh` 安装配置，环境指示符会**自动配置**，无需额外操作。
+
 ## 前置要求
 
 - ✅ 已安装 Powerlevel10k 主题
 - ✅ 已运行 `p10k configure` 生成 `~/.p10k.zsh`
 - ✅ 已安装项目的 ZSH 配置
 
-## 方案 B：使用 Powerlevel10k 自定义段
+## 自动设置（推荐 - 已集成到安装脚本）
 
-这是推荐的方案，指示符会显示在第一行右侧，持续显示。
-
-### 自动设置（推荐）
-
-运行自动设置脚本：
+使用项目的安装脚本会自动配置环境指示符：
 
 ```bash
-chmod +x ./scripts/setup-p10k-env-indicators.sh
-./scripts/setup-p10k-env-indicators.sh
+# 标准安装（自动配置环境指示符）
+./scripts/install_zsh_config.sh
+
+# 或使用 NVM 优化版本（也自动配置环境指示符）
+./scripts/install_zsh_config.sh --with-optimization
 ```
 
-然后重新加载 ZSH：
+安装完成后重新加载 ZSH：
 
 ```bash
 exec zsh
 ```
+
+### 独立设置脚本（已弃用）
+
+> **注意**: `setup-p10k-env-indicators.sh` 脚本已被集成到 `install_zsh_config.sh` 中。
+> 建议使用主安装脚本进行完整配置。
+
+如果你需要单独配置环境指示符（不推荐），可以参考下面的手动设置步骤。
 
 ### 手动设置
 

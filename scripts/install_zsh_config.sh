@@ -325,6 +325,70 @@ install_config_files() {
             log_info "✓ 已安装 help.zsh (帮助系统)"
         fi
     fi
+
+    # 配置 Powerlevel10k 环境指示符
+    setup_p10k_env_indicators
+}
+
+# 配置 Powerlevel10k 环境指示符
+setup_p10k_env_indicators() {
+    log_step "配置 Powerlevel10k 环境指示符..."
+
+    # 检查 ~/.p10k.zsh 是否存在
+    if [[ ! -f "$HOME/.p10k.zsh" ]]; then
+        log_warn "~/.p10k.zsh 不存在，跳过环境指示符配置"
+        log_info "请在首次启动 ZSH 后运行 'p10k configure' 生成配置文件"
+        return 0
+    fi
+
+    # 备份 p10k 配置文件
+    cp "$HOME/.p10k.zsh" "$HOME/.p10k.zsh.backup-$(date +%Y%m%d-%H%M%S)"
+    log_info "已备份 ~/.p10k.zsh"
+
+    # 检查是否已经配置过
+    if grep -q "env_indicators" "$HOME/.p10k.zsh" 2>/dev/null; then
+        log_info "环境指示符已配置，跳过"
+        return 0
+    fi
+
+    # 1. 添加 env_indicators 到 RIGHT_PROMPT_ELEMENTS
+    sed -i '/typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(/a\    env_indicators' "$HOME/.p10k.zsh"
+    log_info "✓ 已将 env_indicators 添加到 RIGHT_PROMPT_ELEMENTS"
+
+    # 2. 添加 prompt_env_indicators 函数定义
+    # 找到配置函数结束的位置（最后一个单独的 } 行）
+    local line_num=$(grep -n "^}" "$HOME/.p10k.zsh" | tail -1 | cut -d: -f1)
+
+    # 创建临时文件存放函数定义
+    cat > /tmp/p10k_env_function.txt << 'FUNC_EOF'
+
+# ===============================================
+# Environment Indicators Custom Segment
+# ===============================================
+# Displays container status, SSH status, and proxy status
+# on the right side of the first line of the prompt
+
+function prompt_env_indicators() {
+  # Load environment detection functions from ~/.zsh/functions/context.zsh
+  if typeset -f _get_env_indicators &>/dev/null; then
+    local indicators=$(_get_env_indicators)
+    # Use p10k segment to display icons (no background, no foreground colors)
+    [[ -n "$indicators" ]] && p10k segment -t "$indicators"
+  fi
+}
+
+# Instant prompt support (ensures indicators appear in instant prompt)
+function instant_prompt_env_indicators() {
+  prompt_env_indicators
+}
+FUNC_EOF
+
+    # 插入函数到正确位置
+    sed -i "${line_num} r /tmp/p10k_env_function.txt" "$HOME/.p10k.zsh"
+    rm /tmp/p10k_env_function.txt
+
+    log_success "✓ 已配置 Powerlevel10k 环境指示符"
+    log_info "环境指示符将显示在提示符第一行右侧"
 }
 
 # 设置 FZF
@@ -453,6 +517,12 @@ show_completion_info() {
     echo "  • 首次加载会自动安装 Powerlevel10k 主题"
     echo "  • 推荐安装 Nerd Font 字体以获得最佳显示效果"
     echo "  • 可随时运行 'p10k configure' 更改主题样式"
+    echo "  • 环境指示符 (🖥️ 🌐 🔐) 已自动配置并显示在第一行右侧"
+    echo ""
+    echo "🎨 环境指示符说明:"
+    echo "  • 🖥️/🐳 - 物理主机/Docker 容器"
+    echo "  • 🏠/🌐 - 本地会话/SSH 会话"
+    echo "  • 🔐 - 代理已启用（仅在启用时显示）"
     echo ""
     echo "🔄 卸载方法:"
     echo "  • 恢复备份: cat ~/.zsh_backup_dir"

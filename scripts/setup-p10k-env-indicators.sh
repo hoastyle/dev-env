@@ -26,23 +26,43 @@ fi
 
 # Find the RIGHT_PROMPT_ELEMENTS line and add env_indicators
 # The segment should be near the beginning of RIGHT_PROMPT_ELEMENTS
-sed -i.bak2 '/typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(/,/)/s/(/(&\n    env_indicators/' "$HOME/.p10k.zsh"
+# Use a safer approach: insert after the opening line with proper formatting
+sed -i.bak2 '/typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(/a\    env_indicators' "$HOME/.p10k.zsh"
 
 # Also add the prompt_env_indicators function definition if not present
-if ! grep -q "prompt_env_indicators()" "$HOME/.p10k.zsh"; then
-    # Add the function at the end of the file, before the last line
-    cat >> "$HOME/.p10k.zsh" << 'EOF'
+if ! grep -q "function prompt_env_indicators()" "$HOME/.p10k.zsh"; then
+    # Find the line number where we should insert the function
+    # Insert after the closing brace of the main config function
+    line_num=$(grep -n "^}" "$HOME/.p10k.zsh" | tail -1 | cut -d: -f1)
 
-# Environment indicators segment (custom)
-prompt_env_indicators() {
-    # This function is called by Powerlevel10k to display env indicators
-    # It sources the function from ~/.zsh/functions/context.zsh
-    if typeset -f _get_env_indicators &>/dev/null; then
-        local indicators=$(_get_env_indicators)
-        [[ -n "$indicators" ]] && print -P "$indicators"
-    fi
+    # Create temporary file with the function
+    cat > /tmp/p10k_env_function.txt << 'FUNC_EOF'
+
+# ===============================================
+# Environment Indicators Custom Segment
+# ===============================================
+# Displays container status, SSH status, and proxy status
+# on the right side of the first line of the prompt
+
+function prompt_env_indicators() {
+  # Load environment detection functions from ~/.zsh/functions/context.zsh
+  if typeset -f _get_env_indicators &>/dev/null; then
+    local indicators=$(_get_env_indicators)
+    # Use p10k segment to display icons (no background, no foreground colors)
+    [[ -n "$indicators" ]] && p10k segment -t "$indicators"
+  fi
 }
-EOF
+
+# Instant prompt support (ensures indicators appear in instant prompt)
+function instant_prompt_env_indicators() {
+  prompt_env_indicators
+}
+FUNC_EOF
+
+    # Insert the function at the correct location
+    sed -i "${line_num} r /tmp/p10k_env_function.txt" "$HOME/.p10k.zsh"
+    rm /tmp/p10k_env_function.txt
+
     echo "✅ Added prompt_env_indicators function to ~/.p10k.zsh"
 fi
 
