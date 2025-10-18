@@ -2,18 +2,19 @@
 
 **项目版本**: 2.1
 **创建日期**: 2025-10-15
-**最后更新**: 2025-10-18
+**最后更新**: 2025-10-19
 **维护者**: Development Team
 
 ---
 
 ## 📋 项目概述
 
-本项目是一个完整的开发环境配置管理系统，主要专注于 ZSH Shell 环境的配置、管理和优化。提供了标准化的开发环境配置，支持多种开发工具、模块化函数管理、性能优化和多种启动模式。
+本项目是一个完整的开发环境配置管理系统，主要专注于 ZSH Shell 环境的配置、管理和优化。提供了标准化的开发环境配置，支持多种开发工具、模块化函数管理、环境指示符、性能优化和多种启动模式。
 
 ### 🎯 **主要特性**
 
 - ✅ **ZSH 配置管理**: 完整的 ZSH 配置文件和插件管理
+- ✅ **环境指示符**: 在提示符中显示容器、SSH、代理状态 (🖥️ 🌐 🔐)
 - ✅ **模块化函数**: 环境检测、搜索增强、帮助系统、性能分析模块化管理
 - ✅ **自动化工具**: 一键安装、备份、恢复脚本
 - ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
@@ -29,24 +30,26 @@
 ```
 dev-env/
 ├── config/                        # 配置文件目录
-│   ├── .zshrc                    # ZSH 主配置文件 (优化版)
-│   ├── .zshrc.optimized         # 性能优化配置文件
-│   └── .zshrc.ultra-optimized   # 超高性能配置文件
+│   ├── .zshrc                    # ZSH 主配置文件
+│   └── .zshrc.nvm-optimized      # NVM 优化版本配置文件
 ├── scripts/                       # 脚本工具目录
-│   ├── install_zsh_config.sh     # 自动安装脚本
+│   ├── install_zsh_config.sh     # 自动安装脚本 (集成环境指示符)
 │   ├── zsh_tools.sh              # 配置管理工具集
 │   ├── zsh_optimizer.sh          # 性能优化工具
 │   ├── zsh_launcher.sh           # 多模式启动器
 │   ├── zsh_minimal.sh            # 极简模式启动器
-│   ├── docker-container-entrypoint.sh  # Docker 入口脚本
 │   └── ssh/                      # SSH 相关配置
 ├── docs/                          # 文档目录
-│   ├── README.md                  # 项目说明文档
-│   ├── ZSH_CONFIG_ANALYSIS.md     # 详细配置分析报告
-│   ├── ZSH_CONFIG_TEMPLATE.md     # 配置模板和使用指南
-│   └── TROUBLESHOOTING_DEBUG_GUIDE.md  # 调试指南和故障排除
+│   ├── README.md                  # 文档中心索引
+│   ├── ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md  # 环境指示符全程记录
+│   ├── P10K_ENV_INDICATORS_SETUP.md  # Powerlevel10k 设置指南
+│   ├── KNOWLEDGE_BASE.md          # 技术知识库
+│   ├── ADRs/                      # 技术决策记录
+│   │   └── 001-powerlevel10k-integration.md
+│   ├── proxy/                     # 代理功能文档
+│   └── zsh-config/               # ZSH 配置文档
 ├── zsh-functions/                 # 模块化自定义函数目录
-│   ├── environment.zsh            # 环境检测和配置重载函数
+│   ├── context.zsh                # 环境检测和指示符核心逻辑
 │   ├── search.zsh                 # 搜索增强函数 (hg, hig, hrg, hirg)
 │   ├── utils.zsh                  # 实用工具函数 (proxy, unproxy)
 │   ├── help.zsh                   # 统一命令帮助系统
@@ -82,8 +85,19 @@ exec zsh
 - ✅ 系统级集成，配置永久生效
 - ✅ 所有依赖工具自动安装
 - ✅ 自定义函数完全可用
+- ✅ **环境指示符自动配置** (🖥️ 🌐 🔐)
 - ✅ 日常使用无需额外步骤
 - ✅ 支持完整的开发环境
+
+**环境指示符功能**：
+安装完成后，你的提示符将显示环境状态：
+```
+~/workspace ⎇ master        🖥️ 🌐 🔐 < hao@mm
+$
+```
+- 🖥️/🐳: 物理主机/Docker 容器
+- 🌐/🏠: SSH/本地会话
+- 🔐: 代理已启用 (仅在启用时显示)
 
 #### ⚡ **方式二：直接启动 (临时使用)**
 
