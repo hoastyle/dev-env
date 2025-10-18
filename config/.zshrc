@@ -198,6 +198,36 @@ unset -f _dev_env_init_completion
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ===============================================
+# Environment Context Indicators in RPROMPT
+# ===============================================
+# Display environment indicators (🐳 container, 🌐 SSH, 🔐 proxy) in RPROMPT
+# Only shown when the corresponding condition is met
+
+# Store original RPROMPT for restoration
+_save_original_rprompt() {
+    if [[ -z "$RPROMPT_ORIGINAL" ]]; then
+        export RPROMPT_ORIGINAL="$RPROMPT"
+    fi
+}
+
+# Update RPROMPT with environment indicators
+_update_env_indicators_rprompt() {
+    local env_indicators=$(_get_env_indicators)
+
+    if [[ -n "$env_indicators" ]]; then
+        # Prepend environment indicators to RPROMPT
+        export RPROMPT="$env_indicators ${RPROMPT_ORIGINAL}"
+    else
+        # Restore original RPROMPT when no indicators
+        export RPROMPT="${RPROMPT_ORIGINAL}"
+    fi
+}
+
+# Initialize RPROMPT update
+_save_original_rprompt
+precmd_functions+=(_update_env_indicators_rprompt)
+
+# ===============================================
 # Configuration Complete
 # ===============================================
 

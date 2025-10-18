@@ -15,15 +15,19 @@ init_help_database() {
     # 环境检测命令
     COMMAND_CATEGORIES[check_environment]="环境检测"
     COMMAND_CATEGORIES[reload_zsh]="环境检测"
+    COMMAND_CATEGORIES[env_status]="环境检测"
 
     COMMAND_DESCRIPTIONS[check_environment]="检测当前运行环境（Docker容器/物理主机）"
     COMMAND_DESCRIPTIONS[reload_zsh]="安全地重新加载ZSH配置"
+    COMMAND_DESCRIPTIONS[env_status]="显示当前环境上下文（容器、SSH、代理状态）"
 
     COMMAND_USAGES[check_environment]="check_environment"
     COMMAND_USAGES[reload_zsh]="reload_zsh"
+    COMMAND_USAGES[env_status]="env_status"
 
     COMMAND_EXAMPLES[check_environment]="check_environment"
     COMMAND_EXAMPLES[reload_zsh]="reload_zsh"
+    COMMAND_EXAMPLES[env_status]="env_status"
 
     # 搜索增强命令
     COMMAND_CATEGORIES[hg]="搜索增强"
@@ -168,6 +172,7 @@ show_help_overview() {
     echo "🌍 环境检测 ($env_count 个命令)"
     echo "   check_environment - 检测当前运行环境"
     echo "   reload_zsh       - 重新加载ZSH配置"
+    echo "   env_status       - 显示环境上下文状态"
     echo ""
 
     echo "🔍 搜索增强 ($search_count 个命令)"
