@@ -155,22 +155,24 @@ setopt HIST_IGNORE_ALL_DUPS
 export PATH=$HOME/.local/bin:$PATH
 
 # ===============================================
+# Custom Functions
+# ===============================================
+
+# Load custom functions from ~/.zsh/functions
+if [[ -d "$HOME/.zsh/functions" ]]; then
+    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+        if [[ -f "$function_file" ]]; then
+            source "$function_file"
+        fi
+    done
+fi
+
+# ===============================================
 # Powerlevel10k 主题配置
 # ===============================================
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# ===============================================
-# 自定义函数模块
-# ===============================================
-
-# 加载自定义函数模块（如果存在）
-if [[ -d ~/.zsh/functions ]]; then
-    for func_file in ~/.zsh/functions/*.zsh; do
-        [[ -f "$func_file" ]] && source "$func_file"
-    done
-fi
 
 # ===============================================
 # Environment Context Indicators
@@ -182,3 +184,12 @@ fi
 # Or manually edit ~/.p10k.zsh and add 'env_indicators' to RIGHT_PROMPT_ELEMENTS
 #
 # See: docs/P10K_ENV_INDICATORS_SETUP.md for detailed setup instructions
+
+# ===============================================
+# Configuration Complete
+# ===============================================
+
+# Welcome message disabled to support Powerlevel10k instant prompt
+# The theme provides its own visual feedback
+# To re-enable, uncomment the following line:
+# echo "🎉 Development Environment ZSH Configuration Loaded"
