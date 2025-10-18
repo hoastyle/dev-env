@@ -25,30 +25,31 @@ _is_using_proxy() {
 }
 
 # 生成环境指示符字符串（显示所有环境状态）
-# 返回值格式: "🖥️ 物理 🌐 SSH 🔐" （常态显示所有信息）
+# 返回值格式: "🖥  🌐 🔐" （补偿emoji宽度差异，视觉间距一致）
 _get_env_indicators() {
     local indicators=""
 
-    # 容器状态
+    # 容器状态（使用双空格补偿视觉宽度）
     if _is_in_container; then
-        indicators+="🐳"
+        indicators+="🐳  "  # 双空格
     else
-        indicators+="🖥️"
+        indicators+="🖥  "  # 双空格，补偿emoji显示宽度
     fi
 
-    # 连接方式
+    # 连接方式（单空格）
     if _is_in_ssh; then
-        indicators+=" 🌐"
+        indicators+="🌐 "
     else
-        indicators+=" 🏠"
+        indicators+="🏠 "
     fi
 
-    # 代理状态
+    # 代理状态（最后一个，无空格）
     if _is_using_proxy; then
-        indicators+=" 🔐"
+        indicators+="🔐"
     fi
 
-    echo "$indicators"
+    # 去除尾部多余的空格
+    echo "${indicators% }"
 }
 
 # Powerlevel10k 兼容的自定义段函数
