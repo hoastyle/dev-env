@@ -171,3 +171,24 @@ if [[ -d ~/.zsh/functions ]]; then
         [[ -f "$func_file" ]] && source "$func_file"
     done
 fi
+
+# ===============================================
+# Environment Context Indicators in First Line of Prompt
+# ===============================================
+# Display environment indicators in first line before the prompt
+# Shows container, SSH, and proxy status
+
+# Display environment indicators before prompt
+_display_env_indicators() {
+    local env_indicators=$(_get_env_indicators)
+    # Display in cyan color with brackets
+    print "%F{cyan}[${env_indicators}]%f"
+}
+
+# Hook to display indicators before each prompt
+_display_env_indicators_precmd() {
+    _display_env_indicators
+}
+
+# Register the precmd hook
+precmd_functions+=(_display_env_indicators_precmd)

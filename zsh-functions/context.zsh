@@ -24,16 +24,40 @@ _is_using_proxy() {
     return $?
 }
 
-# 生成环境指示符字符串（用于 RPROMPT）
-# 返回值格式: "🐳 🌐 🔐" （仅显示存在的状态，空格分隔）
+# 生成环境指示符字符串（显示所有环境状态）
+# 返回值格式: "🖥️ 物理 🏠 本地 ✗ 无代理" （常态显示所有信息）
 _get_env_indicators() {
     local indicators=""
 
-    _is_in_container && indicators+="🐳"
-    _is_in_ssh && indicators+="${indicators:+ }🌐"
-    _is_using_proxy && indicators+="${indicators:+ }🔐"
+    # 容器状态
+    if _is_in_container; then
+        indicators+="🐳 Docker"
+    else
+        indicators+="🖥️ 物理"
+    fi
+
+    # 连接方式
+    if _is_in_ssh; then
+        indicators+=" 🌐 SSH"
+    else
+        indicators+=" 🏠 本地"
+    fi
+
+    # 代理状态
+    if _is_using_proxy; then
+        indicators+=" ✓ 代理"
+    else
+        indicators+=" ✗ 无代理"
+    fi
 
     echo "$indicators"
+}
+
+# 为 LPROMPT 生成环境指示符段（在提示符第一行显示）
+_get_env_indicators_prompt_segment() {
+    local indicators=$(_get_env_indicators)
+    # 添加颜色和间距
+    echo "%F{cyan}[${indicators}]%f "
 }
 
 # 查询命令：显示详细的环境状态

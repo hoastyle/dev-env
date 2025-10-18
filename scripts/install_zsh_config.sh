@@ -315,7 +315,15 @@ install_config_files() {
     # 复制自定义函数 (如果存在)
     if [[ -d "$project_dir/zsh-functions" ]]; then
         cp -r "$project_dir/zsh-functions/"* "$HOME/.zsh/functions/"
-        log_success "已安装自定义函数"
+        log_success "已安装自定义函数 (包括环境指示符)"
+
+        # 验证关键函数是否被安装
+        if [[ -f "$HOME/.zsh/functions/context.zsh" ]]; then
+            log_info "✓ 已安装 context.zsh (环境检测函数)"
+        fi
+        if [[ -f "$HOME/.zsh/functions/help.zsh" ]]; then
+            log_info "✓ 已安装 help.zsh (帮助系统)"
+        fi
     fi
 }
 
