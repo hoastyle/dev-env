@@ -34,6 +34,13 @@ log_header() {
     echo -e "${PURPLE}=== $1 ===${NC}"
 }
 
+# 获取项目根目录
+get_project_root() {
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local project_root="$(dirname "$script_dir")"
+    echo "$project_root"
+}
+
 # 显示帮助信息
 show_help() {
     echo "ZSH Launcher - 多模式启动器"
@@ -80,7 +87,7 @@ backup_current_config() {
 switch_to_mode() {
     local mode="$1"
     local persist="$2"
-    local project_root="/home/hao/Workspace/MM/utility/dev-env"
+    local project_root="$(get_project_root)"
 
     log_header "切换到 $mode 模式"
 
@@ -125,7 +132,7 @@ switch_to_mode() {
 # 启动指定模式的ZSH
 launch_zsh() {
     local mode="$1"
-    local project_root="/home/hao/Workspace/MM/utility/dev-env"
+    local project_root="$(get_project_root)"
     local parent_pid="$PPID"
 
     # Mark launcher-managed shells so we can collapse nested sessions.
@@ -168,7 +175,7 @@ launch_zsh() {
 run_benchmark() {
     log_header "ZSH性能基准测试"
 
-    local project_root="/home/hao/Workspace/MM/utility/dev-env"
+    local project_root="$(get_project_root)"
     local results=()
 
     # 测试标准模式
@@ -268,8 +275,10 @@ main() {
     shift || true
 
     # 检查是否在正确的目录
-    if [[ ! -f "/home/hao/Workspace/MM/utility/dev-env/config/.zshrc" ]]; then
-        log_error "请在包含dev-env项目的环境中运行此脚本"
+    local project_root="$(get_project_root)"
+    if [[ ! -f "$project_root/config/.zshrc" ]]; then
+        log_error "配置文件不存在: $project_root/config/.zshrc"
+        log_info "请确保在 dev-env 项目目录中运行此脚本"
         exit 1
     fi
 

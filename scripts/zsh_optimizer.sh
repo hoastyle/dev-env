@@ -15,6 +15,11 @@ NC='\033[0m'
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# 获取项目根目录的函数
+get_project_root() {
+    echo "$PROJECT_ROOT"
+}
+
 # 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -160,7 +165,7 @@ apply_optimization() {
     backup_config
 
     # 应用优化配置
-    local project_root="/home/hao/Workspace/MM/utility/dev-env"
+    local project_root="$(get_project_root)"
     local optimized_config="$project_root/config/.zshrc.optimized"
 
     if [[ -f "$optimized_config" ]]; then

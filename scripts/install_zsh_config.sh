@@ -188,13 +188,21 @@ install_antigen() {
     fi
 
     log_info "下载 Antigen..."
-    curl -L git.io/antigen > "$HOME/.antigen.zsh"
 
-    if [[ $? -eq 0 ]]; then
-        log_success "Antigen 安装完成"
+    # 尝试从主URL下载
+    if ! curl -L git.io/antigen > "$HOME/.antigen.zsh" 2>/dev/null; then
+        log_warn "从主URL下载失败，尝试备用源..."
+
+        # 尝试备用URL
+        if ! curl -L https://raw.githubusercontent.com/zsh-users/antigen/master/bin/antigen.zsh > "$HOME/.antigen.zsh" 2>/dev/null; then
+            log_error "Antigen 安装失败，所有源都不可用"
+            log_info "请检查网络连接或手动下载: https://github.com/zsh-users/antigen"
+            exit 1
+        else
+            log_success "从备用源成功下载 Antigen"
+        fi
     else
-        log_error "Antigen 安装失败"
-        exit 1
+        log_success "Antigen 安装完成"
     fi
 }
 
