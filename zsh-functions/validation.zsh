@@ -216,8 +216,6 @@ assert_pattern() {
     fi
 }
 
-# Export all functions for use in subshells
-export -f error_msg warning_msg success_msg info_msg
-export -f validate_param_count validate_not_empty validate_directory validate_file validate_command validate_pattern
-export -f assert_param assert_directory assert_file assert_command assert_pattern
-export -f print_usage
+# Note: Function export is handled by ZSH's function scope
+# In ZSH, functions are automatically available in subshells when sourced
+# No need for export -f (which is Bash-specific)

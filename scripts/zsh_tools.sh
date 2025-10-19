@@ -382,13 +382,21 @@ benchmark_performance() {
 
     log_info "测试启动时间..."
 
+    # 检查 /usr/bin/time 是否可用
+    local time_cmd="/usr/bin/time"
+    if [[ ! -x "$time_cmd" ]]; then
+        time_cmd="time"
+    fi
+
     # 测试冷启动时间
-    local cold_start_time=$(time (zsh -i -c 'exit' 2>/dev/null) 2>&1 | grep real | awk '{print $2}')
-    log_info "冷启动时间: $cold_start_time"
+    local cold_start_output=$( { $time_cmd -f "%e" bash -c 'zsh -i -c "exit"' 2>&1; } 2>&1)
+    local cold_start_time=$(echo "$cold_start_output" | tail -1 | grep -oE '^[0-9]+\.[0-9]+' || echo "0.0")
+    log_info "冷启动时间: ${cold_start_time}s"
 
     # 测试热启动时间
-    local warm_start_time=$(time (zsh -i -c 'exit' 2>/dev/null) 2>&1 | grep real | awk '{print $2}')
-    log_info "热启动时间: $warm_start_time"
+    local warm_start_output=$( { $time_cmd -f "%e" bash -c 'zsh -i -c "exit"' 2>&1; } 2>&1)
+    local warm_start_time=$(echo "$warm_start_output" | tail -1 | grep -oE '^[0-9]+\.[0-9]+' || echo "0.0")
+    log_info "热启动时间: ${warm_start_time}s"
 
     # 检查内存使用
     log_info "检查内存使用..."
@@ -397,18 +405,17 @@ benchmark_performance() {
 
     # 检查插件数量
     log_info "统计插件信息..."
-    local plugin_count=$(zsh -i -c "antigen list 2>/dev/null | wc -l" || echo "0")
+    local plugin_count=$(zsh -i -c "antigen list 2>/dev/null | wc -l" 2>/dev/null || echo "0")
     log_info "已加载插件数量: $plugin_count"
 
     # 性能评级
     echo ""
     log_info "性能评级:"
 
-    # 启动时间评级
-    local cold_seconds=$(echo "$cold_start_time" | sed 's/s//')
-    if (( $(echo "$cold_seconds < 1.0" | bc -l) )); then
+    # 启动时间评级 - 使用更稳健的比较方式
+    if (( $(echo "$cold_start_time < 1.0" | bc -l 2>/dev/null || echo 0) )); then
         log_success "启动速度: 优秀 (< 1.0s)"
-    elif (( $(echo "$cold_seconds < 2.0" | bc -l) )); then
+    elif (( $(echo "$cold_start_time < 2.0" | bc -l 2>/dev/null || echo 0) )); then
         log_info "启动速度: 良好 (1.0-2.0s)"
     else
         log_warn "启动速度: 一般 (> 2.0s)"
