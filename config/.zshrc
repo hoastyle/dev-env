@@ -127,8 +127,14 @@ export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
 # Load custom functions from ~/.zsh/functions
 if [[ -d "$HOME/.zsh/functions" ]]; then
+    # Load validation module first (required by other functions)
+    if [[ -f "$HOME/.zsh/functions/validation.zsh" ]]; then
+        source "$HOME/.zsh/functions/validation.zsh"
+    fi
+
+    # Load all other function modules
     for function_file in "$HOME/.zsh/functions"/*.zsh; do
-        if [[ -f "$function_file" ]]; then
+        if [[ -f "$function_file" ]] && [[ "$(basename "$function_file")" != "validation.zsh" ]]; then
             source "$function_file"
         fi
     done

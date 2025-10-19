@@ -135,6 +135,7 @@ _check_proxy_availability() {
 }
 
 # 网络代理设置 (优化版)
+# Network proxy configuration (optimized)
 proxy() {
     if handle_help_param "proxy" "$1"; then
         return 0
@@ -147,9 +148,8 @@ proxy() {
     local no_proxy="${config_info#*|}"
 
     # 验证代理地址格式
-    if [[ ! "$proxy_addr" =~ ^[0-9a-zA-Z.-]+:[0-9]+$ ]]; then
-        echo "❌ 错误: 代理地址格式无效: $proxy_addr"
-        echo "   预期格式: host:port (例: 127.0.0.1:7890)"
+    if ! assert_pattern "$proxy_addr" "^[0-9a-zA-Z.-]+:[0-9]+$" "proxy_address"; then
+        print_usage "proxy" 'proxy [host:port] [--verify]' 'proxy' 'proxy 127.0.0.1:7890' 'proxy 127.0.0.1:7890 -v'
         return 1
     fi
 
@@ -172,7 +172,7 @@ proxy() {
     export NO_PROXY="$no_proxy"
     export no_proxy="$no_proxy"
 
-    echo "✅ 代理已启用"
+    success_msg "代理已启用"
     echo "   地址: http://$proxy_addr"
     echo "   NO_PROXY: $no_proxy"
 
@@ -184,6 +184,7 @@ proxy() {
 }
 
 # 禁用网络代理 (优化版)
+# Disable network proxy (optimized)
 unproxy() {
     if handle_help_param "unproxy" "$1"; then
         return 0
@@ -200,10 +201,11 @@ unproxy() {
         unset $var
     done
 
-    echo "❌ 代理已禁用"
+    info_msg "代理已禁用"
 }
 
 # 快速目录跳转函数 (需要 autojump 支持)
+# Fast directory jump function (requires autojump support)
 if command -v autojump &> /dev/null; then
     # 快速跳转到常用目录
     jdev() {
@@ -212,23 +214,22 @@ if command -v autojump &> /dev/null; then
             return 0
         fi
 
-        # 检查参数
-        if [[ -z "$1" ]]; then
-            echo "❌ 错误: 缺少目录名称"
-            echo "用法: jdev <directory_name>"
-            echo "示例: jdev workspace"
-            echo "输入 'jdev --help' 查看详细帮助"
+        # 验证必需参数
+        if ! assert_param "$1" "directory_name"; then
+            print_usage "jdev" 'jdev <directory_name>' 'jdev workspace' 'jdev projects'
             echo ""
-            echo "💡 提示: 首先需要使用 autojump 访问目录以建立记忆"
+            info_msg "首先需要使用 autojump 访问目录以建立记忆"
             return 1
         fi
 
-        local target_dir=$(autojump "$1" 2>/dev/null || echo "$HOME/Workspace")
+        local dir_name="$1"
+        local target_dir=$(autojump "$dir_name" 2>/dev/null || echo "$HOME/Workspace")
+
         if [[ "$target_dir" != "$HOME/Workspace" ]]; then
             cd "$target_dir"
-            echo "✅ 已跳转到: $target_dir"
+            success_msg "已跳转到: $target_dir"
         else
-            echo "⚠️  未找到 '$1' 的记录，跳转到默认工作目录: $target_dir"
+            warning_msg "未找到 '$dir_name' 的记录，跳转到默认工作目录"
             cd "$target_dir"
         fi
     }
