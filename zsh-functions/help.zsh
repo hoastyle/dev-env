@@ -2,6 +2,8 @@
 # ===============================================
 # Help System Functions
 # ===============================================
+# Optimized with singleton pattern to prevent
+# redundant database initialization on every call
 
 # 命令帮助数据库
 typeset -A ZSH_COMMANDS
@@ -10,8 +12,15 @@ typeset -A COMMAND_DESCRIPTIONS
 typeset -A COMMAND_USAGES
 typeset -A COMMAND_EXAMPLES
 
-# 初始化命令数据库
+# 数据库初始化标志 (singleton pattern)
+typeset -g ZSH_HELP_INITIALIZED=0
+
+# 初始化命令数据库 (仅执行一次)
 init_help_database() {
+    # 如果已初始化，直接返回
+    if [[ $ZSH_HELP_INITIALIZED -eq 1 ]]; then
+        return 0
+    fi
     # 环境检测命令
     COMMAND_CATEGORIES[check_environment]="环境检测"
     COMMAND_CATEGORIES[reload_zsh]="环境检测"
@@ -95,6 +104,9 @@ init_help_database() {
     for cmd in "${(@k)COMMAND_CATEGORIES}"; do
         ZSH_COMMANDS[$cmd]=1
     done
+
+    # 标记初始化完成 (singleton pattern)
+    ZSH_HELP_INITIALIZED=1
 }
 
 # 统一帮助命令
