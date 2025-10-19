@@ -335,9 +335,9 @@ B. 增强日志系统
 ## 🔗 相关文件
 
 - 审查报告: 用户提供的项目审查输出
-- TASK.md: `/docs/TASK.md` (已更新)
-- CONTEXT.md: `/docs/CONTEXT.md` (需更新)
-- PLANNING.md: `/docs/PLANNING.md` (需参考)
+- TASK.md: `./TASK.md` (已更新)
+- CONTEXT.md: `./CONTEXT.md` (已更新)
+- PLANNING.md: `./PLANNING.md` (已参考)
 
 ---
 

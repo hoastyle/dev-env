@@ -41,9 +41,16 @@ dev-env/
 │   └── ssh/                      # SSH 相关配置
 ├── docs/                          # 文档目录
 │   ├── README.md                  # 文档中心索引
+│   ├── management/                # 项目管理文档 (v2.1.1 新增)
+│   │   ├── PRD.md                # 产品需求文档
+│   │   ├── PLANNING.md           # 架构规划文档
+│   │   ├── TASK.md               # 任务追踪文档
+│   │   ├── CONTEXT.md            # 工作上下文
+│   │   ├── KNOWLEDGE.md          # 知识库
+│   │   ├── HOTFIX_2_1_1.md       # 高优先级修复说明
+│   │   └── REVIEW_CONSISTENCY_ANALYSIS.md  # 审查一致性分析
 │   ├── ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md  # 环境指示符全程记录
 │   ├── P10K_ENV_INDICATORS_SETUP.md  # Powerlevel10k 设置指南
-│   ├── KNOWLEDGE_BASE.md          # 技术知识库
 │   ├── ADRs/                      # 技术决策记录
 │   │   └── 001-powerlevel10k-integration.md
 │   ├── proxy/                     # 代理功能文档
@@ -551,6 +558,18 @@ exec zsh
 ---
 
 ## 📚 文档资源
+
+### 📋 **项目管理文档** (v2.1.1 新增)
+
+管理类文档位于 `docs/management/` 目录:
+
+- **[PRD.md](docs/management/PRD.md)**: 产品需求文档 - 项目目标、功能需求、非功能需求、用户场景
+- **[PLANNING.md](docs/management/PLANNING.md)**: 架构规划文档 - 技术架构、开发规范、测试策略、部署指南
+- **[TASK.md](docs/management/TASK.md)**: 任务追踪文档 - 任务进度、优先级矩阵、完成度统计、依赖关系
+- **[CONTEXT.md](docs/management/CONTEXT.md)**: 工作上下文 - 项目状态、工作历史、已知问题、性能数据
+- **[KNOWLEDGE.md](docs/management/KNOWLEDGE.md)**: 知识库 - 核心原则、技术决策、最佳实践、常见问题解决方案
+- **[HOTFIX_2_1_1.md](docs/management/HOTFIX_2_1_1.md)**: 高优先级修复说明 - v2.1.1 版本修复详情
+- **[REVIEW_CONSISTENCY_ANALYSIS.md](docs/management/REVIEW_CONSISTENCY_ANALYSIS.md)**: 审查一致性分析 - 与代码审查报告的对齐分析
 
 ### 📖 **代理功能文档** (v2.1 新增)
 

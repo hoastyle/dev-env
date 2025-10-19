@@ -125,12 +125,12 @@
 
 ### 新增文件 (2025-10-19)
 ```
-docs/
+docs/management/
 ├── PRD.md                    # 产品需求文档 (新增)
 ├── PLANNING.md               # 架构规划文档 (新增)
 ├── TASK.md                   # 任务追踪文档 (新增)
 ├── CONTEXT.md                # 当前上下文 (新增)
-├── KNOWLEDGE.md              # 知识库 (待创建)
+├── KNOWLEDGE.md              # 知识库 (已创建)
 └── HOTFIX_2_1_1.md          # 高优先级修复说明 (新增)
 ```
 
