@@ -7,6 +7,7 @@ set -e
 
 # 配置选项
 USE_NVM_OPTIMIZATION=false
+DRY_RUN=false
 
 # 颜色定义
 RED='\033[0;31m'
@@ -37,6 +38,44 @@ log_step() {
     echo -e "${CYAN}[STEP]${NC} $1"
 }
 
+# 干运行模式输出
+dry_run_msg() {
+    echo -e "${CYAN}[DRY-RUN]${NC} $1"
+}
+
+# 干运行安全的执行函数 - mkdir
+dry_mkdir() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        if [[ ! -d "$1" ]]; then
+            dry_run_msg "mkdir -p $1"
+        fi
+    else
+        mkdir -p "$1"
+    fi
+}
+
+# 干运行安全的执行函数 - cp
+dry_cp() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        if [[ -e "$1" ]]; then
+            dry_run_msg "cp $1 $2"
+        fi
+    else
+        cp "$1" "$2"
+    fi
+}
+
+# 干运行安全的执行函数 - cp -r
+dry_cp_r() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        if [[ -d "$1" ]]; then
+            dry_run_msg "cp -r $1 $2"
+        fi
+    else
+        cp -r "$1" "$2"
+    fi
+}
+
 # 显示帮助信息
 show_help() {
     echo "ZSH 配置自动安装脚本"
@@ -45,12 +84,15 @@ show_help() {
     echo ""
     echo "选项:"
     echo "  -h, --help                 显示此帮助信息"
+    echo "  --dry-run                  干运行模式 (显示将要执行的操作，不实际执行)"
     echo "  --with-optimization        使用 NVM 优化版本 (推荐性能优先的用户)"
     echo "  --nvm-optimized            同上 (别名)"
     echo ""
     echo "示例:"
     echo "  $0                         # 标准版本安装"
+    echo "  $0 --dry-run              # 预览将要执行的操作"
     echo "  $0 --with-optimization     # NVM 优化版本安装"
+    echo "  $0 --dry-run --with-optimization  # 预览优化版本的操作"
     echo ""
 }
 
@@ -61,6 +103,10 @@ parse_arguments() {
             -h|--help)
                 show_help
                 exit 0
+                ;;
+            --dry-run)
+                DRY_RUN=true
+                log_info "已启用干运行模式 (不会实际执行操作)"
                 ;;
             --with-optimization|--nvm-optimized)
                 USE_NVM_OPTIMIZATION=true
@@ -142,39 +188,41 @@ backup_existing_config() {
     log_step "备份现有配置..."
 
     local backup_dir="$HOME/zsh-backup-$(date +%Y%m%d-%H%M%S)"
-    mkdir -p "$backup_dir"
+    dry_mkdir "$backup_dir"
 
     # 备份 .zshrc
     if [[ -f "$HOME/.zshrc" ]]; then
-        cp "$HOME/.zshrc" "$backup_dir/"
+        dry_cp "$HOME/.zshrc" "$backup_dir/"
         log_info "已备份 .zshrc"
     fi
 
     # 备份 .p10k.zsh
     if [[ -f "$HOME/.p10k.zsh" ]]; then
-        cp "$HOME/.p10k.zsh" "$backup_dir/"
+        dry_cp "$HOME/.p10k.zsh" "$backup_dir/"
         log_info "已备份 .p10k.zsh"
     fi
 
     # 备份 .antigen.zsh
     if [[ -f "$HOME/.antigen.zsh" ]]; then
-        cp "$HOME/.antigen.zsh" "$backup_dir/"
+        dry_cp "$HOME/.antigen.zsh" "$backup_dir/"
         log_info "已备份 .antigen.zsh"
     fi
 
     # 备份 .antigen 目录
     if [[ -d "$HOME/.antigen" ]]; then
-        cp -r "$HOME/.antigen" "$backup_dir/"
+        dry_cp_r "$HOME/.antigen" "$backup_dir/"
         log_info "已备份 .antigen 目录"
     fi
 
     # 备份自定义函数目录
     if [[ -d "$HOME/.zsh" ]]; then
-        cp -r "$HOME/.zsh" "$backup_dir/"
+        dry_cp_r "$HOME/.zsh" "$backup_dir/"
         log_info "已备份 .zsh 目录"
     fi
 
-    echo "$backup_dir" > "$HOME/.zsh_backup_dir"
+    if [[ "$DRY_RUN" != "true" ]]; then
+        echo "$backup_dir" > "$HOME/.zsh_backup_dir"
+    fi
     log_success "配置已备份到: $backup_dir"
 }
 
@@ -184,6 +232,12 @@ install_antigen() {
 
     if [[ -f "$HOME/.antigen.zsh" ]]; then
         log_warn "Antigen 已存在，跳过安装"
+        return
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        dry_run_msg "curl -L git.io/antigen > $HOME/.antigen.zsh"
+        log_success "Antigen 安装完成"
         return
     fi
 
@@ -546,6 +600,15 @@ main() {
 
     # 解析命令行参数
     parse_arguments "$@"
+
+    # 显示干运行模式提示
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo -e "${YELLOW}┌─ 干运行模式已启用 ──────────────────────────────${NC}"
+        echo -e "${YELLOW}│${NC} 将显示所有操作但${RED}不会实际执行${NC}"
+        echo -e "${YELLOW}│${NC} 使用不带 --dry-run 参数执行实际操作"
+        echo -e "${YELLOW}└───────────────────────────────────────────────${NC}"
+        echo ""
+    fi
 
     check_root
     check_system

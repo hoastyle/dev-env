@@ -5,6 +5,9 @@
 
 set -e
 
+# 全局标志
+DRY_RUN=false
+
 # 颜色定义
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -35,6 +38,11 @@ log_header() {
     echo -e "${PURPLE}=== $1 ===${NC}"
 }
 
+# 干运行模式输出
+dry_run_msg() {
+    echo -e "${CYAN}[DRY-RUN]${NC} $1"
+}
+
 # 显示帮助信息
 show_help() {
     echo "ZSH 配置管理工具集"
@@ -52,16 +60,18 @@ show_help() {
     echo "  doctor            系统诊断"
     echo "  reset             重置配置到默认状态"
     echo ""
-    echo "选项:"
-    echo "  -h, --help   显示帮助信息"
-    echo "  -v, --verbose 详细输出"
-    echo "  -q, --quiet  静默模式"
+    echo "全局选项:"
+    echo "  --dry-run         干运行模式 (显示操作但不执行)"
+    echo "  -h, --help        显示帮助信息"
+    echo "  -v, --verbose     详细输出"
+    echo "  -q, --quiet       静默模式"
     echo ""
     echo "示例:"
-    echo "  $0 validate              # 验证配置"
-    echo "  $0 backup                # 备份配置"
-    echo "  $0 restore /path/to/backup  # 恢复配置"
-    echo "  $0 update                # 更新插件"
+    echo "  $0 validate                      # 验证配置"
+    echo "  $0 --dry-run backup             # 预览备份操作"
+    echo "  $0 backup                        # 备份配置"
+    echo "  $0 restore /path/to/backup       # 恢复配置"
+    echo "  $0 update                        # 更新插件"
     echo ""
 }
 
@@ -345,19 +355,35 @@ clean_cache() {
     if [[ -d "$HOME/.antigen" ]]; then
         log_info "清理 Antigen 缓存..."
         local antigen_size=$(du -sk "$HOME/.antigen" 2>/dev/null | cut -f1)
-        rm -rf "$HOME/.antigen/init.zsh"
-        rm -rf "$HOME/.antigen/.cache"
+
+        if [[ "$DRY_RUN" == "true" ]]; then
+            dry_run_msg "rm -rf $HOME/.antigen/init.zsh"
+            dry_run_msg "rm -rf $HOME/.antigen/.cache"
+        else
+            rm -rf "$HOME/.antigen/init.zsh"
+            rm -rf "$HOME/.antigen/.cache"
+        fi
+
         log_success "已清理 Antigen 缓存 (~${antigen_size}KB)"
         ((cleaned_size += antigen_size))
     fi
 
     # 清理 ZSH 缓存
     log_info "清理 ZSH 缓存..."
-    rm -f "$HOME/.zcompdump"* 2>/dev/null || true
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        dry_run_msg "rm -f $HOME/.zcompdump*"
+    else
+        rm -f "$HOME/.zcompdump"* 2>/dev/null || true
+    fi
 
     local comp_cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/dev-env"
     if [[ -d "$comp_cache_root" ]]; then
-        rm -f "$comp_cache_root"/zcompdump-* 2>/dev/null || true
+        if [[ "$DRY_RUN" == "true" ]]; then
+            dry_run_msg "rm -f $comp_cache_root/zcompdump-*"
+        else
+            rm -f "$comp_cache_root"/zcompdump-* 2>/dev/null || true
+        fi
     fi
 
     log_success "已清理 ZSH 补全缓存 (含 ${comp_cache_root#${HOME}/})"
@@ -621,7 +647,24 @@ EOF
 # 主函数
 main() {
     local command="$1"
-    shift || true
+
+    # 解析全局选项
+    if [[ "$command" == "--dry-run" ]]; then
+        DRY_RUN=true
+        command="$2"
+        shift 2 || shift || true
+    else
+        shift || true
+    fi
+
+    # 显示干运行模式提示
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo -e "${YELLOW}┌─ 干运行模式已启用 ──────────────────────────────${NC}"
+        echo -e "${YELLOW}│${NC} 将显示所有操作但${RED}不会实际执行${NC}"
+        echo -e "${YELLOW}│${NC} 使用不带 --dry-run 参数执行实际操作"
+        echo -e "${YELLOW}└───────────────────────────────────────────────${NC}"
+        echo ""
+    fi
 
     case "$command" in
         "validate")
