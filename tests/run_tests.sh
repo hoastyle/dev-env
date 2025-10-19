@@ -4,7 +4,7 @@
 # Version: 1.0
 # Created: 2025-10-19
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEST_RUNNER="$SCRIPT_DIR/test_runner.sh"
@@ -186,7 +186,6 @@ main() {
                 show_help
                 exit 1
                 ;;
-            shift
         esac
         shift
     done

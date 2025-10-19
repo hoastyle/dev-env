@@ -4,7 +4,7 @@
 # Version: 1.0
 # Created: 2025-10-19
 
-set -e
+set -euo pipefail
 
 # Source test_utils if not already sourced
 if [[ ! -v TEST_UTILS_LOADED ]]; then

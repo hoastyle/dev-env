@@ -4,7 +4,7 @@
 # Version: 1.0
 # Created: 2025-10-19
 
-set -e
+set -euo pipefail
 
 # ============================================================================
 # Configuration
@@ -319,19 +319,18 @@ main() {
     echo -e "\033[1m\033[34m╚════════════════════════════════════════╝\033[0m"
     echo ""
 
+    # Load libraries first (before using their functions)
+    if ! load_libraries; then
+        echo "ERROR: Failed to load test libraries" >&2
+        return 1
+    fi
+
     # Initialize test state
     init_test_state
 
     # Setup fixtures
     if ! setup_fixtures; then
         log_error "Failed to setup test fixtures"
-        return 1
-    fi
-
-    # Load libraries
-    if ! load_libraries; then
-        log_error "Failed to load test libraries"
-        teardown_fixtures
         return 1
     fi
 

@@ -322,7 +322,7 @@ test_success_status_code() {
 
 # Test failure status code
 test_failure_status_code() {
-    false || true  # Avoid script exit
+    ( false )  # Execute in subshell to capture exit code
     local status=$?
 
     assert_num_equal 1 "$status" "Command should return failure status (1)"

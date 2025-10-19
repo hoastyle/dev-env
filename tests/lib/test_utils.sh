@@ -4,21 +4,25 @@
 # Version: 1.0
 # Created: 2025-10-19
 
-set -e
+set -euo pipefail
 
 # ============================================================================
 # Color and Formatting Constants
 # ============================================================================
 
-# Color definitions
-readonly COLOR_RESET='\033[0m'
-readonly COLOR_RED='\033[0;31m'
-readonly COLOR_GREEN='\033[0;32m'
-readonly COLOR_YELLOW='\033[0;33m'
-readonly COLOR_BLUE='\033[0;34m'
-readonly COLOR_CYAN='\033[0;36m'
-readonly COLOR_BOLD='\033[1m'
-readonly COLOR_DIM='\033[2m'
+# Guard against multiple sourcing of readonly variables
+if [[ ! -v TEST_UTILS_LOADED ]]; then
+    # Color definitions
+    readonly COLOR_RESET='\033[0m'
+    readonly COLOR_RED='\033[0;31m'
+    readonly COLOR_GREEN='\033[0;32m'
+    readonly COLOR_YELLOW='\033[0;33m'
+    readonly COLOR_BLUE='\033[0;34m'
+    readonly COLOR_CYAN='\033[0;36m'
+    readonly COLOR_BOLD='\033[1m'
+    readonly COLOR_DIM='\033[2m'
+    readonly TEST_UTILS_LOADED=1
+fi
 
 # ============================================================================
 # Logging Functions
