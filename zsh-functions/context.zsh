@@ -31,7 +31,7 @@ _get_env_indicators() {
 
     # 容器状态（使用双空格补偿视觉宽度）
     if _is_in_container; then
-        indicators+="🐳  "  # 双空格
+        indicators+="🐳 "  # 双空格
     else
         indicators+="🖥  "  # 双空格，补偿emoji显示宽度
     fi
