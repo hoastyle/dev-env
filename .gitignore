@@ -98,3 +98,4 @@ docs/build/
 .cache/
 .parcel-cache/
 .eslintcache
+tags
