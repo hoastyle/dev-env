@@ -389,7 +389,8 @@ install_config_files() {
     fi
 
     # 配置 Powerlevel10k 环境指示符
-    # Note: Disabled - context segment in .p10k.zsh already handles user@hostname display
+    # Note: env_indicators 现已直接集成到 config/.p10k.zsh 中
+    # 无需通过脚本动态添加,避免配置重复
     # setup_p10k_env_indicators
 }
 
