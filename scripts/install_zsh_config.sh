@@ -389,7 +389,8 @@ install_config_files() {
     fi
 
     # 配置 Powerlevel10k 环境指示符
-    setup_p10k_env_indicators
+    # Note: Disabled - context segment in .p10k.zsh already handles user@hostname display
+    # setup_p10k_env_indicators
 }
 
 # 配置 Powerlevel10k 环境指示符
