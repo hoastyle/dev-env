@@ -1,8 +1,8 @@
 # CONTEXT.md - dev-env 项目当前上下文
 
-**版本**: 2.1.1
-**最后更新**: 2025-10-19
-**会话**: 项目审查与高优先级修复
+**版本**: 2.1.2
+**最后更新**: 2025-10-20
+**会话**: Powerlevel10k 提示符配置修复
 
 ---
 
@@ -20,10 +20,10 @@
 - 待办: 8 (9%)
 
 ### 最近活动
-- **最后提交**: 69c09cf (2025-10-19)
-- **提交信息**: refactor: v2.1.1 稳定性增强
-- **修改文件数**: 7 个
-- **新增文件**: 1 个 (HOTFIX_2_1_1.md)
+- **最后提交**: 6f93220 (2025-10-20)
+- **提交信息**: docs(install): 更新 setup_p10k_env_indicators 注释说明
+- **修改文件数**: 2 个
+- **新增文件**: 0 个
 
 ---
 
@@ -97,6 +97,66 @@
 - 6 个文件修改
 - 1 个新增文档 (306 行)
 - 所有修复已提交和验证
+
+---
+
+### 会话 3: Powerlevel10k 提示符配置修复 (2025-10-20)
+
+**目标**: 修复右侧提示符重复显示 user@hostname 的问题
+
+**问题描述**:
+- 用户报告提示符右侧显示重复的 user@hostname: "🖥  🏠  ✔  hao@mm hao@mm"
+- 环境指示符 (🖥/🐳, 🏠/🌐, 🔐) 正常显示
+- 需要保持环境指示符的同时,消除重复的 user@hostname
+
+**进行的工作**:
+
+1. 问题诊断 (完成 ✅)
+   - 分析 `.p10k.zsh` 配置文件结构
+   - 检查 `RIGHT_PROMPT_ELEMENTS` 中的段定义
+   - 识别 context 段的配置参数
+
+2. 根因定位 (完成 ✅)
+   - 发现第 987 行错误配置:
+     ```zsh
+     typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION='%n@%m'
+     ```
+   - `CONTENT_EXPANSION` 和 `VISUAL_IDENTIFIER_EXPANSION` 都设置为 '%n@%m'
+   - 导致内容区域和图标区域都显示 user@hostname
+
+3. 配置修复 (完成 ✅)
+   - 分离 CONTENT 和 VISUAL_IDENTIFIER 配置:
+     ```zsh
+     typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION='%n@%m'
+     typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_VISUAL_IDENTIFIER_EXPANSION=''
+     ```
+   - 保留内容显示,清空图标显示,避免重复
+
+4. 集成优化 (完成 ✅)
+   - 将 env_indicators 段直接集成到 config/.p10k.zsh
+   - 禁用 install_zsh_config.sh 中的动态注入
+   - 避免配置重复和冲突
+
+5. 文档更新 (完成 ✅)
+   - 更新 install_zsh_config.sh 注释说明
+   - 添加配置变更原因说明
+
+**提交记录**:
+- 146779c: feat(prompt): 将 env_indicators 段直接集成到 .p10k.zsh 配置中
+- 1bcd4e9: fix(prompt): 修复 context 段重复显示 user@hostname 问题
+- 6f93220: docs(install): 更新 setup_p10k_env_indicators 注释说明
+
+**产出**:
+- 2 个文件修改 (config/.p10k.zsh, scripts/install_zsh_config.sh)
+- 3 个 git commits
+- 问题完全解决,等待用户部署验证
+
+**技术要点**:
+- Powerlevel10k 段配置参数理解:
+  * `_CONTENT_EXPANSION`: 段的文本内容
+  * `_VISUAL_IDENTIFIER_EXPANSION`: 段的图标/前缀
+  * 两者会同时显示,不是互斥关系
+- 静态配置优于动态注入,避免重复和配置不一致
 
 ---
 

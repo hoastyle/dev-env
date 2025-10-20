@@ -365,6 +365,74 @@ cat ~/.zshrc | head -50
 
 ---
 
+### Q4: Powerlevel10k 提示符重复显示内容
+
+**症状**:
+- 提示符右侧显示重复的 user@hostname: "hao@mm hao@mm"
+- 或某个段的内容显示两次
+
+**诊断**:
+```bash
+# 检查 context 段配置
+grep -A 5 "POWERLEVEL9K_CONTEXT.*EXPANSION" ~/.p10k.zsh
+
+# 查看 RIGHT_PROMPT_ELEMENTS 配置
+grep -A 50 "RIGHT_PROMPT_ELEMENTS" ~/.p10k.zsh | head -50
+```
+
+**根本原因**:
+Powerlevel10k 的段配置有两个关键参数:
+- `_CONTENT_EXPANSION`: 段的文本内容
+- `_VISUAL_IDENTIFIER_EXPANSION`: 段的图标/前缀
+
+**错误配置示例**:
+```zsh
+# ❌ 错误: 同时设置 CONTENT 和 VISUAL_IDENTIFIER 为相同值
+typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION='%n@%m'
+# 结果: 内容区域显示 "hao@mm" + 图标区域显示 "hao@mm" = "hao@mm hao@mm"
+```
+
+**正确配置示例**:
+```zsh
+# ✅ 正确: 分离 CONTENT 和 VISUAL_IDENTIFIER
+typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION='%n@%m'
+typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_VISUAL_IDENTIFIER_EXPANSION=''
+# 结果: 内容区域显示 "hao@mm" + 图标区域为空 = "hao@mm"
+```
+
+**解决方案**:
+```bash
+# 1. 编辑 .p10k.zsh 配置
+vim ~/.p10k.zsh
+
+# 2. 找到重复显示的段配置 (如 context 段约在第 987 行)
+# 3. 分离 CONTENT_EXPANSION 和 VISUAL_IDENTIFIER_EXPANSION
+# 4. 重新加载配置
+exec zsh
+```
+
+**技术要点**:
+- `_CONTENT_EXPANSION` 和 `_VISUAL_IDENTIFIER_EXPANSION` **不是互斥关系**,会同时显示
+- 如果只想显示内容,将 VISUAL_IDENTIFIER_EXPANSION 设置为空字符串 `''`
+- 如果只想显示图标,将 CONTENT_EXPANSION 设置为空字符串 `''`
+- 展开变量 (EXPANSION) 优先级高于模板变量 (TEMPLATE)
+
+**相关配置参数**:
+```zsh
+# 模板配置 (默认方式)
+POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
+
+# 展开配置 (覆盖模板,更灵活)
+POWERLEVEL9K_CONTEXT_CONTENT_EXPANSION='%n@%m'
+POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+```
+
+**参考**:
+- 修复 commit: 1bcd4e9
+- 相关文件: `config/.p10k.zsh` 第 987-989 行
+
+---
+
 ## 📖 文档组织结构
 
 ### 文档体系
