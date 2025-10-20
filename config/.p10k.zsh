@@ -39,6 +39,7 @@
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
+    env_indicators          # environment status (docker/ssh/proxy)
     status                  # exit code of the last command
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
@@ -1827,6 +1828,26 @@
   # If p10k is already loaded, reload configuration.
   # This works even with POWERLEVEL9K_DISABLE_HOT_RELOAD=true.
   (( ! $+functions[p10k] )) || p10k reload
+}
+
+# ===============================================
+# Environment Indicators Custom Segment
+# ===============================================
+# Displays container status, SSH status, and proxy status
+# on the right side of the first line of the prompt
+
+function prompt_env_indicators() {
+  # Load environment detection functions from ~/.zsh/functions/context.zsh
+  if typeset -f _get_env_indicators &>/dev/null; then
+    local indicators=$(_get_env_indicators)
+    # Use p10k segment to display icons (no background, no foreground colors)
+    [[ -n "$indicators" ]] && p10k segment -t "$indicators"
+  fi
+}
+
+# Instant prompt support (ensures indicators appear in instant prompt)
+function instant_prompt_env_indicators() {
+  prompt_env_indicators
 }
 
 # Tell `p10k configure` which file it should overwrite.
