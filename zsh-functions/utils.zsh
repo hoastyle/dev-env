@@ -204,33 +204,71 @@ unproxy() {
     info_msg "代理已禁用"
 }
 
-# 快速目录跳转函数 (需要 autojump 支持)
-# Fast directory jump function (requires autojump support)
-if command -v autojump &> /dev/null; then
-    # 快速跳转到常用目录
-    jdev() {
-        # 处理帮助参数
-        if handle_help_param "jdev" "$1"; then
-            return 0
-        fi
+# Fast directory jump function with autojump support
+# 快速目录跳转函数 (支持 autojump)
+# ===============================================
 
-        # 验证必需参数
-        if ! assert_param "$1" "directory_name"; then
-            print_usage "jdev" 'jdev <directory_name>' 'jdev workspace' 'jdev projects'
-            echo ""
-            info_msg "首先需要使用 autojump 访问目录以建立记忆"
-            return 1
-        fi
+jdev() {
+    # Handle help parameter
+    if handle_help_param "jdev" "$1"; then
+        cat << 'EOF'
+USAGE: jdev <directory_name>
+DESCRIPTION: Jump to frequently used development directory using autojump history
 
-        local dir_name="$1"
-        local target_dir=$(autojump "$dir_name" 2>/dev/null || echo "$HOME/Workspace")
+ARGUMENTS:
+    <directory_name>  Directory name or pattern to jump to
 
-        if [[ "$target_dir" != "$HOME/Workspace" ]]; then
-            cd "$target_dir"
-            success_msg "已跳转到: $target_dir"
-        else
-            warning_msg "未找到 '$dir_name' 的记录，跳转到默认工作目录"
-            cd "$target_dir"
-        fi
-    }
-fi
+EXAMPLES:
+    jdev workspace    # Jump to workspace directory
+    jdev projects     # Jump to projects directory
+    jdev dev          # Jump to dev directory
+
+REQUIREMENTS:
+    - autojump must be installed
+    - You must have previously visited the target directory
+
+INSTALLATION:
+    Ubuntu/Debian: apt-get install autojump
+    macOS:         brew install autojump
+
+NOTES:
+    - After installation, run: exec zsh
+    - Use 'j' command for direct autojump access
+    - Use 'jhistory' to see autojump history
+EOF
+        return 0
+    fi
+
+    # Check if autojump is available
+    if ! command -v autojump &> /dev/null; then
+        error_msg "autojump is not installed"
+        echo "Install with: apt-get install autojump (Ubuntu/Debian) or brew install autojump (macOS)"
+        return 1
+    fi
+
+    # Validate required parameter
+    if ! assert_param "$1" "directory_name"; then
+        print_usage "jdev" 'jdev <directory_name>' 'jdev workspace' 'jdev projects'
+        echo ""
+        info_msg "Tip: First use autojump to visit a directory to record it in history"
+        return 1
+    fi
+
+    local dir_name="$1"
+    local target_dir=$(autojump "$dir_name" 2>/dev/null)
+
+    # Check if directory was found in autojump history
+    if [[ -z "$target_dir" ]] || [[ ! -d "$target_dir" ]]; then
+        warning_msg "Directory '$dir_name' not found in autojump history"
+        echo ""
+        echo "You can:"
+        echo "  1. Visit the directory first: cd /path/to/$dir_name"
+        echo "  2. Then use: jdev $dir_name"
+        echo "  3. Or view history: jhistory"
+        return 1
+    fi
+
+    # Jump to directory
+    cd "$target_dir"
+    success_msg "Jumped to: $target_dir"
+}

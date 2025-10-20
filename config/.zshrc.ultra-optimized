@@ -74,10 +74,10 @@ alias python=python3
 alias pip=pip3
 
 # Conda Environment - Lazy Loading
-if [[ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]]; then
-    export CONDA_EXE="/home/hao/anaconda3/bin/conda"
-    export _CONDA_ROOT="/home/hao/anaconda3"
-    alias conda-init='eval "$(/home/hao/anaconda3/bin/conda shell.zsh hook)" && conda activate base'
+if [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]]; then
+    export CONDA_EXE="$HOME/anaconda3/bin/conda"
+    export _CONDA_ROOT="$HOME/anaconda3"
+    alias conda-init="eval \"\$($HOME/anaconda3/bin/conda shell.zsh hook)\" && conda activate base"
 fi
 
 # NVM - Lazy Loading
@@ -103,8 +103,23 @@ export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:u
 export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
 export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
-# Autojump - Lazy Loading
-alias autojump-lazy='[[ -s /home/hao/.autojump/etc/profile.d/autojump.sh ]] && source /home/hao/.autojump/etc/profile.d/autojump.sh'
+# Autojump - Lazy Loading (ultra-optimized)
+lazy_load_autojump() {
+    if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
+        source "$HOME/.autojump/etc/profile.d/autojump.sh"
+        alias j='autojump'
+        alias jhistory='autojump -s'
+    elif command -v autojump &> /dev/null; then
+        alias j='autojump'
+        alias jhistory='autojump -s'
+    else
+        j() { echo "❌ autojump not installed" >&2; return 1; }
+        jhistory() { echo "❌ autojump not installed" >&2; return 1; }
+    fi
+}
+alias autojump-init='lazy_load_autojump'
+j() { lazy_load_autojump; autojump "$@" 2>/dev/null || return 1; }
+jhistory() { lazy_load_autojump; autojump -s "$@" 2>/dev/null || return 1; }
 
 # ===============================================
 # Custom Functions

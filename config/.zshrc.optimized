@@ -56,11 +56,11 @@ alias python=python3
 alias pip=pip3
 
 # Conda Environment - Optimized Loading
-if [[ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]]; then
+if [[ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]]; then
     # Only activate conda when explicitly needed
-    export CONDA_EXE="/home/hao/anaconda3/bin/conda"
-    export _CONDA_ROOT="/home/hao/anaconda3"
-    alias conda-init='eval "$(/home/hao/anaconda3/bin/conda shell.zsh hook)" && conda activate base'
+    export CONDA_EXE="$HOME/anaconda3/bin/conda"
+    export _CONDA_ROOT="$HOME/anaconda3"
+    alias conda-init="eval \"\$($HOME/anaconda3/bin/conda shell.zsh hook)\" && conda activate base"
 fi
 
 # NVM (Node Version Manager) - Lazy Loading
@@ -92,11 +92,52 @@ export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:u
 export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
 export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
-# Autojump - Lazy Loading
+# Autojump Configuration - Lazy Loading (optimized for performance)
+# ===============================================
 lazy_load_autojump() {
-    [[ -s /home/hao/.autojump/etc/profile.d/autojump.sh ]] && source /home/hao/.autojump/etc/profile.d/autojump.sh
+    if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
+        source "$HOME/.autojump/etc/profile.d/autojump.sh"
+        alias j='autojump'
+        alias jhistory='autojump -s'
+    elif command -v autojump &> /dev/null; then
+        alias j='autojump'
+        alias jhistory='autojump -s'
+        [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
+            source "$(dirname $(command -v autojump))/../share/autojump/autojump.sh"
+    else
+        j() {
+            echo "❌ autojump is not installed" >&2
+            echo "Use: alias autojump-init='lazy_load_autojump' to initialize it later" >&2
+            return 1
+        }
+        jhistory() {
+            echo "❌ autojump is not installed" >&2
+            return 1
+        }
+    fi
 }
-alias autojump-lazy='lazy_load_autojump'
+
+# Initialize autojump lazily only when needed
+alias autojump-init='lazy_load_autojump'
+
+# Provide convenience functions that trigger lazy loading
+j() {
+    lazy_load_autojump
+    if command -v autojump &> /dev/null; then
+        autojump "$@"
+    else
+        return 1
+    fi
+}
+
+jhistory() {
+    lazy_load_autojump
+    if command -v autojump &> /dev/null; then
+        autojump -s "$@"
+    else
+        return 1
+    fi
+}
 
 # ===============================================
 # Custom Functions

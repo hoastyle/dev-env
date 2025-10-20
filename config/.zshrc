@@ -70,15 +70,15 @@ alias python=python3
 alias pip=pip3
 
 # Conda Environment
-__conda_setup="$(CONDA_REPORT_ERRORS=false '/home/hao/anaconda3/bin/conda' shell.bash hook 2> /dev/null)"
+__conda_setup="$(CONDA_REPORT_ERRORS=false "$HOME/anaconda3/bin/conda" shell.bash hook 2> /dev/null)"
 if [ $? -eq 0 ]; then
     \eval "$__conda_setup"
 else
-    if [ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/hao/anaconda3/etc/profile.d/conda.sh"
+    if [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/anaconda3/etc/profile.d/conda.sh"
         CONDA_CHANGEPS1=false conda activate base
     else
-        \export PATH="/home/hao/anaconda3/bin:$PATH"
+        \export PATH="$HOME/anaconda3/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -118,8 +118,38 @@ _fzf_compgen_dir() {
 export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
 export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
-# Autojump
-[[ -s /home/hao/.autojump/etc/profile.d/autojump.sh ]] && source /home/hao/.autojump/etc/profile.d/autojump.sh
+# Autojump Configuration
+# ===============================================
+# Fast directory jumping with autojump
+# Install: apt-get install autojump OR brew install autojump
+if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
+    source "$HOME/.autojump/etc/profile.d/autojump.sh"
+    # Create convenience alias
+    alias j='autojump'
+    alias jhistory='autojump -s'
+elif command -v autojump &> /dev/null; then
+    # Fallback: autojump installed but not in expected location
+    # Try to find autojump from PATH
+    if [[ -n "$(command -v autojump)" ]]; then
+        alias j='autojump'
+        alias jhistory='autojump -s'
+        # Source autojump shell integration if available
+        [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
+            source "$(dirname $(command -v autojump))/../share/autojump/autojump.sh"
+    fi
+else
+    # Autojump not installed - provide helpful message
+    j() {
+        echo "❌ autojump is not installed" >&2
+        echo "Please install with: apt-get install autojump (Ubuntu/Debian) or brew install autojump (macOS)" >&2
+        echo "After installation, restart your shell with: exec zsh" >&2
+        return 1
+    }
+    jhistory() {
+        echo "❌ autojump is not installed" >&2
+        return 1
+    }
+fi
 
 # ===============================================
 # Custom Functions
