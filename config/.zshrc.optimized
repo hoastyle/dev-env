@@ -94,24 +94,29 @@ export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
 # Autojump Configuration - Lazy Loading (optimized for performance)
 # ===============================================
+# NOTE: Do NOT create aliases j='autojump' as they override autojump.zsh function definitions!
 lazy_load_autojump() {
     if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
         source "$HOME/.autojump/etc/profile.d/autojump.sh"
-        alias j='autojump'
-        alias jhistory='autojump -s'
+        # autojump.zsh provides j() function - no need for aliases
     elif command -v autojump &> /dev/null; then
-        alias j='autojump'
-        alias jhistory='autojump -s'
         [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
             source "$(dirname $(command -v autojump))/../share/autojump/autojump.sh"
+        # If autojump shell integration failed, provide fallback
+        if ! command -v j &> /dev/null; then
+            alias j='autojump'
+            alias jhistory='autojump -s'
+        fi
     else
         j() {
             echo "❌ autojump is not installed" >&2
-            echo "Use: alias autojump-init='lazy_load_autojump' to initialize it later" >&2
+            echo "Install with: apt-get install autojump (Ubuntu/Debian) or brew install autojump (macOS)" >&2
+            echo "Use: autojump-init to initialize after installation" >&2
             return 1
         }
         jhistory() {
             echo "❌ autojump is not installed" >&2
+            echo "Install autojump to use this feature" >&2
             return 1
         }
     fi

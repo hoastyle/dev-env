@@ -104,22 +104,74 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x
 export PATH=/usr/local/cuda-11.1/bin/:$PATH
 
 # Autojump - Lazy Loading (ultra-optimized)
+# NOTE: CRITICAL FIX - j() must use 'cd' to actually change directories!
+#       Just calling autojump returns directory path but doesn't change to it.
+#
+# OPTIMIZATION: Use one-time loading flag to avoid redundant initialization
+typeset -g _AUTOJUMP_LAZY_LOADED=0
+
 lazy_load_autojump() {
+    # Skip if already loaded
+    [[ $_AUTOJUMP_LAZY_LOADED -eq 1 ]] && return 0
+
     if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
         source "$HOME/.autojump/etc/profile.d/autojump.sh"
-        alias j='autojump'
-        alias jhistory='autojump -s'
+        # autojump.zsh provides proper j() function with cd integration
     elif command -v autojump &> /dev/null; then
-        alias j='autojump'
-        alias jhistory='autojump -s'
+        [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
+            source "$(dirname $(command -v autojump))/../share/autojump/autojump.sh"
     else
-        j() { echo "❌ autojump not installed" >&2; return 1; }
-        jhistory() { echo "❌ autojump not installed" >&2; return 1; }
+        # autojump not available - keep placeholder functions
+        return 1
     fi
+
+    _AUTOJUMP_LAZY_LOADED=1
 }
 alias autojump-init='lazy_load_autojump'
-j() { lazy_load_autojump; autojump "$@" 2>/dev/null || return 1; }
-jhistory() { lazy_load_autojump; autojump -s "$@" 2>/dev/null || return 1; }
+
+# Ultra-optimized j() - lazy load autojump and jump to directory
+# FIXED: Avoid function override conflict by checking if autojump.zsh's j() was loaded
+j() {
+    # First-time initialization
+    if [[ $_AUTOJUMP_LAZY_LOADED -eq 0 ]]; then
+        lazy_load_autojump
+
+        # If autojump.zsh successfully defined j(), delegate to it
+        if typeset -f j | grep -q "autojump"; then
+            # Undefine this wrapper and call the real j() from autojump.zsh
+            unfunction j
+            j "$@"
+            return $?
+        fi
+    fi
+
+    # Fallback implementation if autojump.zsh's j() is not available
+    if command -v autojump &> /dev/null; then
+        local target_dir="$(autojump "$@" 2>/dev/null)"
+        if [[ -d "$target_dir" ]]; then
+            cd "$target_dir" && echo "📂 $target_dir"
+        else
+            echo "autojump: directory '$*' not found" >&2
+            return 1
+        fi
+    else
+        echo "❌ autojump is not installed" >&2
+        echo "Install with: apt-get install autojump (Ubuntu/Debian) or brew install autojump (macOS)" >&2
+        return 1
+    fi
+}
+
+jhistory() {
+    # Initialize autojump if not already loaded
+    [[ $_AUTOJUMP_LAZY_LOADED -eq 0 ]] && lazy_load_autojump
+
+    if command -v autojump &> /dev/null; then
+        autojump -s "$@" 2>/dev/null || return 1
+    else
+        echo "❌ autojump is not installed" >&2
+        return 1
+    fi
+}
 
 # ===============================================
 # Custom Functions

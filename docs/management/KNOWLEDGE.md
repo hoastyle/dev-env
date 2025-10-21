@@ -433,6 +433,72 @@ POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
 ---
 
+### Q5: j 命令不能跳转（仅显示目录名而不改变工作目录）
+
+**症状**:
+- 运行 `j pattern` 显示目标目录路径（如 `/home/user/workspace`）
+- 但工作目录没有改变，仍在原位置
+- 可能出现错误: "defining function based on alias `j'" 或 "parse error near ()""
+
+**根本原因**:
+ZSH 中别名优先级高于函数定义。如果在 `.zshrc` 中创建了 `alias j='autojump'`，
+会阻止 `autojump.zsh` 中的 `j()` 函数定义。autojump 命令本身只**返回**目录路径，
+而改变工作目录需要在**当前 shell 中**执行 `cd` 命令，这只能在 shell 函数中进行。
+
+**诊断**:
+```bash
+type j    # 如果显示 "j is an alias for autojump" 就是问题所在
+          # 应该显示 "j is a shell function from /path/to/autojump.zsh"
+```
+
+**解决方案**:
+```bash
+# ❌ 错误做法: 创建别名
+alias j='autojump'
+
+# ✅ 正确做法: 不创建别名，让 autojump.sh 的函数定义生效
+source ~/.autojump/etc/profile.d/autojump.sh
+# autojump.sh 会自动加载 autojump.zsh，其中定义了正确的 j() 函数
+```
+
+**实现细节** (autojump.zsh 中的 j() 函数):
+```zsh
+j() {
+    if [[ ${1} == -* ]] && [[ ${1} != "--" ]]; then
+        autojump ${@}
+        return
+    fi
+
+    setopt localoptions noautonamedirs
+    local output="$(autojump ${@})"
+    if [[ -d "${output}" ]]; then
+        if [ -t 1 ]; then  # if stdout is a terminal, use colors
+                echo -e "\\033[31m${output}\\033[0m"
+        else
+                echo -e "${output}"
+        fi
+        cd "${output}"    # ← 关键：在函数中执行 cd
+    else
+        echo "autojump: directory '${@}' not found"
+        echo "\n${output}\n"
+        echo "Try \`autojump --help\` for more information."
+        false
+    fi
+}
+```
+
+**关键要点**:
+- 别名仅代替命令，不能在当前 shell 中执行复杂操作
+- Shell 集成脚本中的函数可以访问当前 shell 的内置命令（如 cd）
+- 对于改变状态的操作，必须使用函数而不是别名
+
+**参考**:
+- 修复 commit: (待提交)
+- 相关文件: `config/.zshrc` 第 125-130 行, `config/.zshrc.optimized` 第 99-109 行
+- 相关工具: autojump shell 集成脚本位置 `~/.autojump/share/autojump/autojump.zsh`
+
+---
+
 ## 📖 文档组织结构
 
 ### 文档体系
