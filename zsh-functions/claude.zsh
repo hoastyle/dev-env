@@ -118,15 +118,20 @@ cc-create() {
         warning_msg "模板文件不存在: $CLAUDE_TEMPLATE_FILE"
         info_msg "正在创建默认模板..."
 
-        # 创建默认模板
+        # 创建默认模板（Claude Code CLI 格式）
         cat > "$CLAUDE_TEMPLATE_FILE" <<'EOF'
 {
-  "api_key": "YOUR_API_KEY_HERE",
-  "base_url": "https://api.anthropic.com",
-  "model": "claude-3-5-sonnet-20241022",
-  "max_tokens": 8096,
-  "temperature": 0.7,
-  "timeout": 60
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "YOUR_AUTH_TOKEN_HERE",
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
+  },
+  "model": "sonnet",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/ccline/ccline",
+    "padding": 0
+  },
+  "alwaysThinkingEnabled": false
 }
 EOF
         success_msg "已创建默认模板: $CLAUDE_TEMPLATE_FILE"
@@ -266,26 +271,39 @@ cc-validate() {
         fi
         success_msg "✓ JSON 格式正确"
 
-        # 检查必需字段
+        # 检查必需字段（兼容两种格式）
+        # 格式1: env.ANTHROPIC_AUTH_TOKEN (Claude Code CLI)
+        # 格式2: api_key (Anthropic API)
+        local has_auth_token=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' "$config_file")
         local has_api_key=$(jq -r '.api_key // empty' "$config_file")
-        local has_base_url=$(jq -r '.base_url // empty' "$config_file")
+
+        # Base URL 可能在 env.ANTHROPIC_BASE_URL 或顶层 base_url
+        local has_base_url=$(jq -r '(.env.ANTHROPIC_BASE_URL // .base_url) // empty' "$config_file")
+
+        # 模型字段
         local has_model=$(jq -r '.model // empty' "$config_file")
 
         echo ""
         info_msg "配置字段检查:"
 
-        if [[ -n "$has_api_key" && "$has_api_key" != "YOUR_API_KEY_HERE" ]]; then
+        # 检查认证信息
+        if [[ -n "$has_auth_token" && "$has_auth_token" != "YOUR_AUTH_TOKEN_HERE" ]]; then
+            success_msg "✓ ANTHROPIC_AUTH_TOKEN: 已配置"
+        elif [[ -n "$has_api_key" && "$has_api_key" != "YOUR_API_KEY_HERE" ]]; then
             success_msg "✓ api_key: 已配置"
         else
-            warning_msg "⚠ api_key: 未配置或使用默认值"
+            warning_msg "⚠ 认证信息: 未配置或使用默认值"
+            info_msg "  请配置 env.ANTHROPIC_AUTH_TOKEN 或 api_key"
         fi
 
+        # 检查 Base URL
         if [[ -n "$has_base_url" ]]; then
             success_msg "✓ base_url: $has_base_url"
         else
             warning_msg "⚠ base_url: 未配置"
         fi
 
+        # 检查模型
         if [[ -n "$has_model" ]]; then
             success_msg "✓ model: $has_model"
         else
@@ -411,10 +429,22 @@ cc-list() {
 
         # 如果有 jq，显示配置详情
         if command -v jq &>/dev/null; then
+            # 查询模型（顶层字段）
             local model=$(jq -r '.model // "未配置"' "$config_file" 2>/dev/null)
-            local base_url=$(jq -r '.base_url // "未配置"' "$config_file" 2>/dev/null)
+
+            # 查询 Base URL（可能在 env.ANTHROPIC_BASE_URL 或顶层 base_url）
+            local base_url=$(jq -r '(.env.ANTHROPIC_BASE_URL // .base_url) // "未配置"' "$config_file" 2>/dev/null)
+
+            # 查询 Auth Token（检查是否已配置）
+            local auth_token=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // empty' "$config_file" 2>/dev/null)
+            local auth_status="未配置"
+            if [[ -n "$auth_token" && "$auth_token" != "YOUR_AUTH_TOKEN_HERE" ]]; then
+                auth_status="已配置"
+            fi
+
             echo "    模型: $model"
             echo "    服务器: $base_url"
+            echo "    认证: $auth_status"
         fi
 
         echo ""
