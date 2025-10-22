@@ -1,0 +1,37 @@
+# Markdownlint配置文件
+# 基于项目需求定制的Markdown格式规则
+
+# 默认启用所有规则
+default: true
+
+# 禁用特定规则
+MD013: false # 行长度限制（项目中可能有长URL或代码）
+MD033: false # 内联HTML（某些情况下需要HTML标签）
+MD041: false # 第一行必须是顶级标题（某些文档可能不需要）
+
+# 自定义规则配置
+MD007:
+  # 无序列表缩进
+  indent: 2
+
+MD004:
+  # 无序列表样式统一使用星号
+  style: "asterisk"
+
+MD022:
+  # 标题周围空行
+  lines_above: 1
+  lines_below: 1
+
+MD032:
+  # 列表周围空行
+  lines_above: 1
+  lines_below: 1
+
+MD012:
+  # 禁止多个连续空行
+  maximum: 1
+
+MD025: false # 允许多个顶级标题（项目文档需要多个章节）
+# 禁止代码块的限制
+MD046: false

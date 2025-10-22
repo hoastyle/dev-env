@@ -1,0 +1,244 @@
+# Pre-commit Starter Configuration
+# 基于 PRD.md 需求文档完全重写
+# 设计原则: 性能优先、自动修复、分层检查、智能排除
+# 项目定位: 帮助其他项目快速建立企业级代码质量检查体系
+
+repos:
+  # ===========================================
+  # 第一层: 基础格式化和修复 (最快)
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0 # 使用最新稳定版本
+    hooks:
+      # 自动修复: 尾随空白
+      - id: trailing-whitespace
+        name: "Auto-fix: 移除尾随空白"
+        description: 自动移除行尾空白字符
+        args: [--markdown-linebreak-ext=md]
+
+      # 自动修复: 文件末尾换行
+      - id: end-of-file-fixer
+        name: "Auto-fix: 文件末尾换行"
+        description: 确保文件以单个换行符结束
+
+      # 自动修复: 行尾标准化
+      - id: mixed-line-ending
+        name: "Auto-fix: 行尾标准化"
+        description: 将行尾转换为Unix LF格式
+        args: [--fix=lf]
+
+  # YAML 文件格式化 - 使用 prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.3 # 使用最新稳定版本
+    hooks:
+      - id: prettier
+        name: "Auto-fix: YAML格式化"
+        description: 使用Prettier自动修复YAML文件格式问题
+        files: \.(yaml|yml)$
+        args: [--write, --tab-width=2, --print-width=100]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # 验证: YAML语法
+      - id: check-yaml
+        name: "Validate: YAML语法检查"
+        description: 验证YAML文件语法正确性
+
+      # 验证: JSON语法
+      - id: check-json
+        name: "Validate: JSON语法检查"
+        description: 验证JSON文件语法正确性
+
+      # 验证: 大文件检查
+      - id: check-added-large-files
+        name: "Validate: 大文件检查"
+        description: 防止意外提交大文件
+        args: [--maxkb=1024] # 1MB限制
+
+      # 验证: 合并冲突标记
+      - id: check-merge-conflict
+        name: "Validate: 合并冲突检查"
+        description: 检查是否包含未解决的合并冲突标记
+
+      # 验证: 可执行文件权限
+      - id: check-executables-have-shebangs
+        name: "Validate: 可执行文件权限"
+        description: 确保可执行文件有正确的shebang
+
+  # ===========================================
+  # 第二层: 代码格式化 (自动修复)
+  # ===========================================
+  # C++ 格式化 - 使用项目现有的 .clang-format
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v16.0.6 # 使用稳定版本
+    hooks:
+      - id: clang-format
+        name: "Auto-format: C++代码格式化"
+        description: 使用项目.clang-format文件自动格式化C++代码
+        files: \.(cpp|hpp|cc|cxx|c|h|hpp)$
+        args: [-i, --style=file]
+
+  # Python 格式化 - Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1 # 使用最新稳定版本
+    hooks:
+      - id: black
+        name: "Auto-format: Python代码格式化"
+        description: 使用Black自动格式化Python代码
+        language_version: python3
+        args: [--line-length=100, --target-version=py38]
+
+  # ===========================================
+  # 第三层: Python代码质量检查
+  # ===========================================
+  # Python 语法检查 - Flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0 # 使用最新版本
+    hooks:
+      - id: flake8
+        name: "Validate: Python语法检查"
+        description: 使用Flake8检查Python代码语法和风格
+        args: [--max-line-length=100, --extend-ignore=E203, W503]
+        additional_dependencies: [flake8-docstrings, flake8-import-order]
+
+  # Python 类型检查 - MyPy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0 # 使用最新版本
+    hooks:
+      - id: mypy
+        name: "Validate: Python类型检查"
+        description: 使用MyPy进行静态类型检查
+        args: [--ignore-missing-imports, --disallow-untyped-defs]
+        additional_dependencies: [types-requests, types-PyYAML]
+
+  # Python 安全检查 - Bandit
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5 # 使用最新版本
+    hooks:
+      - id: bandit
+        name: "Validate: Python安全检查"
+        description: 使用Bandit检测Python代码安全问题
+        args: [-r, -x, tests/]
+
+  # ===========================================
+  # 第四层: Shell脚本检查
+  # ===========================================
+  # Shell 脚本检查 - ShellCheck
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6 # 使用最新版本
+    hooks:
+      - id: shellcheck
+        name: "Validate: Shell脚本检查"
+        description: 使用ShellCheck检查Shell脚本语法和最佳实践
+        args: [--severity=warning, --external-sources]
+
+  # ===========================================
+  # 第五层: 专用文件格式化
+  # ===========================================
+  # CMake 文件格式化
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        name: "Auto-format: CMake文件格式化"
+        description: 自动格式化CMakeLists.txt文件
+
+  # Markdown 文件自动修复
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.11.0 # 使用最新稳定版本
+    hooks:
+      - id: markdownlint-cli2-fix
+        name: "Auto-fix: Markdown格式修复"
+        description: 自动修复Markdown格式问题
+        args: [--config=.markdownlint.yaml]
+
+  # ===========================================
+  # 第六层: 项目特定检查
+  # ===========================================
+  - repo: local
+    hooks:
+      # C++ 头文件检查
+      - id: check-cpp-headers
+        name: "Validate: C++头文件检查"
+        description: 检查C++头文件的规范性
+        entry: bash
+        language: system
+        files: \.(hpp|h)$
+        args:
+          - -c
+          - |
+            if [ $# -eq 0 ]; then
+              echo "✅ C++头文件检查完成 (无文件需要检查)"
+              exit 0
+            fi
+            for file in "$@"; do
+              # 检查头文件保护
+              if ! grep -q "#pragma once\|#ifndef.*_H\|#ifndef.*_HPP" "$file"; then
+                echo "⚠️  $file: 缺少头文件保护 (#pragma once 或 #ifndef)"
+              fi
+              # 检查是否包含不必要的命名空间
+              if grep -q "using namespace std" "$file"; then
+                echo "⚠️  $file: 头文件中避免使用 \"using namespace std\""
+              fi
+            done
+            echo "✅ C++头文件检查完成"
+
+      # 项目文件结构检查
+      - id: check-project-structure
+        name: "Validate: 项目结构检查"
+        description: 检查项目文件结构的规范性
+        entry: bash
+        language: system
+        files: \.(cpp|hpp|cc|cxx|c|h|py|sh)$
+        args:
+          - -c
+          - |
+            if [ $# -eq 0 ]; then
+              echo "✅ 项目结构检查完成 (无文件需要检查)"
+              exit 0
+            fi
+            # 检查是否在正确的目录中
+            for file in "$@"; do
+              if [[ "$file" == src* ]] || [[ "$file" == include* ]] || [[ "$file" == scripts* ]] || [[ "$file" == test* ]]; then
+                echo "✅ $file: 目录位置正确"
+              else
+                echo "⚠️  $file: 请确认文件目录位置"
+              fi
+            done
+            echo "✅ 项目结构检查完成"
+
+# ===========================================
+# 全局配置
+# ===========================================
+fail_fast: false # 不要在第一个错误就停止，要运行所有检查
+default_language_version:
+  python: python3 # 默认使用Python3
+
+# 默认安装的hook类型
+default_install_hook_types: [pre-commit, pre-push]
+
+# ===========================================
+# 文件排除配置 (严格按照PRD.md要求)
+# ===========================================
+
+# ===========================================
+# 文件排除配置 (严格按照PRD.md要求)
+# ===========================================
+exclude: ^(build/|thirdparty/|test/googletest/|test/GtestSample/|test/GtestExample/|jquery-easyui-1.7.0/|cmake-build-debug/|cmake-build-release/|third_party/|external/|vendor/|\.cache/|.*\.pcd$|.*\.txt$|.*\.js$)
+
+# ===========================================
+# 最小版本要求
+# ===========================================
+minimum_pre_commit_version: "3.0.0"
+# ===========================================
+# 配置说明
+# ===========================================
+# 本配置基于PRD.md需求文档设计:
+# 1. 只检查增量相关文件 - pre-commit默认行为
+# 2. 支持所有PRD要求的语言和文件类型验证
+# 3. 严格按照PRD.md要求配置文件和目录排除
+# 4. 分层设计: 从快速修复到深度检查
+# 5. 所有能自动修复的工具都配置了自动修复
+# 6. 使用项目现有的.clang-format文件
+# 7. 移除了静态工具，留到push阶段考虑
