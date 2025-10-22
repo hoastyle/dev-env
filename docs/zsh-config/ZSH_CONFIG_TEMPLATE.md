@@ -9,6 +9,7 @@
 ## 1. 快速开始
 
 ### 📦 **一键安装**
+
 ```bash
 # 克隆配置仓库
 git clone <repository-url> ~/.zsh-config
@@ -22,6 +23,7 @@ source ~/.zshrc
 ```
 
 ### 🔧 **手动安装**
+
 ```bash
 # 1. 安装 Antigen
 curl -L git.io/antigen > ~/.antigen.zsh
@@ -43,6 +45,7 @@ source ~/.zshrc
 ## 2. 配置文件模板
 
 ### 📋 **基础配置模板**
+
 ```bash
 # ===============================
 # ZSH Configuration Template
@@ -140,6 +143,7 @@ alias pip='pip3'
 ```
 
 ### 🎯 **轻量级模板** (适合服务器环境)
+
 ```bash
 # Minimal ZSH Configuration
 source "$HOME/.antigen.zsh"
@@ -159,6 +163,7 @@ alias ...='cd ../..'
 ```
 
 ### 🚀 **开发增强模板** (适合开发机器)
+
 ```bash
 # Enhanced Development Configuration
 source "$HOME/.antigen.zsh"
@@ -201,6 +206,7 @@ export GIT_PS1_SHOWSTASHSTATE=1
 ## 3. 环境适配
 
 ### 🐳 **Docker 环境配置**
+
 ```bash
 # Docker 环境专用配置
 if [[ -f "/.dockerenv" ]]; then
@@ -216,6 +222,7 @@ fi
 ```
 
 ### 🖥️ **服务器环境配置**
+
 ```bash
 # 服务器环境优化
 if [[ $(uname -s) == "Linux" ]] && [[ -z "$DISPLAY" ]]; then
@@ -232,6 +239,7 @@ fi
 ```
 
 ### 💻 **MacOS 环境配置**
+
 ```bash
 # MacOS 专用配置
 if [[ $(uname -s) == "Darwin" ]]; then
@@ -253,6 +261,7 @@ fi
 ### 📊 **插件分类**
 
 #### 🎯 **核心插件** (推荐安装)
+
 | 插件 | 功能 | 性能影响 |
 |------|------|---------|
 | `git` | Git 命令增强 | 低 |
@@ -261,6 +270,7 @@ fi
 | `zsh-autosuggestions` | 自动建议 | 中 |
 
 #### 🛠️ **开发工具插件** (按需选择)
+
 | 插件 | 功能 | 适用场景 |
 |------|------|---------|
 | `docker` | Docker 命令补全 | 容器化开发 |
@@ -269,6 +279,7 @@ fi
 | `python` | Python 环境管理 | Python 开发 |
 
 #### ⚡ **性能优化插件**
+
 | 插件 | 功能 | 注意事项 |
 |------|------|---------|
 | `zsh-autosuggestions` | 自动建议 | 可能影响历史记录 |
@@ -278,6 +289,7 @@ fi
 ### 🎯 **推荐配置组合**
 
 #### 💻 **开发者配置**
+
 ```bash
 # 开发者推荐插件组合
 antigen bundle git
@@ -290,6 +302,7 @@ antigen bundle pip
 ```
 
 #### 🖥️ **运维工程师配置**
+
 ```bash
 # 运维工程师推荐插件组合
 antigen bundle git
@@ -300,6 +313,7 @@ antigen bundle docker
 ```
 
 #### 🐧 **服务器管理员配置**
+
 ```bash
 # 服务器管理员推荐插件组合
 antigen bundle git
@@ -313,6 +327,7 @@ antigen bundle extract
 ### 🎨 **主题选择**
 
 #### 🏃‍♂️ **轻量级主题**
+
 ```bash
 # 简洁主题
 antigen theme minimal     # 极简主题
@@ -321,6 +336,7 @@ antigen theme lambda      # Lambda 主题
 ```
 
 #### 🎯 **功能丰富主题**
+
 ```bash
 # 功能主题
 antigen theme robbyrussell    # 经典主题 (推荐)
@@ -329,6 +345,7 @@ antigen theme bureau          # 现代 UI 风格
 ```
 
 #### 🌈 **彩色主题**
+
 ```bash
 # 彩色主题
 antigen theme gallois         # 彩色箭头
@@ -337,6 +354,7 @@ antigen theme refined         # 优雅配色
 ```
 
 ### 🎯 **自定义主题示例**
+
 ```bash
 # 自定义主题函数
 custom_theme() {
@@ -366,6 +384,7 @@ antigen theme custom_theme
 ### ⚡ **启动时间优化**
 
 #### 🔧 **插件延迟加载**
+
 ```bash
 # 延迟加载函数
 _lazy_load() {
@@ -392,6 +411,7 @@ _lazy_load docker 'echo "Docker commands loading..."' 'docker'
 ```
 
 #### 🚀 **条件加载**
+
 ```bash
 # 根据环境条件加载插件
 if command -v docker &> /dev/null; then
@@ -408,6 +428,7 @@ fi
 ```
 
 ### 📊 **性能监控**
+
 ```bash
 # 启动时间监控
 zsh_load_time() {
@@ -430,6 +451,7 @@ zsh_memory_usage() {
 ### 🔧 **常见问题解决**
 
 #### ❌ **问题: 主题不显示**
+
 ```bash
 # 解决方案: 强制重新加载主题
 antigen theme robbyrussell
@@ -438,6 +460,7 @@ exec zsh
 ```
 
 #### ⚠️ **问题: 插件加载失败**
+
 ```bash
 # 检查插件状态
 antigen list
@@ -449,6 +472,7 @@ antigen apply
 ```
 
 #### 🐌 **问题: 启动速度慢**
+
 ```bash
 # 检查启动时间
 zsh -i -c 'echo $(( $(date +%s%N) - $(date +%s%N) ))'
@@ -458,6 +482,7 @@ antigen bundle <plugin-name> --disable
 ```
 
 ### 🔍 **调试模式**
+
 ```bash
 # 启用详细输出
 setopt XTRACE
@@ -473,6 +498,7 @@ zsh -i -c 'echo $fpath'
 ## 8. 备份与恢复
 
 ### 💾 **配置备份**
+
 ```bash
 #!/bin/bash
 # backup_zsh.sh
@@ -494,6 +520,7 @@ echo "✅ ZSH 配置已备份到: $BACKUP_DIR"
 ```
 
 ### 🔄 **配置恢复**
+
 ```bash
 #!/bin/bash
 # restore_zsh.sh
@@ -521,6 +548,7 @@ echo "✅ ZSH 配置已恢复"
 ## 9. 安装脚本
 
 ### 📦 **自动安装脚本**
+
 ```bash
 #!/bin/bash
 # install_zsh_config.sh
@@ -623,6 +651,7 @@ main "$@"
 ## 10. 使用示例
 
 ### 💻 **日常使用**
+
 ```bash
 # 检查当前环境
 check_environment
@@ -643,6 +672,7 @@ git commit -m "update config"
 ```
 
 ### 🛠️ **开发工作流**
+
 ```bash
 # 激活 Python 环境
 conda activate myenv
@@ -659,6 +689,7 @@ docker run -it ubuntu bash
 ```
 
 ### 📊 **性能监控**
+
 ```bash
 # 检查启动时间
 zsh_load_time

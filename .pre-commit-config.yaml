@@ -93,8 +93,10 @@ repos:
   # 第三层: Python代码质量检查
   # ===========================================
   # Python 语法检查 - Flake8
+  # 注意: 使用 5.0.4 版本以兼容 Python 3.8.0
+  # 最新版本 (6.0.0+) 需要 Python >= 3.8.1
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0 # 使用最新版本
+    rev: 5.0.4 # 兼容 Python 3.8.0 的版本
     hooks:
       - id: flake8
         name: "Validate: Python语法检查"
@@ -103,8 +105,10 @@ repos:
         additional_dependencies: [flake8-docstrings, flake8-import-order]
 
   # Python 类型检查 - MyPy
+  # 注意: 使用 1.0.1 版本以兼容 Python 3.8.0
+  # 版本 1.1+ 需要 Python >= 3.8.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0 # 使用最新版本
+    rev: v1.0.1 # 兼容 Python 3.8.0 的版本
     hooks:
       - id: mypy
         name: "Validate: Python类型检查"
@@ -113,8 +117,9 @@ repos:
         additional_dependencies: [types-requests, types-PyYAML]
 
   # Python 安全检查 - Bandit
+  # 注意: 使用 1.7.5 版本以兼容 Python 3.8.0
   - repo: https://github.com/pycqa/bandit
-    rev: 1.7.5 # 使用最新版本
+    rev: 1.7.5 # 兼容 Python 3.8.0 的版本
     hooks:
       - id: bandit
         name: "Validate: Python安全检查"

@@ -11,8 +11,9 @@
 本文档记录了 ZSH 帮助系统开发过程中遇到的一个典型问题：函数无法正常运行的问题诊断和修复过程。该案例展示了系统性的调试方法和 ZSH 开发的最佳实践。
 
 ### 🎯 问题现象
-- `zsh_help` 命令返回 `command not found`
-- 新创建的帮助系统函数无法在当前 Shell 环境中使用
+
+* `zsh_help` 命令返回 `command not found`
+* 新创建的帮助系统函数无法在当前 Shell 环境中使用
 
 ---
 
@@ -54,6 +55,7 @@ grep -A 10 "Load custom functions" ~/.zshrc
 ### 第三步：根因分析
 
 #### A. **文件路径问题**
+
 ```
 项目目录: /home/hao/Workspace/MM/utility/dev-env/zsh-functions/help.zsh
 用户目录: ~/.zsh/functions/help.zsh (缺失)
@@ -61,6 +63,7 @@ grep -A 10 "Load custom functions" ~/.zshrc
 ```
 
 #### B. **配置时序问题**
+
 ```
 1. source ~/.zshrc (加载时 help.zsh 不存在)
 2. 开发 help.zsh (在项目目录)
@@ -122,6 +125,7 @@ fi
 ### 问题分析
 
 #### ZSH 数组语法说明
+
 ```zsh
 # COMMAND_CATEGORIES 关联数组
 COMMAND_CATEGORIES[hg]="搜索增强"
@@ -132,6 +136,7 @@ ${COMMAND_CATEGORIES[(I)hg]}  # 返回 hg 的索引 (非空)
 ```
 
 #### 逻辑流程错误
+
 1. 用户输入: `zsh_help hg`
 2. 第一个条件: `${COMMAND_CATEGORIES[(I)hg]}` 返回非空值
 3. 结果: 被误判为类别查询，调用 `show_category_help "hg"`
@@ -386,10 +391,10 @@ echo "🏁 测试完成"
 
 ## 📖 相关文档
 
-- [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
-- [项目配置文档](../../CLAUDE.md)
-- [函数模块文档](../../zsh-functions/README.md)
-- [安装配置指南](../README.md)
+* [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
+* [项目配置文档](../../CLAUDE.md)
+* [函数模块文档](../../zsh-functions/README.md)
+* [安装配置指南](../README.md)
 
 ---
 
