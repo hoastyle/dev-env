@@ -1,9 +1,9 @@
 # TASK.md - dev-env 项目任务追踪
 
-**版本**: 2.1.7
+**版本**: 2.1.8
 **最后更新**: 2025-10-22
 **项目状态**: 稳定，活跃维护中
-**最后工作**: Claude CLI 配置管理系统完整实现 ✅ (已提交)
+**最后工作**: Claude CLI 配置格式修复完成 ✅ (已提交)
 
 ---
 
@@ -17,9 +17,9 @@
 | **待办** | 6 | ⏳ 6.3% |
 
 **更新说明**:
-- 2025-10-22 完成 Claude CLI 配置管理系统实现并已提交 ✅
-- 2025-10-22 任务统计更新: 88→89 完成，项目完成度提升至 92.7%
-- 2025-10-22 关键成就: 8 个命令、520 行代码、热重载机制、动态别名生成
+- 2025-10-22 完成 Claude CLI 配置格式和显示修复 (Bug Fix) ✅
+- 2025-10-22 修复两个关键问题: 模板格式不匹配、cc-list 显示不准确
+- 2025-10-22 实现格式兼容机制，支持 Claude Code CLI 和 Anthropic API 两种格式
 
 ---
 
@@ -242,6 +242,78 @@
 ---
 
 ## ✅ 最近完成的任务 (Recently Completed)
+
+### 已完成 (2025-10-22) - Claude CLI 配置修复 ✅
+
+#### 0.5. Claude CLI 配置格式和显示修复 ✅
+- **完成时间**: 2025-10-22 16:45
+- **优先级**: High (Bug Fix)
+- **工作量**: S (小)
+- **提交**: e2dbb60
+
+**问题诊断**:
+
+1. **问题 1: 模板文件格式不匹配** 🐛
+   - **症状**: `cc-create` 生成的配置与实际使用的格式不一致
+   - **根本原因**: 模板使用 Anthropic API 格式，而用户实际使用 Claude Code CLI 格式
+   - **影响**: 用户创建新配置后需要手动调整结构
+
+2. **问题 2: cc-list 显示状态不准确** 🐛
+   - **症状**: 显示"模型: 未配置"、"服务器: 未配置"，但实际已配置
+   - **根本原因**: jq 查询路径错误，查询顶层字段而非 `env` 下的字段
+   - **影响**: 用户无法正确查看配置状态
+
+**修复内容**:
+
+1. **更新默认模板** ✅
+   ```json
+   // 修复前（Anthropic API 格式）
+   {
+     "api_key": "YOUR_API_KEY_HERE",
+     "base_url": "https://api.anthropic.com",
+     "model": "claude-3-5-sonnet-20241022"
+   }
+
+   // 修复后（Claude Code CLI 格式）
+   {
+     "env": {
+       "ANTHROPIC_AUTH_TOKEN": "YOUR_AUTH_TOKEN_HERE",
+       "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
+     },
+     "model": "sonnet",
+     "statusLine": {...}
+   }
+   ```
+
+2. **修复 cc-list 显示逻辑** ✅
+   - 使用 jq 回退查询: `(.env.ANTHROPIC_BASE_URL // .base_url)`
+   - 新增认证状态显示: "已配置"/"未配置"
+   - 兼容 Claude Code CLI 和 Anthropic API 两种格式
+
+3. **修复 cc-validate 验证逻辑** ✅
+   - 优先检查 `env.ANTHROPIC_AUTH_TOKEN`
+   - 回退检查 `api_key`
+   - 改进错误提示，明确两种配置方式
+
+**技术亮点**:
+- ✨ jq 回退机制实现格式兼容
+- ✨ 优雅降级策略，支持新旧两种格式
+- ✨ 改进安全性，避免泄露完整 Token
+- ✨ 跨格式字段检查和验证
+
+**验证结果**:
+- ✓ ZSH 语法检查: PASSED
+- ✓ jq 查询在实际配置测试: PASSED
+- ✓ 新模板 JSON 格式: VALID
+- ✓ 字段回退查询: WORKING
+
+**修改文件**:
+- 修改: `zsh-functions/claude.zsh` (+42, -12 lines)
+
+**知识库更新**:
+- 新增 Q6: Claude Code CLI 配置格式差异处理
+
+---
 
 ### 已完成 (2025-10-22) - Claude CLI 配置管理系统 ✅
 
