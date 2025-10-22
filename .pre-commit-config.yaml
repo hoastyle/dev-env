@@ -157,6 +157,7 @@ repos:
         name: "Auto-fix: Markdown格式修复"
         description: 自动修复Markdown格式问题
         args: [--config=.markdownlint.yaml]
+        stages: [pre-commit]  # 仅在 pre-commit 阶段运行，不在 push 时运行
 
   # ===========================================
   # 第六层: 项目特定检查
