@@ -23,6 +23,7 @@ ls -la PROXY_QUICK_REFERENCE.md
 ### 步骤 2：加载函数库
 
 #### 方式 A：完整安装（推荐）
+
 ```bash
 # 运行安装脚本
 ./scripts/install_zsh_config.sh
@@ -31,6 +32,7 @@ ls -la PROXY_QUICK_REFERENCE.md
 ```
 
 #### 方式 B：手动加载（临时）
+
 ```bash
 # 在当前 ZSH 会话中加载
 source zsh-functions/utils.zsh
@@ -149,14 +151,14 @@ bash test_proxy_enhancements.sh
 
 ### 手动测试清单
 
-- [ ] 检查 `proxy` 命令
-- [ ] 检查 `unproxy` 命令
-- [ ] 检查 `check_proxy` 命令
-- [ ] 检查 `proxy_status` 命令
-- [ ] 验证配置文件创建
-- [ ] 测试自定义代理地址
-- [ ] 测试代理验证功能
-- [ ] 验证帮助系统集成
+* [ ] 检查 `proxy` 命令
+* [ ] 检查 `unproxy` 命令
+* [ ] 检查 `check_proxy` 命令
+* [ ] 检查 `proxy_status` 命令
+* [ ] 验证配置文件创建
+* [ ] 测试自定义代理地址
+* [ ] 测试代理验证功能
+* [ ] 验证帮助系统集成
 
 ---
 
@@ -360,32 +362,35 @@ env | grep proxy
 
 ## ✅ 集成清单
 
-- [ ] 确认文件已更新（utils.zsh, help.zsh）
-- [ ] 加载函数库（source 或运行安装脚本）
-- [ ] 验证命令可用（type proxy）
-- [ ] 测试基础功能（proxy, check_proxy）
-- [ ] 测试高级功能（自定义地址、验证）
-- [ ] 查看配置文件（cat ~/.proxy_config）
-- [ ] 运行测试脚本（./test_proxy_enhancements.sh）
-- [ ] 查看帮助文档（zsh_help proxy）
+* [ ] 确认文件已更新（utils.zsh, help.zsh）
+* [ ] 加载函数库（source 或运行安装脚本）
+* [ ] 验证命令可用（type proxy）
+* [ ] 测试基础功能（proxy, check_proxy）
+* [ ] 测试高级功能（自定义地址、验证）
+* [ ] 查看配置文件（cat ~/.proxy_config）
+* [ ] 运行测试脚本（./test_proxy_enhancements.sh）
+* [ ] 查看帮助文档（zsh_help proxy）
 
 ---
 
 ## 🎓 学习路径
 
 ### 初级用户
+
 1. 阅读 PROXY_QUICK_REFERENCE.md
 2. 运行 proxy 命令启用代理
 3. 使用 check_proxy 检查状态
 4. 查看 proxy_status 了解详情
 
 ### 中级用户
+
 1. 编辑 ~/.proxy_config 自定义设置
 2. 使用自定义代理地址：`proxy 127.0.0.1:10808`
 3. 验证代理连接：`proxy ... --verify`
 4. 在脚本中集成代理功能
 
 ### 高级用户
+
 1. 研究 PROXY_OPTIMIZATION.md 了解优化原理
 2. 查看 utils.zsh 源代码理解实现细节
 3. 扩展功能（如添加代理链支持）
@@ -395,26 +400,28 @@ env | grep proxy
 
 ## 🔗 相关资源
 
-- 主项目文档：[../../README.md](../../README.md)
-- 开发指南：[../../CLAUDE.md](../../CLAUDE.md)
-- ZSH 配置：[../../config/.zshrc](../../config/.zshrc)
-- 函数库：[../../zsh-functions/](../../zsh-functions/)
+* 主项目文档：[../../README.md](../../README.md)
+* 开发指南：[../../CLAUDE.md](../../CLAUDE.md)
+* ZSH 配置：[../../config/.zshrc](../../config/.zshrc)
+* 函数库：[../../zsh-functions/](../../zsh-functions/)
 
 ---
 
 ## 📝 更新记录
 
 ### v2.1 (2025-10-17)
-- ✅ 添加 check_proxy 命令
-- ✅ 添加 proxy_status 命令
-- ✅ 实现代理可用性检测
-- ✅ 实现配置文件管理
-- ✅ 修复 NO_PROXY 配置
-- ✅ 创建完整文档
-- ✅ 创建测试脚本
+
+* ✅ 添加 check_proxy 命令
+* ✅ 添加 proxy_status 命令
+* ✅ 实现代理可用性检测
+* ✅ 实现配置文件管理
+* ✅ 修复 NO_PROXY 配置
+* ✅ 创建完整文档
+* ✅ 创建测试脚本
 
 ### v2.0 及之前
-- 原始代理功能
+
+* 原始代理功能
 
 ---
 

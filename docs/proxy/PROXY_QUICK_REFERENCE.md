@@ -3,6 +3,7 @@
 ## 🚀 快速开始
 
 ### 1. 启用代理
+
 ```bash
 proxy                    # 使用默认配置启用
 proxy 127.0.0.1:7890    # 使用自定义地址
@@ -10,6 +11,7 @@ proxy 127.0.0.1:7890 -v # 启用并验证连接
 ```
 
 ### 2. 检查状态
+
 ```bash
 check_proxy              # 快速检查 (输出: ✅/❌)
 check_proxy -s          # 显示详细状态
@@ -17,6 +19,7 @@ proxy_status            # 显示完整配置信息
 ```
 
 ### 3. 禁用代理
+
 ```bash
 unproxy                 # 清除所有代理变量
 ```
@@ -37,6 +40,7 @@ unproxy                 # 清除所有代理变量
 ## 💡 常用场景
 
 ### 场景 1：启用默认代理
+
 ```bash
 $ proxy
 ✅ 代理已启用
@@ -45,6 +49,7 @@ $ proxy
 ```
 
 ### 场景 2：使用 V2Ray 代理
+
 ```bash
 $ proxy 127.0.0.1:10808
 ✅ 代理已启用
@@ -53,6 +58,7 @@ $ proxy 127.0.0.1:10808
 ```
 
 ### 场景 3：验证代理连接
+
 ```bash
 $ proxy 127.0.0.1:7890 --verify
 ✅ 代理已启用
@@ -63,6 +69,7 @@ $ proxy 127.0.0.1:7890 --verify
 ```
 
 ### 场景 4：查看完整代理配置
+
 ```bash
 $ proxy_status
 
@@ -83,6 +90,7 @@ $ proxy_status
 ```
 
 ### 场景 5：禁用代理
+
 ```bash
 $ unproxy
 ❌ 代理已禁用
@@ -93,6 +101,7 @@ $ unproxy
 ## ⚙️ 配置文件 (~/.proxy_config)
 
 ### 默认内容
+
 ```bash
 # Proxy Configuration File
 PROXY_ADDRESS=127.0.0.1:7890
@@ -101,6 +110,7 @@ PROXY_TIMEOUT=3
 ```
 
 ### 修改配置
+
 ```bash
 # 编辑配置文件
 nano ~/.proxy_config
@@ -117,6 +127,7 @@ proxy    # 使用新的 10808 端口
 ## 🔍 命令选项详解
 
 ### `proxy` 命令
+
 ```bash
 proxy [host:port] [--verify|-v]
 
@@ -132,6 +143,7 @@ proxy [host:port] [--verify|-v]
 ```
 
 ### `check_proxy` 命令
+
 ```bash
 check_proxy [--status|-s]
 
@@ -145,6 +157,7 @@ check_proxy [--status|-s]
 ```
 
 ### `proxy_status` 命令
+
 ```bash
 proxy_status
 
@@ -158,6 +171,7 @@ proxy_status
 ```
 
 ### `unproxy` 命令
+
 ```bash
 unproxy
 
@@ -176,6 +190,7 @@ unproxy
 ## 🆘 故障排除
 
 ### 问题 1：代理连接失败
+
 ```bash
 # 验证代理地址
 $ proxy 127.0.0.1:7890 --verify
@@ -188,6 +203,7 @@ $ proxy 127.0.0.1:7890 --verify
 ```
 
 ### 问题 2：环境变量未设置
+
 ```bash
 # 检查代理是否启用
 $ check_proxy
@@ -198,6 +214,7 @@ proxy 127.0.0.1:7890    # 重新启用代理
 ```
 
 ### 问题 3：配置文件不存在
+
 ```bash
 # 首次使用会自动创建
 $ proxy
@@ -206,6 +223,7 @@ $ proxy
 ```
 
 ### 问题 4：查看帮助信息
+
 ```bash
 # 查看所有代理命令帮助
 zsh_help 实用工具
@@ -222,6 +240,7 @@ zsh_help unproxy
 ## 📚 相关命令
 
 ### 查看环境变量
+
 ```bash
 # 查看代理相关环境变量
 echo $http_proxy
@@ -233,6 +252,7 @@ env | grep -i proxy
 ```
 
 ### 测试代理连接
+
 ```bash
 # 使用 curl 测试代理
 curl -x http://127.0.0.1:7890 https://www.google.com
@@ -242,6 +262,7 @@ wget -e http_proxy=127.0.0.1:7890 https://www.google.com
 ```
 
 ### 检查代理可用性
+
 ```bash
 # 尝试连接代理服务
 timeout 3 bash -c "echo > /dev/tcp/127.0.0.1/7890" && echo "Connected" || echo "Failed"
@@ -252,6 +273,7 @@ timeout 3 bash -c "echo > /dev/tcp/127.0.0.1/7890" && echo "Connected" || echo "
 ## 🎯 最佳实践
 
 ### 1. 定期检查代理状态
+
 ```bash
 # 工作开始时检查
 check_proxy --status
@@ -261,12 +283,14 @@ proxy_status
 ```
 
 ### 2. 验证代理配置
+
 ```bash
 # 修改配置后验证
 proxy 127.0.0.1:7890 --verify
 ```
 
 ### 3. 使用配置文件管理多个代理
+
 ```bash
 # ~/.proxy_config
 # 快速修改 PROXY_ADDRESS，重新启用即可
@@ -275,6 +299,7 @@ PROXY_ADDRESS=127.0.0.1:10808  # V2Ray
 ```
 
 ### 4. 脚本中使用代理
+
 ```bash
 # 脚本开始
 proxy 127.0.0.1:7890
@@ -325,7 +350,7 @@ zsh_help unproxy
 
 ## 📊 版本信息
 
-- **版本**: 2.1
-- **更新日期**: 2025-10-17
-- **维护者**: Development Team
-- **状态**: ✅ 生产就绪
+* **版本**: 2.1
+* **更新日期**: 2025-10-17
+* **维护者**: Development Team
+* **状态**: ✅ 生产就绪

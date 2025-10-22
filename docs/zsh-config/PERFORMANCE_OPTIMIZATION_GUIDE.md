@@ -55,11 +55,12 @@ exec zsh
 ```
 
 **完整安装的优势**：
-- ✅ 系统级集成，配置永久生效
-- ✅ 所有依赖工具自动安装
-- ✅ 自定义函数完全可用
-- ✅ 日常使用无需额外步骤
-- ✅ 支持完整的开发环境
+
+* ✅ 系统级集成，配置永久生效
+* ✅ 所有依赖工具自动安装
+* ✅ 自定义函数完全可用
+* ✅ 日常使用无需额外步骤
+* ✅ 支持完整的开发环境
 
 #### ⚡ **方式二：直接启动 (临时使用)**
 
@@ -76,14 +77,16 @@ cd dev-env/scripts
 ```
 
 **直接启动的优势**：
-- ⚡ 即开即用，无需安装
-- ⚡ 临时环境，不影响现有配置
-- ⚡ 适合测试和快速体验
-- ⚡ 支持性能测试和对比
+
+* ⚡ 即开即用，无需安装
+* ⚡ 临时环境，不影响现有配置
+* ⚡ 适合测试和快速体验
+* ⚡ 支持性能测试和对比
 
 ### ⚠️ **直接启动的限制和依赖**
 
 #### 🔧 **必需依赖**
+
 ```bash
 # 需要预先安装以下工具：
 # Ubuntu/Debian:
@@ -94,17 +97,19 @@ brew install fzf fd ripgrep
 ```
 
 #### 📋 **功能限制**
-- ❌ `./scripts/zsh_tools.sh` 部分功能不可用
-- ❌ 自定义函数模块 (如 `zsh_help`) 需要手动加载
-- ❌ 系统级配置验证功能受限
-- ❌ 插件更新和管理功能不可用
+
+* ❌ `./scripts/zsh_tools.sh` 部分功能不可用
+* ❌ 自定义函数模块 (如 `zsh_help`) 需要手动加载
+* ❌ 系统级配置验证功能受限
+* ❌ 插件更新和管理功能不可用
 
 #### ✅ **可用功能**
-- ✅ 三种启动模式 (minimal/fast/normal)
-- ✅ 性能对比测试 (`./zsh_launcher.sh benchmark`)
-- ✅ 详细性能分析
-- ✅ 基础命令帮助 (启动器内置)
-- ✅ 配置切换和恢复功能
+
+* ✅ 三种启动模式 (minimal/fast/normal)
+* ✅ 性能对比测试 (`./zsh_launcher.sh benchmark`)
+* ✅ 详细性能分析
+* ✅ 基础命令帮助 (启动器内置)
+* ✅ 配置切换和恢复功能
 
 ### 📊 性能对比测试
 
@@ -118,19 +123,22 @@ brew install fzf fd ripgrep
 
 ### 🎯 **使用场景建议**
 
-#### **选择完整安装**，如果：
-- 需要日常开发环境
-- 需要完整的自定义函数支持
-- 希望配置永久生效
-- 需要插件管理和更新功能
+#### **选择完整安装**，如果
 
-#### **选择直接启动**，如果：
-- 只是临时测试环境
-- 需要快速体验性能优化效果
-- 不想影响现有系统配置
-- 需要在多个配置间切换测试
+* 需要日常开发环境
+* 需要完整的自定义函数支持
+* 希望配置永久生效
+* 需要插件管理和更新功能
+
+#### **选择直接启动**，如果
+
+* 只是临时测试环境
+* 需要快速体验性能优化效果
+* 不想影响现有系统配置
+* 需要在多个配置间切换测试
 
 #### **混合使用策略**
+
 ```bash
 # 1. 先用直接启动体验效果
 ./scripts/zsh_launcher.sh benchmark
@@ -149,6 +157,7 @@ brew install fzf fd ripgrep
 ### 问题诊断过程
 
 #### 1. 初始性能测试
+
 ```bash
 # 基础性能测试
 ./scripts/zsh_tools.sh benchmark
@@ -161,6 +170,7 @@ brew install fzf fd ripgrep
 ```
 
 #### 2. 详细性能分析
+
 ```bash
 # 使用内置性能分析器
 zsh -c "zmodload zsh/zprof; source ~/.zshrc; zprof"
@@ -178,9 +188,9 @@ zsh -c "zmodload zsh/zprof; source ~/.zshrc; zprof"
 
 **关键发现**: 改善补全缓存后，NVM 自动初始化成为新的性能瓶颈。
 
-- **nvm_auto / nvm_process_parameters**: 会在每次启动时扫描 `.nvmrc` 并解析 Node 版本
-- **nvm_ensure_version_installed**: 校验并安装指定版本，导致额外 I/O
-- **compinit**: 已通过缓存机制将耗时降至 30 ms 内
+* **nvm_auto / nvm_process_parameters**: 会在每次启动时扫描 `.nvmrc` 并解析 Node 版本
+* **nvm_ensure_version_installed**: 校验并安装指定版本，导致额外 I/O
+* **compinit**: 已通过缓存机制将耗时降至 30 ms 内
 
 ---
 
@@ -191,11 +201,13 @@ zsh -c "zmodload zsh/zprof; source ~/.zshrc; zprof"
 **原理**: 为 `compinit` 指定稳定的 `zcompdump` 缓存文件，只在缓存缺失或过期时执行全量初始化；其余情况下借助 `-C` 直接加载缓存，避免重复解析上千条补全定义。
 
 **实现要点**:
-- 缓存路径：`${XDG_CACHE_HOME:-$HOME/.cache}/dev-env/zcompdump-$HOST-$ZSH_VERSION`
-- 默认有效期：`ZSH_COMPDUMP_TTL=86400` 秒，可按需覆盖
-- 自动检测不安全目录：若 `compaudit` 告警则改用 `compinit -i`
+
+* 缓存路径：`${XDG_CACHE_HOME:-$HOME/.cache}/dev-env/zcompdump-$HOST-$ZSH_VERSION`
+* 默认有效期：`ZSH_COMPDUMP_TTL=86400` 秒，可按需覆盖
+* 自动检测不安全目录：若 `compaudit` 告警则改用 `compinit -i`
 
 **配置示例**（已同步到 `.zshrc` / `.zshrc.optimized`）:
+
 ```zsh
 _dev_env_init_completion() {
     setopt LOCAL_OPTIONS EXTENDED_GLOB
@@ -239,6 +251,7 @@ unset -f _dev_env_init_completion
 **原理**: 移除非必要的重型插件，保留核心功能
 
 **原始配置**:
+
 ```bash
 antigen bundle git
 antigen bundle zsh-users/zsh-completions
@@ -253,6 +266,7 @@ antigen bundle mafredri/zsh-async
 ```
 
 **优化配置**:
+
 ```bash
 # 核心插件
 antigen bundle git
@@ -267,6 +281,7 @@ antigen bundle zsh-users/zsh-completions
 **原理**: 将重量级环境工具改为按需激活
 
 **优化前**:
+
 ```bash
 # Conda 立即激活
 __conda_setup="$(CONDA_REPORT_ERRORS=false '/home/hao/anaconda3/bin/conda' shell.bash hook 2> /dev/null)"
@@ -286,6 +301,7 @@ export NVM_DIR="$HOME/.nvm"
 ```
 
 **优化后**:
+
 ```bash
 # Conda 延迟加载
 if [[ -f "/home/hao/anaconda3/etc/profile.d/conda.sh" ]]; then
@@ -312,16 +328,19 @@ alias nvm-lazy='[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_D
 #### 1. 极速模式 (Minimal Mode)
 
 **特点**:
-- 启动时间: 2ms (99.9% 性能提升)
-- 按需加载功能
-- 最小化配置
+
+* 启动时间: 2ms (99.9% 性能提升)
+* 按需加载功能
+* 最小化配置
 
 **适用场景**:
-- 快速命令执行
-- 脚本任务
-- 临时终端
+
+* 快速命令执行
+* 脚本任务
+* 临时终端
 
 **使用方法**:
+
 ```bash
 ./scripts/zsh_launcher.sh minimal
 # 或
@@ -349,15 +368,18 @@ restore-zsh         # 恢复原始配置
 #### 2. 快速模式 (Fast Mode)
 
 **特点**:
-- 启动时间: 0.606s (61% 性能提升)
-- 保留主要开发功能
-- 按需启用补全
+
+* 启动时间: 0.606s (61% 性能提升)
+* 保留主要开发功能
+* 按需启用补全
 
 **适用场景**:
-- 日常开发工作
-- 需要部分功能的任务
+
+* 日常开发工作
+* 需要部分功能的任务
 
 **使用方法**:
+
 ```bash
 ./scripts/zsh_launcher.sh fast
 
@@ -368,15 +390,18 @@ comp-enable
 #### 3. 标准模式 (Normal Mode)
 
 **特点**:
-- 启动时间: 1.568s (完整功能)
-- 完整功能集
-- 无性能妥协
+
+* 启动时间: 1.568s (完整功能)
+* 完整功能集
+* 无性能妥协
 
 **适用场景**:
-- 复杂开发任务
-- 需要完整功能的场景
+
+* 复杂开发任务
+* 需要完整功能的场景
 
 **使用方法**:
+
 ```bash
 ./scripts/zsh_launcher.sh normal
 ```
@@ -404,22 +429,26 @@ comp-enable
 ### 分析工具
 
 #### 1. 基础性能测试
+
 ```bash
 ./scripts/zsh_tools.sh benchmark
 ```
 
 #### 2. 详细性能分析
+
 ```bash
 ./scripts/zsh_tools.sh benchmark-detailed
 ```
 
 **分析内容**:
-- 分段启动时间分析
-- 插件性能分析
-- 内存使用分析
-- 性能评分和建议
+
+* 分段启动时间分析
+* 插件性能分析
+* 内存使用分析
+* 性能评分和建议
 
 #### 3. 性能优化工具
+
 ```bash
 # 分析当前性能
 ./scripts/zsh_optimizer.sh analyze
@@ -434,6 +463,7 @@ comp-enable
 ### 分析报告解读
 
 #### 分段启动时间分析
+
 ```
 🔍 分段启动时间分析
 ===============
@@ -446,6 +476,7 @@ comp-enable
 ```
 
 #### 性能评分系统
+
 ```
 🏆 性能评分:
   启动时间评分: 85/100
@@ -456,6 +487,7 @@ comp-enable
 ```
 
 #### 优化建议
+
 ```
 💡 性能优化建议
 ===============
@@ -474,6 +506,7 @@ comp-enable
 ### 方案1: 使用现成的多模式启动器 (推荐)
 
 **步骤**:
+
 ```bash
 # 1. 进入脚本目录
 cd /path/to/dev-env/scripts
@@ -490,14 +523,16 @@ cd /path/to/dev-env/scripts
 ```
 
 **优势**:
-- 即开即用
-- 安全可靠 (自动备份)
-- 模式切换灵活
-- 完整的文档支持
+
+* 即开即用
+* 安全可靠 (自动备份)
+* 模式切换灵活
+* 完整的文档支持
 
 ### 方案2: 手动应用优化配置
 
 **步骤**:
+
 ```bash
 # 1. 备份当前配置
 cp ~/.zshrc ~/.zshrc.backup
@@ -513,13 +548,15 @@ comp-enable
 ```
 
 **优势**:
-- 完全控制配置
-- 可根据需求定制
-- 学习配置原理
+
+* 完全控制配置
+* 可根据需求定制
+* 学习配置原理
 
 ### 方案3: 渐进式优化
 
 **步骤**:
+
 ```bash
 # 1. 性能分析
 ./scripts/zsh_optimizer.sh analyze
@@ -534,9 +571,10 @@ comp-enable
 ```
 
 **优势**:
-- 基于数据决策
-- 渐进式改进
-- 可控的风险
+
+* 基于数据决策
+* 渐进式改进
+* 可控的风险
 
 ---
 
@@ -590,6 +628,7 @@ bindkey '^H' load_heavy_plugin  # Ctrl+H
 ### 环境特定优化
 
 #### 开发环境
+
 ```bash
 # 保留开发相关插件
 antigen bundle git
@@ -598,6 +637,7 @@ antigen bundle npm
 ```
 
 #### 服务器环境
+
 ```bash
 # 最小化配置
 antigen bundle git
@@ -605,6 +645,7 @@ antigen bundle git
 ```
 
 #### CI/CD 环境
+
 ```bash
 # 完全最小化
 # 仅保留基础功能
@@ -619,11 +660,13 @@ antigen bundle git
 #### 1. 函数无法使用
 
 **问题**:
+
 ```bash
 zsh_help  # 返回: command not found: zsh_help
 ```
 
 **解决方案**:
+
 ```bash
 # 检查函数文件是否存在
 ls -la ~/.zsh/functions/ | grep help.zsh
@@ -643,6 +686,7 @@ type zsh_help
 **问题**: 在最小模式下 Tab 补全不工作
 
 **解决方案**:
+
 ```bash
 # 手动启用补全系统
 comp-enable
@@ -658,6 +702,7 @@ echo $COMPLETION_ENABLED  # 应该返回 "true"
 **问题**: 启动时间仍然很慢
 
 **诊断步骤**:
+
 ```bash
 # 运行详细性能分析
 ./scripts/zsh_tools.sh benchmark-detailed
@@ -678,6 +723,7 @@ rm -f ~/.zcompdump*
 **问题**: 无法切换启动模式
 
 **解决方案**:
+
 ```bash
 # 检查启动器权限
 ls -la scripts/zsh_launcher.sh
@@ -740,6 +786,7 @@ time zsh -i -c 'exit'
 ### 1. 性能监控
 
 定期检查启动性能：
+
 ```bash
 # 每周运行一次性能检查
 ./scripts/zsh_launcher.sh benchmark
@@ -762,10 +809,11 @@ git commit -m "Update ZSH configuration"
 ### 3. 环境适配
 
 根据使用环境选择合适的模式：
-- **开发机器**: 快速模式
-- **服务器**: 标准模式或自定义轻量配置
-- **CI/CD**: 最小模式
-- **临时使用**: 极速模式
+
+* **开发机器**: 快速模式
+* **服务器**: 标准模式或自定义轻量配置
+* **CI/CD**: 最小模式
+* **临时使用**: 极速模式
 
 ### 4. 插件管理
 
@@ -785,16 +833,18 @@ git commit -m "Update ZSH configuration"
 ## 🔗 相关资源
 
 ### 内部文档
-- [项目主文档](../README.md)
-- [模块配置文档](../../CLAUDE.md)
-- [函数模块文档](../../zsh-functions/README.md)
-- [调试指南](TROUBLESHOOTING_DEBUG_GUIDE.md)
+
+* [项目主文档](../README.md)
+* [模块配置文档](../../CLAUDE.md)
+* [函数模块文档](../../zsh-functions/README.md)
+* [调试指南](TROUBLESHOOTING_DEBUG_GUIDE.md)
 
 ### 外部资源
-- [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
-- [Antigen 插件管理器](https://github.com/zsh-users/antigen)
-- [ZSH 性能优化技巧](https://github.com/unixorn/awesome-zsh-plugins#speed)
-- [Linux 性能分析工具](https://brendangregg.com/perf/)
+
+* [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
+* [Antigen 插件管理器](https://github.com/zsh-users/antigen)
+* [ZSH 性能优化技巧](https://github.com/unixorn/awesome-zsh-plugins#speed)
+* [Linux 性能分析工具](https://brendangregg.com/perf/)
 
 ---
 

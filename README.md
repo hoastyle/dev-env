@@ -13,15 +13,15 @@
 
 ### 🎯 **主要特性**
 
-- ✅ **ZSH 配置管理**: 完整的 ZSH 配置文件和插件管理
-- ✅ **环境指示符**: 在提示符中显示容器、SSH、代理状态 (🖥️ 🌐 🔐)
-- ✅ **模块化函数**: 环境检测、搜索增强、帮助系统、性能分析模块化管理
-- ✅ **自动化工具**: 一键安装、备份、恢复脚本
-- ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
-- ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
-- ⚡ **极速启动**: 多模式启动器，启动速度提升高达99.9%
-- ✅ **性能优化**: 深度性能分析和智能优化建议
-- ✅ **文档完善**: 详细的使用文档和配置说明
+* ✅ **ZSH 配置管理**: 完整的 ZSH 配置文件和插件管理
+* ✅ **环境指示符**: 在提示符中显示容器、SSH、代理状态 (🖥️ 🌐 🔐)
+* ✅ **模块化函数**: 环境检测、搜索增强、帮助系统、性能分析模块化管理
+* ✅ **自动化工具**: 一键安装、备份、恢复脚本
+* ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
+* ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
+* ⚡ **极速启动**: 多模式启动器，启动速度提升高达99.9%
+* ✅ **性能优化**: 深度性能分析和智能优化建议
+* ✅ **文档完善**: 详细的使用文档和配置说明
 
 ---
 
@@ -89,22 +89,25 @@ exec zsh
 ```
 
 **完整安装的优势**：
-- ✅ 系统级集成，配置永久生效
-- ✅ 所有依赖工具自动安装
-- ✅ 自定义函数完全可用
-- ✅ **环境指示符自动配置** (🖥️ 🌐 🔐)
-- ✅ 日常使用无需额外步骤
-- ✅ 支持完整的开发环境
+
+* ✅ 系统级集成，配置永久生效
+* ✅ 所有依赖工具自动安装
+* ✅ 自定义函数完全可用
+* ✅ **环境指示符自动配置** (🖥️ 🌐 🔐)
+* ✅ 日常使用无需额外步骤
+* ✅ 支持完整的开发环境
 
 **环境指示符功能**：
 安装完成后，你的提示符将显示环境状态：
+
 ```
 ~/workspace ⎇ master        🖥️ 🌐 🔐 < hao@mm
 $
 ```
-- 🖥️/🐳: 物理主机/Docker 容器
-- 🌐/🏠: SSH/本地会话
-- 🔐: 代理已启用 (仅在启用时显示)
+
+* 🖥️/🐳: 物理主机/Docker 容器
+* 🌐/🏠: SSH/本地会话
+* 🔐: 代理已启用 (仅在启用时显示)
 
 #### ⚡ **方式二：直接启动 (临时使用)**
 
@@ -123,11 +126,12 @@ cd dev-env/scripts
 ```
 
 **直接启动的优势**：
-- ⚡ 即开即用，无需安装
-- ⚡ 临时环境，不影响现有配置
-- ⚡ 适合测试和快速体验
-- ⚡ 支持性能测试和对比
-- ⚡ 可在不同模式间快速切换
+
+* ⚡ 即开即用，无需安装
+* ⚡ 临时环境，不影响现有配置
+* ⚡ 适合测试和快速体验
+* ⚡ 支持性能测试和对比
+* ⚡ 可在不同模式间快速切换
 
 ### 📊 **两种方式对比**
 
@@ -145,6 +149,7 @@ cd dev-env/scripts
 直接使用 `zsh_launcher.sh` 时，需要注意以下限制：
 
 #### 🔧 **必需依赖**
+
 ```bash
 # 需要预先安装以下工具：
 # Ubuntu/Debian:
@@ -155,33 +160,38 @@ brew install fzf fd ripgrep
 ```
 
 #### 📋 **功能限制**
-- ❌ `./scripts/zsh_tools.sh` 部分功能不可用
-- ❌ 自定义函数模块 (如 `zsh_help`) 需要手动加载
-- ❌ 系统级配置验证功能受限
-- ❌ 插件更新和管理功能不可用
+
+* ❌ `./scripts/zsh_tools.sh` 部分功能不可用
+* ❌ 自定义函数模块 (如 `zsh_help`) 需要手动加载
+* ❌ 系统级配置验证功能受限
+* ❌ 插件更新和管理功能不可用
 
 #### ✅ **可用功能**
-- ✅ 三种启动模式 (minimal/fast/normal)
-- ✅ 性能对比测试 (`./scripts/zsh_launcher.sh benchmark`)
-- ✅ 详细性能分析 (`./scripts/zsh_launcher.sh benchmark-detailed`)
-- ✅ 基础命令帮助 (启动器内置)
-- ✅ 配置切换和恢复功能
+
+* ✅ 三种启动模式 (minimal/fast/normal)
+* ✅ 性能对比测试 (`./scripts/zsh_launcher.sh benchmark`)
+* ✅ 详细性能分析 (`./scripts/zsh_launcher.sh benchmark-detailed`)
+* ✅ 基础命令帮助 (启动器内置)
+* ✅ 配置切换和恢复功能
 
 ### 🎯 **使用建议**
 
-#### **选择完整安装**，如果：
-- 需要日常开发环境
-- 需要完整的自定义函数支持
-- 希望配置永久生效
-- 需要插件管理和更新功能
+#### **选择完整安装**，如果
 
-#### **选择直接启动**，如果：
-- 只是临时测试环境
-- 需要快速体验性能优化效果
-- 不想影响现有系统配置
-- 需要在多个配置间切换测试
+* 需要日常开发环境
+* 需要完整的自定义函数支持
+* 希望配置永久生效
+* 需要插件管理和更新功能
+
+#### **选择直接启动**，如果
+
+* 只是临时测试环境
+* 需要快速体验性能优化效果
+* 不想影响现有系统配置
+* 需要在多个配置间切换测试
 
 #### **混合使用策略**
+
 ```bash
 # 1. 先用直接启动体验效果
 ./scripts/zsh_launcher.sh benchmark
@@ -325,13 +335,14 @@ source ~/.zshrc
 
 ### 🎯 **主题配置**
 
-- **默认主题**: robbyrussell
-- **特点**: 简洁的箭头提示符 `➜`
-- **功能**: Git 集成、路径优化、状态编码
+* **默认主题**: robbyrussell
+* **特点**: 简洁的箭头提示符 `➜`
+* **功能**: Git 集成、路径优化、状态编码
 
 ### 🛠️ **开发工具集成**
 
 #### FZF 模糊搜索
+
 ```bash
 # 文件搜索
 fzf
@@ -344,6 +355,7 @@ cd $(find * -type d | fzf)
 ```
 
 #### 搜索增强
+
 ```bash
 hg "pattern" dir       # 递归搜索，区分大小写
 hig "pattern" dir      # 递归搜索，忽略大小写
@@ -351,6 +363,7 @@ hrg "pattern" dir      # 使用 ripgrep 搜索
 ```
 
 #### 网络代理 (v2.1 优化)
+
 ```bash
 proxy                    # 启用代理
 unproxy                  # 禁用代理
@@ -364,6 +377,7 @@ proxy 127.0.0.1:7890 -v  # 启用并验证代理连接
 ### 🔧 **模块化函数系统**
 
 #### 环境检测模块 (environment.zsh)
+
 ```bash
 check_environment
 # 输出:
@@ -378,6 +392,7 @@ reload_zsh
 ```
 
 #### 搜索增强模块 (search.zsh)
+
 ```bash
 hg "pattern" directory      # 递归搜索，区分大小写
 hig "pattern" directory     # 递归搜索，忽略大小写
@@ -386,6 +401,7 @@ hirg "pattern" directory    # 使用 ripgrep 忽略大小写搜索
 ```
 
 #### 工具函数模块 (utils.zsh) - v2.1 优化
+
 ```bash
 proxy                      # 启用代理
 unproxy                   # 禁用代理
@@ -398,6 +414,7 @@ proxy 192.168.1.1:1080 --verify  # 验证代理连接
 ```
 
 #### 帮助系统模块 (help.zsh)
+
 ```bash
 zsh_help                  # 统一命令帮助系统
 zsh_help <command>        # 查看具体命令帮助
@@ -406,6 +423,7 @@ comp-enable                # 启用补全系统 (最小模式)
 ```
 
 #### 性能分析模块 (performance.zsh)
+
 ```bash
 # 通过以下命令使用:
 ./scripts/zsh_tools.sh benchmark-detailed    # 详细性能分析
@@ -434,29 +452,35 @@ comp-enable                # 启用补全系统 (最小模式)
 ### 🚀 **多模式启动系统**
 
 **极速模式** (99.9%性能提升)
+
 ```bash
 ./scripts/zsh_launcher.sh minimal
 # 或
 ./scripts/zsh_minimal.sh
 ```
-- 2毫秒极速启动
-- 按需加载功能
-- 适合快速命令执行
+
+* 2毫秒极速启动
+* 按需加载功能
+* 适合快速命令执行
 
 **快速模式** (61%性能提升)
+
 ```bash
 ./scripts/zsh_launcher.sh fast
 ```
-- 启动速度提升61%
-- 保留主要开发功能
-- 按需启用补全
+
+* 启动速度提升61%
+* 保留主要开发功能
+* 按需启用补全
 
 **标准模式** (完整功能)
+
 ```bash
 ./scripts/zsh_launcher.sh normal
 ```
-- 完整功能，无性能妥协
-- 适合复杂开发任务
+
+* 完整功能，无性能妥协
+* 适合复杂开发任务
 
 ---
 
@@ -476,10 +500,10 @@ check_environment
 
 ### 🔧 **容器特性**
 
-- **环境感知**: 自动检测 Docker 环境
-- **GPU 支持**: NVIDIA GPU 支持
-- **X11 转发**: 图形界面应用支持
-- **SSH 访问**: 端口 2222 SSH 访问
+* **环境感知**: 自动检测 Docker 环境
+* **GPU 支持**: NVIDIA GPU 支持
+* **X11 转发**: 图形界面应用支持
+* **SSH 访问**: 端口 2222 SSH 访问
 
 ---
 
@@ -498,6 +522,7 @@ check_environment
 ### 🎯 **环境配置**
 
 #### 开发环境
+
 ```bash
 # 完整功能配置
 antigen bundle git
@@ -507,6 +532,7 @@ antigen bundle zsh-users/zsh-autosuggestions
 ```
 
 #### 服务器环境
+
 ```bash
 # 轻量级配置
 antigen bundle git
@@ -520,6 +546,7 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 ### ❌ **常见问题**
 
 #### 主题不显示
+
 ```bash
 # 解决方案
 antigen theme robbyrussell
@@ -528,6 +555,7 @@ exec zsh
 ```
 
 #### 插件加载失败
+
 ```bash
 # 检查插件状态
 ./scripts/zsh_tools.sh doctor
@@ -538,6 +566,7 @@ exec zsh
 ```
 
 #### 启动速度慢
+
 ```bash
 # 性能对比测试
 ./scripts/zsh_launcher.sh benchmark
@@ -563,35 +592,35 @@ exec zsh
 
 管理类文档位于 `docs/management/` 目录:
 
-- **[PRD.md](docs/management/PRD.md)**: 产品需求文档 - 项目目标、功能需求、非功能需求、用户场景
-- **[PLANNING.md](docs/management/PLANNING.md)**: 架构规划文档 - 技术架构、开发规范、测试策略、部署指南
-- **[TASK.md](docs/management/TASK.md)**: 任务追踪文档 - 任务进度、优先级矩阵、完成度统计、依赖关系
-- **[CONTEXT.md](docs/management/CONTEXT.md)**: 工作上下文 - 项目状态、工作历史、已知问题、性能数据
-- **[KNOWLEDGE.md](docs/management/KNOWLEDGE.md)**: 知识库 - 核心原则、技术决策、最佳实践、常见问题解决方案
-- **[HOTFIX_2_1_1.md](docs/management/HOTFIX_2_1_1.md)**: 高优先级修复说明 - v2.1.1 版本修复详情
-- **[REVIEW_CONSISTENCY_ANALYSIS.md](docs/management/REVIEW_CONSISTENCY_ANALYSIS.md)**: 审查一致性分析 - 与代码审查报告的对齐分析
+* **[PRD.md](docs/management/PRD.md)**: 产品需求文档 - 项目目标、功能需求、非功能需求、用户场景
+* **[PLANNING.md](docs/management/PLANNING.md)**: 架构规划文档 - 技术架构、开发规范、测试策略、部署指南
+* **[TASK.md](docs/management/TASK.md)**: 任务追踪文档 - 任务进度、优先级矩阵、完成度统计、依赖关系
+* **[CONTEXT.md](docs/management/CONTEXT.md)**: 工作上下文 - 项目状态、工作历史、已知问题、性能数据
+* **[KNOWLEDGE.md](docs/management/KNOWLEDGE.md)**: 知识库 - 核心原则、技术决策、最佳实践、常见问题解决方案
+* **[HOTFIX_2_1_1.md](docs/management/HOTFIX_2_1_1.md)**: 高优先级修复说明 - v2.1.1 版本修复详情
+* **[REVIEW_CONSISTENCY_ANALYSIS.md](docs/management/REVIEW_CONSISTENCY_ANALYSIS.md)**: 审查一致性分析 - 与代码审查报告的对齐分析
 
 ### 📖 **代理功能文档** (v2.1 新增)
 
-- **[代理功能优化说明](docs/proxy/PROXY_OPTIMIZATION.md)**: 详细的优化方案和方法论分析
-- **[代理快速参考](docs/proxy/PROXY_QUICK_REFERENCE.md)**: 快速命令参考和常用示例
-- **[代理集成指南](docs/proxy/PROXY_INTEGRATION_GUIDE.md)**: 系统集成和验证清单
-- **[代理完成报告](docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md)**: 优化成果总结和统计
-- **[文档索引](DOCUMENTATION_INDEX.md)**: 完整的文档导航和分类查找
+* **[代理功能优化说明](docs/proxy/PROXY_OPTIMIZATION.md)**: 详细的优化方案和方法论分析
+* **[代理快速参考](docs/proxy/PROXY_QUICK_REFERENCE.md)**: 快速命令参考和常用示例
+* **[代理集成指南](docs/proxy/PROXY_INTEGRATION_GUIDE.md)**: 系统集成和验证清单
+* **[代理完成报告](docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md)**: 优化成果总结和统计
+* **[文档索引](DOCUMENTATION_INDEX.md)**: 完整的文档导航和分类查找
 
 ### 📖 **详细文档**
 
-- **[配置分析报告](docs/zsh-config/ZSH_CONFIG_ANALYSIS.md)**: 详细的配置架构分析
-- **[配置模板指南](docs/zsh-config/ZSH_CONFIG_TEMPLATE.md)**: 完整的配置模板和使用说明
-- **[调试指南](docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md)**: 问题诊断和修复过程记录
-- **[性能优化指南](docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)**: 深度性能分析和优化策略
-- **[函数模块文档](zsh-functions/README.md)**: 模块化函数系统详细说明
+* **[配置分析报告](docs/zsh-config/ZSH_CONFIG_ANALYSIS.md)**: 详细的配置架构分析
+* **[配置模板指南](docs/zsh-config/ZSH_CONFIG_TEMPLATE.md)**: 完整的配置模板和使用说明
+* **[调试指南](docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md)**: 问题诊断和修复过程记录
+* **[性能优化指南](docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)**: 深度性能分析和优化策略
+* **[函数模块文档](zsh-functions/README.md)**: 模块化函数系统详细说明
 
 ### 🔗 **外部资源**
 
-- [Antigen 官方文档](https://github.com/zsh-users/antigen)
-- [Oh My Zsh 插件库](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins)
-- [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
+* [Antigen 官方文档](https://github.com/zsh-users/antigen)
+* [Oh My Zsh 插件库](https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins)
+* [ZSH 官方文档](https://zsh.sourceforge.io/Doc/)
 
 ---
 
@@ -606,9 +635,9 @@ exec zsh
 
 ### 🐛 **问题反馈**
 
-- 使用 GitHub Issues 报告问题
-- 提供详细的错误信息和环境信息
-- 包含复现步骤和预期结果
+* 使用 GitHub Issues 报告问题
+* 提供详细的错误信息和环境信息
+* 包含复现步骤和预期结果
 
 ### 🔄 **开发工作流**
 
@@ -643,63 +672,70 @@ git push origin feature/new-feature
 ## 🔄 版本历史
 
 ### v2.1.1 (2025-10-19) - 稳定性增强版 ⭐
-- 🔧 **消除硬编码路径**: 脚本现在可在任意目录运行
-- 🛡️ **完善错误处理**: Antigen 下载提供备用源
-- ✅ 改进配置文件路径检测机制
-- 📝 统一文档版本号和描述
-- 🎯 项目可移植性提升
+
+* 🔧 **消除硬编码路径**: 脚本现在可在任意目录运行
+* 🛡️ **完善错误处理**: Antigen 下载提供备用源
+* ✅ 改进配置文件路径检测机制
+* 📝 统一文档版本号和描述
+* 🎯 项目可移植性提升
 
 ### v2.1 (2025-10-17) - 代理功能优化版
-- ✨ **代理功能全面优化**: 添加检查和验证机制
-- ✅ 新增 `check_proxy` 命令 - 检查代理状态
-- ✅ 新增 `proxy_status` 命令 - 显示完整代理配置
-- ✅ 实现配置文件管理 (~/.proxy_config)
-- ✅ 支持代理可用性验证 (TCP 连接测试)
-- ✅ 支持自定义代理地址
-- ✅ 代码重复度降低 75% (从 60% → 15%)
-- 📚 创建完整文档体系（5 个新文档，1000+ 行）
-- 📋 创建文档索引系统便于查找
+
+* ✨ **代理功能全面优化**: 添加检查和验证机制
+* ✅ 新增 `check_proxy` 命令 - 检查代理状态
+* ✅ 新增 `proxy_status` 命令 - 显示完整代理配置
+* ✅ 实现配置文件管理 (~/.proxy_config)
+* ✅ 支持代理可用性验证 (TCP 连接测试)
+* ✅ 支持自定义代理地址
+* ✅ 代码重复度降低 75% (从 60% → 15%)
+* 📚 创建完整文档体系（5 个新文档，1000+ 行）
+* 📋 创建文档索引系统便于查找
 
 ### v2.0 (2025-10-16)
-- ⚡ **重大性能突破**: 实现高达99.9%的启动速度提升
-- 🚀 新增多模式启动器 (zsh_launcher.sh) 和极简模式启动器 (zsh_minimal.sh)
-- 📊 深度性能分析系统，精确定位ZSH补全系统瓶颈 (节省437ms)
-- 🎯 三种启动模式：极速模式(2ms)、快速模式(0.6s)、标准模式(完整功能)
-- 🛠️ 新增性能优化工具 (zsh_optimizer.sh) 和智能配置切换
-- 💡 按需加载系统：补全、开发环境可单独启用
-- 🔧 完善的备份恢复机制，支持快速配置切换
+
+* ⚡ **重大性能突破**: 实现高达99.9%的启动速度提升
+* 🚀 新增多模式启动器 (zsh_launcher.sh) 和极简模式启动器 (zsh_minimal.sh)
+* 📊 深度性能分析系统，精确定位ZSH补全系统瓶颈 (节省437ms)
+* 🎯 三种启动模式：极速模式(2ms)、快速模式(0.6s)、标准模式(完整功能)
+* 🛠️ 新增性能优化工具 (zsh_optimizer.sh) 和智能配置切换
+* 💡 按需加载系统：补全、开发环境可单独启用
+* 🔧 完善的备份恢复机制，支持快速配置切换
 
 ### v1.3 (2025-10-16)
-- ✨ 新增详细性能分析系统 (performance.zsh)
-- ✅ 实现高精度分段式性能测试 (benchmark-detailed 命令)
-- ✅ 提供性能评分和优化建议系统
-- ✅ 添加插件性能分析和内存使用分析
-- ✅ 兼容 ZSH 和 Bash 环境的性能测试
-- ⚡ 支持毫秒级精度的启动时间分析
+
+* ✨ 新增详细性能分析系统 (performance.zsh)
+* ✅ 实现高精度分段式性能测试 (benchmark-detailed 命令)
+* ✅ 提供性能评分和优化建议系统
+* ✅ 添加插件性能分析和内存使用分析
+* ✅ 兼容 ZSH 和 Bash 环境的性能测试
+* ⚡ 支持毫秒级精度的启动时间分析
 
 ### v1.2 (2025-10-16)
-- ✨ 新增统一命令帮助系统 (help.zsh)
-- ✅ 为所有自定义命令添加 --help / -h 参数支持
-- ✅ 改进参数检查和错误提示机制
-- ✅ 增强命令发现和分类显示功能
-- 📚 创建详细的调试指南和故障排除文档
-- 🧪 集成详细性能分析和帮助系统验证功能
+
+* ✨ 新增统一命令帮助系统 (help.zsh)
+* ✅ 为所有自定义命令添加 --help / -h 参数支持
+* ✅ 改进参数检查和错误提示机制
+* ✅ 增强命令发现和分类显示功能
+* 📚 创建详细的调试指南和故障排除文档
+* 🧪 集成详细性能分析和帮助系统验证功能
 
 ### v1.1 (2025-10-15)
-- 🐛 修复安装脚本路径问题
-- ✨ 实现模块化函数管理系统
-- ✅ 新增环境检测函数模块
-- ✅ 新增搜索增强函数模块
-- ✅ 新增实用工具函数模块
-- 📚 完善文档和使用指南
+
+* 🐛 修复安装脚本路径问题
+* ✨ 实现模块化函数管理系统
+* ✅ 新增环境检测函数模块
+* ✅ 新增搜索增强函数模块
+* ✅ 新增实用工具函数模块
+* 📚 完善文档和使用指南
 
 ### v1.0 (2025-10-15)
-- ✨ 初始版本发布
-- ✅ 完整的 ZSH 配置管理功能
-- ✅ 自动化安装和配置工具
-- ✅ Docker 环境支持
-- ✅ 性能优化和监控工具
-- ✅ 详细的文档和使用指南
+
+* ✨ 初始版本发布
+* ✅ 完整的 ZSH 配置管理功能
+* ✅ 自动化安装和配置工具
+* ✅ Docker 环境支持
+* ✅ 性能优化和监控工具
+* ✅ 详细的文档和使用指南
 
 ---
 
@@ -707,9 +743,9 @@ git push origin feature/new-feature
 
 如有问题或建议，请通过以下方式联系：
 
-- **GitHub Issues**: 项目问题反馈和讨论
-- **邮箱**: [联系邮箱]
-- **文档**: 查看项目文档获取更多信息
+* **GitHub Issues**: 项目问题反馈和讨论
+* **邮箱**: [联系邮箱]
+* **文档**: 查看项目文档获取更多信息
 
 ---
 
@@ -720,6 +756,7 @@ git push origin feature/new-feature
 ## 🎯 快速命令参考
 
 ### 常用命令
+
 ```bash
 # 环境检查
 check_environment
@@ -741,6 +778,7 @@ proxy_status             # 显示完整配置
 ```
 
 ### 工具命令
+
 ```bash
 # 多模式启动 (推荐)
 ./scripts/zsh_launcher.sh minimal     # 极速模式
@@ -761,6 +799,7 @@ proxy_status             # 显示完整配置
 ```
 
 ### Git 操作
+
 ```bash
 # 项目状态
 git status

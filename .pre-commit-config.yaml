@@ -36,7 +36,7 @@ repos:
         description: 使用Prettier自动修复YAML文件格式问题
         files: \.(yaml|yml)$
         args: [--write, --tab-width=2, --print-width=100]
-        stages: [pre-commit]  # 仅在 pre-commit 阶段运行
+        stages: [pre-commit] # 仅在 pre-commit 阶段运行
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -139,7 +139,7 @@ repos:
         name: "Validate: Shell脚本检查"
         description: 使用ShellCheck检查Shell脚本语法和最佳实践
         args: [--severity=warning, --external-sources]
-        stages: [pre-commit]  # 仅在 pre-commit 阶段运行，不在 push 时运行
+        stages: [pre-commit] # 仅在 pre-commit 阶段运行，不在 push 时运行
 
   # ===========================================
   # 第五层: 专用文件格式化

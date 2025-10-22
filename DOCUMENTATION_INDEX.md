@@ -67,37 +67,46 @@ dev-env/
 ### 👤 不同用户角色的推荐文档
 
 #### 🚀 **新用户**（第一次使用）
+
 **目标**: 快速上手，了解基本功能
 
 推荐顺序（15 分钟）:
+
 1. [README.md](README.md) - 项目概述（5 分钟）
 2. [PROXY_QUICK_REFERENCE.md](docs/proxy/PROXY_QUICK_REFERENCE.md) - 快速参考（5 分钟）
 3. 运行基本命令（5 分钟）
+
    ```bash
    source zsh-functions/utils.zsh
    proxy && check_proxy --status
    ```
 
 #### 💼 **系统管理员**（部署和集成）
+
 **目标**: 系统集成、配置管理、故障排除
 
 推荐顺序（45 分钟）:
+
 1. [PROXY_INTEGRATION_GUIDE.md](docs/proxy/PROXY_INTEGRATION_GUIDE.md) - 集成指南（15 分钟）
 2. [CLAUDE.md](../CLAUDE.md) - 项目指南（15 分钟）
 3. [TROUBLESHOOTING_DEBUG_GUIDE.md](docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - 故障排除（15 分钟）
 
 #### 🛠️ **开发者**（代码维护和扩展）
+
 **目标**: 理解实现原理、扩展功能
 
 推荐顺序（1.5 小时）:
+
 1. [PROXY_OPTIMIZATION.md](docs/proxy/PROXY_OPTIMIZATION.md) - 优化原理（30 分钟）
 2. [zsh-functions/utils.zsh](zsh-functions/utils.zsh) - 源代码阅读（30 分钟）
 3. [PERFORMANCE_OPTIMIZATION_GUIDE.md](docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 性能优化（30 分钟）
 
 #### 📊 **技术架构师**（全面了解项目）
+
 **目标**: 掌握整体架构、设计决策
 
 推荐顺序（2 小时）:
+
 1. [CLAUDE.md](../CLAUDE.md) - 项目愿景和架构（30 分钟）
 2. [PROXY_ENHANCEMENT_SUMMARY.md](docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md) - 完成报告（30 分钟）
 3. [PROXY_OPTIMIZATION.md](docs/proxy/PROXY_OPTIMIZATION.md) - 优化方法论（30 分钟）
@@ -118,10 +127,11 @@ dev-env/
 | [test_proxy_enhancements.sh](test_proxy_enhancements.sh) | 9.9 KB | 功能演示、测试脚本 | 测试人员、验证 |
 
 **快速导航**:
-- 想快速使用代理功能？→ [PROXY_QUICK_REFERENCE.md](docs/proxy/PROXY_QUICK_REFERENCE.md)
-- 想了解优化原理？→ [PROXY_OPTIMIZATION.md](docs/proxy/PROXY_OPTIMIZATION.md)
-- 想集成到系统？→ [PROXY_INTEGRATION_GUIDE.md](docs/proxy/PROXY_INTEGRATION_GUIDE.md)
-- 想看完整效果演示？→ `bash test_proxy_enhancements.sh`
+
+* 想快速使用代理功能？→ [PROXY_QUICK_REFERENCE.md](docs/proxy/PROXY_QUICK_REFERENCE.md)
+* 想了解优化原理？→ [PROXY_OPTIMIZATION.md](docs/proxy/PROXY_OPTIMIZATION.md)
+* 想集成到系统？→ [PROXY_INTEGRATION_GUIDE.md](docs/proxy/PROXY_INTEGRATION_GUIDE.md)
+* 想看完整效果演示？→ `bash test_proxy_enhancements.sh`
 
 ### 🎨 **ZSH 配置模块**
 
@@ -156,7 +166,7 @@ dev-env/
 
 ## 🔍 快速查找表
 
-### 我想...
+### 我想
 
 | 需求 | 推荐文档 | 时间 |
 |------|---------|------|
@@ -204,19 +214,22 @@ dev-env/
 ### 代理功能优化文档
 
 **版本 v2.1** (2025-10-17) - 当前版本
-- ✅ 添加 check_proxy 功能
-- ✅ 添加 proxy_status 功能
-- ✅ 配置文件管理系统
-- ✅ 多层验证机制
-- ✅ 完整文档体系
+
+* ✅ 添加 check_proxy 功能
+* ✅ 添加 proxy_status 功能
+* ✅ 配置文件管理系统
+* ✅ 多层验证机制
+* ✅ 完整文档体系
 
 **版本 v2.0** (2025-10-16)
-- ✅ 性能优化系统
-- ✅ 多模式启动器
-- ✅ 性能分析工具
+
+* ✅ 性能优化系统
+* ✅ 多模式启动器
+* ✅ 性能分析工具
 
 **版本 v1.0** (2025-10-15)
-- ✅ 基础代理功能
+
+* ✅ 基础代理功能
 
 ---
 
@@ -224,11 +237,11 @@ dev-env/
 
 ### 定期检查项
 
-- [ ] 所有文档链接有效性（每周）
-- [ ] 代码示例正确性（每周）
-- [ ] 版本号一致性（更新后）
-- [ ] 日期时间更新（更新后）
-- [ ] 格式和风格一致（每月）
+* [ ] 所有文档链接有效性（每周）
+* [ ] 代码示例正确性（每周）
+* [ ] 版本号一致性（更新后）
+* [ ] 日期时间更新（更新后）
+* [ ] 格式和风格一致（每月）
 
 ### 文档更新流程
 
@@ -264,10 +277,11 @@ dev-env/
 ### 3. 文档内导航
 
 所有主要文档都包含：
-- 📑 **目录**（快速定位）
-- 🔗 **相关链接**（跳转导航）
-- 💡 **快速提示**（重点信息）
-- ⚠️ **注意事项**（常见问题）
+
+* 📑 **目录**（快速定位）
+* 🔗 **相关链接**（跳转导航）
+* 💡 **快速提示**（重点信息）
+* ⚠️ **注意事项**（常见问题）
 
 ---
 
@@ -314,31 +328,35 @@ cat docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md
 ## 🔗 相关文档链接
 
 ### 项目级文档
-- [项目主文档](../README.md)
-- [项目开发指南](../CLAUDE.md)
-- [项目文档索引](../DOCUMENTATION_INDEX.md)
+
+* [项目主文档](../README.md)
+* [项目开发指南](../CLAUDE.md)
+* [项目文档索引](../DOCUMENTATION_INDEX.md)
 
 ### 代理功能文档
-- [优化说明](docs/proxy/PROXY_OPTIMIZATION.md)
-- [快速参考](docs/proxy/PROXY_QUICK_REFERENCE.md)
-- [集成指南](docs/proxy/PROXY_INTEGRATION_GUIDE.md)
-- [完成报告](docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md)
+
+* [优化说明](docs/proxy/PROXY_OPTIMIZATION.md)
+* [快速参考](docs/proxy/PROXY_QUICK_REFERENCE.md)
+* [集成指南](docs/proxy/PROXY_INTEGRATION_GUIDE.md)
+* [完成报告](docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md)
 
 ### 技术文档
-- [配置分析](docs/zsh-config/ZSH_CONFIG_ANALYSIS.md)
-- [配置模板](docs/zsh-config/ZSH_CONFIG_TEMPLATE.md)
-- [故障排除](docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md)
-- [性能优化](docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)
+
+* [配置分析](docs/zsh-config/ZSH_CONFIG_ANALYSIS.md)
+* [配置模板](docs/zsh-config/ZSH_CONFIG_TEMPLATE.md)
+* [故障排除](docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md)
+* [性能优化](docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)
 
 ---
 
 ## 📝 更新日志
 
 ### 2025-10-17 - v2.1 发布
-- ✅ 创建代理功能优化文档体系（5 个文档）
-- ✅ 更新帮助系统集成
-- ✅ 创建文档索引和归档
-- ✅ 完成代码和文档整理
+
+* ✅ 创建代理功能优化文档体系（5 个文档）
+* ✅ 更新帮助系统集成
+* ✅ 创建文档索引和归档
+* ✅ 完成代码和文档整理
 
 ---
 

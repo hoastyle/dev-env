@@ -11,17 +11,19 @@
 在 ZSH 提示符中显示环境上下文信息（容器状态、SSH 状态、代理状态）的完整实现记录。
 
 **功能特性**:
-- 🖥️/🐳: 物理主机/Docker 容器状态
-- 🌐/🏠: SSH/本地会话状态
-- 🔐: 代理启用状态
-- 显示在 Powerlevel10k 第一行右侧
-- 一键安装，自动配置
+
+* 🖥️/🐳: 物理主机/Docker 容器状态
+* 🌐/🏠: SSH/本地会话状态
+* 🔐: 代理启用状态
+* 显示在 Powerlevel10k 第一行右侧
+* 一键安装，自动配置
 
 **关键文档**:
-- [全程实现记录](ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md) - 8个提交的完整开发过程
-- [设置指南](P10K_ENV_INDICATORS_SETUP.md) - Powerlevel10k 集成指南
-- [技术知识库](KNOWLEDGE_BASE.md) - 可复用的技术模式
-- [技术决策](ADRs/001-powerlevel10k-integration.md) - ADR 格式的决策记录
+
+* [全程实现记录](ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md) - 8个提交的完整开发过程
+* [设置指南](P10K_ENV_INDICATORS_SETUP.md) - Powerlevel10k 集成指南
+* [技术知识库](KNOWLEDGE_BASE.md) - 可复用的技术模式
+* [技术决策](ADRs/001-powerlevel10k-integration.md) - ADR 格式的决策记录
 
 ### 🔧 [代理功能文档](proxy/)
 
@@ -30,10 +32,11 @@ dev-env v2.1 代理功能的完整文档，包括优化说明、快速参考、�
 **适合人群**: 所有需要配置网络代理的用户
 
 **关键文档**:
-- [快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 5 分钟快速上手
-- [优化说明](proxy/PROXY_OPTIMIZATION.md) - 深入了解优化原理
-- [集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 系统集成和部署
-- [完成报告](proxy/PROXY_ENHANCEMENT_SUMMARY.md) - 项目成果统计
+
+* [快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 5 分钟快速上手
+* [优化说明](proxy/PROXY_OPTIMIZATION.md) - 深入了解优化原理
+* [集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 系统集成和部署
+* [完成报告](proxy/PROXY_ENHANCEMENT_SUMMARY.md) - 项目成果统计
 
 [→ 进入代理功能文档](proxy/)
 
@@ -44,11 +47,12 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 **适合人群**: ZSH 配置管理者、系统管理员、性能优化人员
 
 **关键文档**:
-- [性能优化指南](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 启动速度优化技术
-- [配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 深度配置架构分析
-- [配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md) - 配置模板和最佳实践
-- [故障排除](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - 问题诊断和修复
-- [性能优化](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 性能分析和优化策略
+
+* [性能优化指南](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 启动速度优化技术
+* [配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 深度配置架构分析
+* [配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md) - 配置模板和最佳实践
+* [故障排除](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - 问题诊断和修复
+* [性能优化](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md) - 性能分析和优化策略
 
 [→ 进入 ZSH 配置文档](zsh-config/)
 
@@ -57,26 +61,31 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 ## 🎯 按用户类型快速导航
 
 ### 👤 **我是第一次使用 dev-env**
+
 1. 查看 [项目主文档](../README.md)
 2. 根据需求选择：
-   - 需要代理功能 → [代理快速参考](proxy/PROXY_QUICK_REFERENCE.md)
-   - 需要配置 ZSH → [ZSH 配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md)
+   * 需要代理功能 → [代理快速参考](proxy/PROXY_QUICK_REFERENCE.md)
+   * 需要配置 ZSH → [ZSH 配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md)
 
 ### 🔧 **我需要集成和部署**
-- [代理集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 代理功能集成
-- [ZSH 配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 了解现有配置
+
+* [代理集成指南](proxy/PROXY_INTEGRATION_GUIDE.md) - 代理功能集成
+* [ZSH 配置分析](zsh-config/ZSH_CONFIG_ANALYSIS.md) - 了解现有配置
 
 ### 🛠️ **我需要故障排除**
-- [代理功能快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 代理相关问题
-- [ZSH 故障排除指南](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - ZSH 相关问题
+
+* [代理功能快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 代理相关问题
+* [ZSH 故障排除指南](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - ZSH 相关问题
 
 ### 📊 **我需要性能优化**
-- [ZSH 性能优化指南](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)
-- [代理优化说明](proxy/PROXY_OPTIMIZATION.md)
+
+* [ZSH 性能优化指南](zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md)
+* [代理优化说明](proxy/PROXY_OPTIMIZATION.md)
 
 ### 🏗️ **我是项目维护者**
-- 所有文档清单见下方
-- [项目开发指南](../CLAUDE.md) - 开发标准和规范
+
+* 所有文档清单见下方
+* [项目开发指南](../CLAUDE.md) - 开发标准和规范
 
 ---
 
@@ -106,9 +115,9 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 
 ## 🔗 相关链接
 
-- [项目主文档](../README.md) - 项目概述和快速开始
-- [文档总索引](../DOCUMENTATION_INDEX.md) - 全项目文档索引
-- [开发指南](../CLAUDE.md) - 项目开发规范和指南
+* [项目主文档](../README.md) - 项目概述和快速开始
+* [文档总索引](../DOCUMENTATION_INDEX.md) - 全项目文档索引
+* [开发指南](../CLAUDE.md) - 项目开发规范和指南
 
 ---
 

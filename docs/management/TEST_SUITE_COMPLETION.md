@@ -30,50 +30,55 @@
 ### 完成文件
 
 #### 1. **test_utils.sh** (150+ 行)
-- **功能**: 工具函数库
-- **包含**:
-  - 日志函数 (6个): log_info, log_success, log_warn, log_error, log_debug, print_*
-  - 计时函数 (3个): start_timer, get_elapsed_time, format_time
-  - 状态管理 (5个): init_test_state, record_pass/fail/skip, print_summary
-  - 临时文件管理 (3个): create_temp_dir/file, cleanup_temps
-  - 命令执行 (3个): run_command, run_silent, command_exists
-  - 断言辅助 (5个): assert_file_exists/readable/writable/contains
+
+* **功能**: 工具函数库
+* **包含**:
+  * 日志函数 (6个): log_info, log_success, log_warn, log_error, log_debug, print_*
+  * 计时函数 (3个): start_timer, get_elapsed_time, format_time
+  * 状态管理 (5个): init_test_state, record_pass/fail/skip, print_summary
+  * 临时文件管理 (3个): create_temp_dir/file, cleanup_temps
+  * 命令执行 (3个): run_command, run_silent, command_exists
+  * 断言辅助 (5个): assert_file_exists/readable/writable/contains
 
 #### 2. **assertions.sh** (250+ 行)
-- **功能**: 20+ 断言函数库
-- **包含的断言类别**:
-  - 相等性 (2个): assert_equal, assert_not_equal
-  - 字符串 (6个): contains, not_contains, regex_match, empty, not_empty, 等
-  - 命令状态 (3个): assert_success, assert_failure, assert_exit_code
-  - 数值 (3个): assert_num_equal, assert_num_gt, assert_num_lt
-  - 文件/目录 (8个): exists, not_exists, readable, writable, 等
-  - 内容 (3个): file_contains, file_not_contains, files_equal
-- **测试框架** (2个): run_test, skip_test
+
+* **功能**: 20+ 断言函数库
+* **包含的断言类别**:
+  * 相等性 (2个): assert_equal, assert_not_equal
+  * 字符串 (6个): contains, not_contains, regex_match, empty, not_empty, 等
+  * 命令状态 (3个): assert_success, assert_failure, assert_exit_code
+  * 数值 (3个): assert_num_equal, assert_num_gt, assert_num_lt
+  * 文件/目录 (8个): exists, not_exists, readable, writable, 等
+  * 内容 (3个): file_contains, file_not_contains, files_equal
+* **测试框架** (2个): run_test, skip_test
 
 #### 3. **fixtures.sh** (250+ 行)
-- **功能**: 测试数据和环境管理
-- **包含**:
-  - 生命周期 (3个): setup_fixtures, teardown_fixtures, register_cleanup
-  - 文件创建 (2个): create_test_file, create_test_directory_structure
-  - 环境设置 (2个): setup_mock_environment, restore_original_environment
-  - 配置夹具 (4个): create_mock_zshrc, create_mock_validation, create_mock_install_script, create_mock_dryrun_lib
-  - 测试数据 (1个): create_sample_test_data
-  - 辅助工具 (4个): get_temp_dir, get_backup_dir, list_fixture_files, dump_file
+
+* **功能**: 测试数据和环境管理
+* **包含**:
+  * 生命周期 (3个): setup_fixtures, teardown_fixtures, register_cleanup
+  * 文件创建 (2个): create_test_file, create_test_directory_structure
+  * 环境设置 (2个): setup_mock_environment, restore_original_environment
+  * 配置夹具 (4个): create_mock_zshrc, create_mock_validation, create_mock_install_script, create_mock_dryrun_lib
+  * 测试数据 (1个): create_sample_test_data
+  * 辅助工具 (4个): get_temp_dir, get_backup_dir, list_fixture_files, dump_file
 
 #### 4. **test_runner.sh** (200+ 行)
-- **功能**: 主测试执行器
-- **特性**:
-  - 自动测试发现机制
-  - 灵活的参数解析系统
-  - 单元和集成测试分离
-  - 详细的结果报告
-  - 过滤和模式匹配支持
+
+* **功能**: 主测试执行器
+* **特性**:
+  * 自动测试发现机制
+  * 灵活的参数解析系统
+  * 单元和集成测试分离
+  * 详细的结果报告
+  * 过滤和模式匹配支持
 
 ### 框架质量指标
-- ✅ 所有文件通过 bash 语法检查
-- ✅ 模块化设计，清晰职责分离
-- ✅ 完整的错误处理
-- ✅ 详细的文档和注释
+
+* ✅ 所有文件通过 bash 语法检查
+* ✅ 模块化设计，清晰职责分离
+* ✅ 完整的错误处理
+* ✅ 详细的文档和注释
 
 ---
 
@@ -82,77 +87,84 @@
 ### 单元测试文件
 
 #### 1. **test_validation.sh** (~350 行)
-- **测试覆盖**:
-  - 消息函数测试 (4个): error_msg, success_msg, warn_msg, info_msg
-  - 参数验证 (3个): empty, non-empty, format validation
-  - 路径验证 (3个): 绝对路径, 相对路径, 父目录引用
-  - 目录验证 (3个): 存在性, 可写性, 结构
-  - 文件验证 (3个): 存在性, 可读性, 可写性
-  - 数组验证 (3个): 非空, 空, 包含元素
-  - 数值验证 (4个): 正数, 零值, 负数, 比较
-  - 状态代码 (3个): 成功, 失败, 自定义
-  - 字符串验证 (4个): 相等性, 不相等, 包含, 正则匹配
+
+* **测试覆盖**:
+  * 消息函数测试 (4个): error_msg, success_msg, warn_msg, info_msg
+  * 参数验证 (3个): empty, non-empty, format validation
+  * 路径验证 (3个): 绝对路径, 相对路径, 父目录引用
+  * 目录验证 (3个): 存在性, 可写性, 结构
+  * 文件验证 (3个): 存在性, 可读性, 可写性
+  * 数组验证 (3个): 非空, 空, 包含元素
+  * 数值验证 (4个): 正数, 零值, 负数, 比较
+  * 状态代码 (3个): 成功, 失败, 自定义
+  * 字符串验证 (4个): 相等性, 不相等, 包含, 正则匹配
 
 #### 2. **test_dryrun.sh** (~380 行)
-- **测试覆盖**:
-  - 干运行标志 (3个): 检测, 默认禁用, 参数解析
-  - 模拟 mkdir (2个): 干运行模式, 正常模式
-  - 模拟 copy (2个): 干运行模式, 正常模式
-  - 安装脚本 (3个): 干运行模式, 正常模式, 退出码
-  - 输出验证 (3个): 格式, 显示命令, 保留详情
-  - 无修改验证 (2个): 无文件创建, 无文件修改
-  - 集成测试 (2个): 多操作, 模式切换
+
+* **测试覆盖**:
+  * 干运行标志 (3个): 检测, 默认禁用, 参数解析
+  * 模拟 mkdir (2个): 干运行模式, 正常模式
+  * 模拟 copy (2个): 干运行模式, 正常模式
+  * 安装脚本 (3个): 干运行模式, 正常模式, 退出码
+  * 输出验证 (3个): 格式, 显示命令, 保留详情
+  * 无修改验证 (2个): 无文件创建, 无文件修改
+  * 集成测试 (2个): 多操作, 模式切换
 
 #### 3. **test_install.sh** (~400 行)
-- **测试覆盖**:
-  - 脚本可用性 (3个): 存在, 可执行, 可读性
-  - 基本执行 (3个): 成功运行, --force 标志, --dry-run
-  - 配置检测 (2个): ZSH 检测, Bash 要求
-  - Antigen (2个): 检测, 安装模拟
-  - 配置文件 (3个): .zshrc 创建, 内容, 函数目录
-  - 备份恢复 (3个): 备份创建, 恢复, 多个备份
-  - 权限管理 (2个): 文件权限, 目录权限
-  - 验证 (3个): 语法验证, 验证文件, 目录结构
-  - 集成 (3个): 主目录检测, 目录结构, 缺失依赖检测, 权限错误处理
+
+* **测试覆盖**:
+  * 脚本可用性 (3个): 存在, 可执行, 可读性
+  * 基本执行 (3个): 成功运行, --force 标志, --dry-run
+  * 配置检测 (2个): ZSH 检测, Bash 要求
+  * Antigen (2个): 检测, 安装模拟
+  * 配置文件 (3个): .zshrc 创建, 内容, 函数目录
+  * 备份恢复 (3个): 备份创建, 恢复, 多个备份
+  * 权限管理 (2个): 文件权限, 目录权限
+  * 验证 (3个): 语法验证, 验证文件, 目录结构
+  * 集成 (3个): 主目录检测, 目录结构, 缺失依赖检测, 权限错误处理
 
 #### 4. **test_tools.sh** (~380 行)
-- **测试覆盖**:
-  - 验证命令 (3个): 可用性, 有效配置, 缺失配置
-  - 备份命令 (4个): 文件创建, 内容保留, 时间戳, 多个备份轮转
-  - 恢复命令 (3个): 从备份恢复, 备份存在验证, 覆盖配置
-  - 清理命令 (3个): 移除缓存, 列出文件, 干运行模式
-  - 性能基准 (3个): 启动时间, 输出格式, 性能评级
-  - Doctor 命令 (3个): 版本检查, 依赖检查, 报告生成
-  - 错误处理 (3个): 无效命令, 缺失参数, 帮助显示
-  - 集成测试 (2个): 命令链接, 状态持久化
+
+* **测试覆盖**:
+  * 验证命令 (3个): 可用性, 有效配置, 缺失配置
+  * 备份命令 (4个): 文件创建, 内容保留, 时间戳, 多个备份轮转
+  * 恢复命令 (3个): 从备份恢复, 备份存在验证, 覆盖配置
+  * 清理命令 (3个): 移除缓存, 列出文件, 干运行模式
+  * 性能基准 (3个): 启动时间, 输出格式, 性能评级
+  * Doctor 命令 (3个): 版本检查, 依赖检查, 报告生成
+  * 错误处理 (3个): 无效命令, 缺失参数, 帮助显示
+  * 集成测试 (2个): 命令链接, 状态持久化
 
 ### 集成测试文件
 
 #### 5. **test_end_to_end.sh** (~420 行)
-- **完整工作流测试**:
-  - 安装工作流 (2个): 完整安装, 带验证
-  - 备份恢复 (2个): 备份创建, 恢复工作流
-  - 干运行工作流 (2个): 干运行安装, 显示操作
-  - 多组件交互 (2个): 配置验证交互, 多脚本交互
-  - 环境设置 (2个): 环境准备, 操作后清理
-  - 复杂工作流 (2个): 安装-修改-恢复, 并发操作模拟
-  - 错误恢复 (2个): 失败恢复, 部分操作恢复
-  - 性能和可扩展性 (2个): 处理多文件, 大文件处理
+
+* **完整工作流测试**:
+  * 安装工作流 (2个): 完整安装, 带验证
+  * 备份恢复 (2个): 备份创建, 恢复工作流
+  * 干运行工作流 (2个): 干运行安装, 显示操作
+  * 多组件交互 (2个): 配置验证交互, 多脚本交互
+  * 环境设置 (2个): 环境准备, 操作后清理
+  * 复杂工作流 (2个): 安装-修改-恢复, 并发操作模拟
+  * 错误恢复 (2个): 失败恢复, 部分操作恢复
+  * 性能和可扩展性 (2个): 处理多文件, 大文件处理
 
 #### 6. **test_workflows.sh** (~480 行)
-- **真实场景测试**:
-  - 开发工作流 (3个): 首次设置, 配置更新, 故障排除
-  - 维护工作流 (2个): 例行维护, 备份轮转
-  - 验证工作流 (3个): 配置验证, 环境检测, 提交
-  - 迁移工作流 (2个): 版本迁移, 回滚
-  - 灾难恢复 (2个): 损坏检测与恢复, 多组件恢复
-  - 性能可靠性 (2个): 负载性能, 重复操作可靠性
+
+* **真实场景测试**:
+  * 开发工作流 (3个): 首次设置, 配置更新, 故障排除
+  * 维护工作流 (2个): 例行维护, 备份轮转
+  * 验证工作流 (3个): 配置验证, 环境检测, 提交
+  * 迁移工作流 (2个): 版本迁移, 回滚
+  * 灾难恢复 (2个): 损坏检测与恢复, 多组件恢复
+  * 性能可靠性 (2个): 负载性能, 重复操作可靠性
 
 ### 测试质量指标
-- ✅ 80+ 个独立测试用例
-- ✅ 全面的代码覆盖
-- ✅ 现实场景模拟
-- ✅ 所有文件通过语法检查
+
+* ✅ 80+ 个独立测试用例
+* ✅ 全面的代码覆盖
+* ✅ 现实场景模拟
+* ✅ 所有文件通过语法检查
 
 ---
 
@@ -161,61 +173,67 @@
 ### 创建的文件
 
 #### 1. **run_tests.sh** (150+ 行)
-- **功能**: 本地测试运行器包装脚本
-- **支持的模式**:
-  - `quick` - 快速测试 (仅单元测试)
-  - `full` - 完整测试 (默认)
-  - `unit` - 仅单元测试
-  - `integration` - 仅集成测试
-  - `debug` - 调试模式 (详细输出)
-  - `watch` - 监视模式 (在文件更改时重新运行)
-- **特性**:
-  - 彩色输出
-  - 详细帮助文本
-  - 灵活的参数解析
-  - 结果报告
+
+* **功能**: 本地测试运行器包装脚本
+* **支持的模式**:
+  * `quick` - 快速测试 (仅单元测试)
+  * `full` - 完整测试 (默认)
+  * `unit` - 仅单元测试
+  * `integration` - 仅集成测试
+  * `debug` - 调试模式 (详细输出)
+  * `watch` - 监视模式 (在文件更改时重新运行)
+* **特性**:
+  * 彩色输出
+  * 详细帮助文本
+  * 灵活的参数解析
+  * 结果报告
 
 #### 2. **.github/workflows/tests.yml** (100+ 行)
-- **功能**: GitHub Actions CI/CD 配置
-- **包含的作业**:
-  - `test` - 完整测试 (矩阵: Ubuntu + macOS, Bash 4.0 + 5.0)
-  - `quick-check` - 快速检查 (仅单元测试)
-  - `lint` - 代码质量检查 (语法验证)
-  - `coverage` - 覆盖率报告
-  - `report` - 生成汇总报告
-- **触发条件**:
-  - 推送到主分支
-  - Pull requests
-  - 特定路径变更
+
+* **功能**: GitHub Actions CI/CD 配置
+* **包含的作业**:
+  * `test` - 完整测试 (矩阵: Ubuntu + macOS, Bash 4.0 + 5.0)
+  * `quick-check` - 快速检查 (仅单元测试)
+  * `lint` - 代码质量检查 (语法验证)
+  * `coverage` - 覆盖率报告
+  * `report` - 生成汇总报告
+* **触发条件**:
+  * 推送到主分支
+  * Pull requests
+  * 特定路径变更
 
 ### CI/CD 质量指标
-- ✅ 多平台测试支持 (Linux, macOS)
-- ✅ 多版本 Bash 支持
-- ✅ 自动化工件上传
-- ✅ 完整的报告生成
+
+* ✅ 多平台测试支持 (Linux, macOS)
+* ✅ 多版本 Bash 支持
+* ✅ 自动化工件上传
+* ✅ 完整的报告生成
 
 ---
 
 ## 📚 文档和工具
 
 ### 创建的文件
+
 1. **tests/README.md** (320 行)
-   - 完整的框架使用指南
-   - API 文档
-   - 最佳实践
-   - 故障排除
+   * 完整的框架使用指南
+   * API 文档
+   * 最佳实践
+   * 故障排除
 
 ### 文档覆盖
-- ✅ 框架库文档
-- ✅ 测试编写指南
-- ✅ 执行说明
-- ✅ 调试指南
+
+* ✅ 框架库文档
+* ✅ 测试编写指南
+* ✅ 执行说明
+* ✅ 调试指南
 
 ---
 
 ## 📈 项目统计
 
 ### 代码统计
+
 ```
 测试框架代码:     1,818 行 (5 文件)
 测试用例代码:     2,231 行 (6 文件)
@@ -224,6 +242,7 @@
 ```
 
 ### 测试用例统计
+
 ```
 单元测试文件:     4 个
   - test_validation.sh: ~22 个测试
@@ -239,48 +258,55 @@
 ```
 
 ### 覆盖率
-- **路径检测**: 100%
-- **参数验证**: 100%
-- **干运行模式**: 100%
-- **安装脚本**: 90%+
-- **配置工具**: 90%+
-- **性能基准**: 85%+
-- **总体**: 90%+
+
+* **路径检测**: 100%
+* **参数验证**: 100%
+* **干运行模式**: 100%
+* **安装脚本**: 90%+
+* **配置工具**: 90%+
+* **性能基准**: 85%+
+* **总体**: 90%+
 
 ---
 
 ## ✨ 主要特性
 
 ### 1. 轻量级框架
-- 无外部依赖
-- 基于纯 Bash
-- 易于维护和扩展
+
+* 无外部依赖
+* 基于纯 Bash
+* 易于维护和扩展
 
 ### 2. 完整的断言库
-- 20+ 断言函数
-- 清晰的错误消息
-- 灵活的参数支持
+
+* 20+ 断言函数
+* 清晰的错误消息
+* 灵活的参数支持
 
 ### 3. 灵活的测试夹具
-- 临时环境管理
-- 模拟配置创建
-- 自动清理机制
+
+* 临时环境管理
+* 模拟配置创建
+* 自动清理机制
 
 ### 4. 强大的 CI/CD 集成
-- GitHub Actions 支持
-- 多平台测试
-- 自动化报告
+
+* GitHub Actions 支持
+* 多平台测试
+* 自动化报告
 
 ### 5. 开发者友好的工具
-- 本地测试运行器
-- 监视模式支持
-- 调试工具
+
+* 本地测试运行器
+* 监视模式支持
+* 调试工具
 
 ---
 
 ## 🚀 使用方法
 
 ### 本地运行
+
 ```bash
 # 快速测试
 cd tests
@@ -297,9 +323,10 @@ cd tests
 ```
 
 ### CI/CD 运行
-- 自动在 GitHub Actions 上运行
-- 支持矩阵构建 (多 OS 和 Bash 版本)
-- 自动生成覆盖率报告
+
+* 自动在 GitHub Actions 上运行
+* 支持矩阵构建 (多 OS 和 Bash 版本)
+* 自动生成覆盖率报告
 
 ---
 
@@ -322,46 +349,51 @@ cd tests
 ## 📝 版本升级
 
 ### 当前版本
-- **dev-env**: v2.1.3 → v2.2.0
-- **变更类型**: Major (新增功能)
+
+* **dev-env**: v2.1.3 → v2.2.0
+* **变更类型**: Major (新增功能)
 
 ### 变更摘要
-- ✨ 新增完整的自动化测试套件
-- ✨ 新增 GitHub Actions CI/CD 工作流
-- ✨ 新增本地测试运行器工具
-- 📚 新增详细的测试文档
+
+* ✨ 新增完整的自动化测试套件
+* ✨ 新增 GitHub Actions CI/CD 工作流
+* ✨ 新增本地测试运行器工具
+* 📚 新增详细的测试文档
 
 ---
 
 ## 🔗 相关文件
 
-- `tests/test_runner.sh` - 主测试执行器
-- `tests/run_tests.sh` - 本地运行器
-- `tests/lib/test_utils.sh` - 工具库
-- `tests/lib/assertions.sh` - 断言库
-- `tests/lib/fixtures.sh` - 夹具库
-- `tests/unit/` - 单元测试目录
-- `tests/integration/` - 集成测试目录
-- `tests/README.md` - 使用文档
-- `tests/.github/workflows/tests.yml` - CI/CD 配置
+* `tests/test_runner.sh` - 主测试执行器
+* `tests/run_tests.sh` - 本地运行器
+* `tests/lib/test_utils.sh` - 工具库
+* `tests/lib/assertions.sh` - 断言库
+* `tests/lib/fixtures.sh` - 夹具库
+* `tests/unit/` - 单元测试目录
+* `tests/integration/` - 集成测试目录
+* `tests/README.md` - 使用文档
+* `tests/.github/workflows/tests.yml` - CI/CD 配置
 
 ---
 
 ## 🎓 后续建议
 
 ### 短期 (1-2 周)
+
 1. ✅ 完成测试套件构建
 2. ⏳ 集成到 GitHub Actions
 3. ⏳ 运行完整测试验证
 4. ⏳ 合并到主分支
 
 ### 中期 (2-4 周)
+
 1. 扩展测试覆盖率到 95%+
 2. 添加性能基准测试
 3. 集成代码覆盖率报告
 4. 建立测试最佳实践文档
 
 ### 长期 (1-3 个月)
+
 1. 自动化功能测试
 2. 负载测试
 3. 集成测试仪表板
@@ -372,12 +404,14 @@ cd tests
 ## 📞 支持信息
 
 ### 文档
-- 详见 `tests/README.md` 获取完整指南
-- 查看 `tests/lib/` 中的框架库获取 API 文档
+
+* 详见 `tests/README.md` 获取完整指南
+* 查看 `tests/lib/` 中的框架库获取 API 文档
 
 ### 问题反馈
-- 提交 GitHub Issue
-- 包含测试输出和环境信息
+
+* 提交 GitHub Issue
+* 包含测试输出和环境信息
 
 ---
 

@@ -10,35 +10,39 @@
 
 **推荐新用户首先阅读**
 
-- [快速参考指南](PROXY_QUICK_REFERENCE.md) - 常用命令、场景示例、快速故障排除
+* [快速参考指南](PROXY_QUICK_REFERENCE.md) - 常用命令、场景示例、快速故障排除
 
 ### 🔧 完整部署 (1 小时)
 
 **系统管理员和集成人员**
 
-- [优化说明与方法论](PROXY_OPTIMIZATION.md) - 详细的优化原理、问题分析、解决方案
-- [集成与部署指南](PROXY_INTEGRATION_GUIDE.md) - 集成步骤、验证清单、故障排除
+* [优化说明与方法论](PROXY_OPTIMIZATION.md) - 详细的优化原理、问题分析、解决方案
+* [集成与部署指南](PROXY_INTEGRATION_GUIDE.md) - 集成步骤、验证清单、故障排除
 
 ### 📊 项目报告
 
 **项目经理和架构师**
 
-- [完成报告](PROXY_ENHANCEMENT_SUMMARY.md) - 优化成果、质量指标、技术亮点
+* [完成报告](PROXY_ENHANCEMENT_SUMMARY.md) - 优化成果、质量指标、技术亮点
 
 ---
 
 ## 🎯 按用户角色选择文档
 
 ### 👤 我是新用户，想快速上手
+
 → [快速参考指南](PROXY_QUICK_REFERENCE.md) (5 分钟)
 
 ### 💼 我是系统管理员，需要集成部署
+
 → [集成与部署指南](PROXY_INTEGRATION_GUIDE.md) (15 分钟)
 
 ### 🛠️ 我是开发者，想了解优化原理
+
 → [优化说明与方法论](PROXY_OPTIMIZATION.md) (30 分钟)
 
 ### 📊 我是架构师，需要完整概览
+
 → [完成报告](PROXY_ENHANCEMENT_SUMMARY.md) (20 分钟)
 
 ---
@@ -77,9 +81,9 @@ proxy 127.0.0.1:10808 --verify
 
 ## 🔗 相关链接
 
-- [项目主文档](../../README.md)
-- [文档总索引](../README.md)
-- [开发指南](../../CLAUDE.md)
+* [项目主文档](../../README.md)
+* [文档总索引](../README.md)
+* [开发指南](../../CLAUDE.md)
 
 ---
 
