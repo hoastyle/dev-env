@@ -2,10 +2,10 @@
 # ===============================================
 # Claude CLI Configuration Management Module
 # ===============================================
-# 功能: Claude CLI 多模型配置管理
-# 特性: 动态别名生成、配置创建、热重载、生命周期管理
+# 功能: Claude CLI 多模型配置管理 + 代理支持
+# 特性: 动态别名生成、配置创建、热重载、生命周期管理、运行时代理控制
 #
-# 使用:
+# 基础命令:
 #   cc-create <name>     - 创建新配置
 #   cc-edit <name>       - 编辑配置（热重载）
 #   cc-validate <name>   - 验证配置
@@ -15,7 +15,18 @@
 #   cc-refresh           - 刷新别名
 #   cc-current           - 显示版本信息
 #
+# 代理支持:
+#   方式1 (配置级) - 在 settings.json 的 env 字段中添加:
+#     "http_proxy": "http://127.0.0.1:7890",
+#     "https_proxy": "http://127.0.0.1:7890"
+#
+#   方式2 (运行时) - 使用命令行参数:
+#     cc-<name> --proxy [地址]           # 启用代理（默认 127.0.0.1:7890）
+#     cc-<name> --proxy 192.168.1.1:8080  # 使用指定代理
+#     cc-<name> --no-proxy               # 明确禁用代理
+#
 # 配置文件命名: settings.json.<name> → 别名: cc-<name>
+
 
 # ============================================
 # 配置常量
@@ -25,7 +36,7 @@ typeset -g CLAUDE_TEMPLATE_FILE="${CLAUDE_CONFIG_DIR}/settings.json"
 typeset -g CLAUDE_EDITOR="${EDITOR:-vim}"
 
 # ============================================
-# 核心函数：通用配置切换
+# 核心函数：通用配置切换（支持运行时代理参数）
 # ============================================
 _claude_with_config() {
     local config_name="$1"
@@ -41,8 +52,60 @@ _claude_with_config() {
         return 1
     fi
 
+    # 处理运行时代理参数
+    local proxy_enabled=false
+    local proxy_url=""
+    local remaining_args=()
+
+    # 解析参数
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --proxy)
+                proxy_enabled=true
+                if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                    proxy_url="$2"
+                    shift 2
+                else
+                    # 使用默认代理地址
+                    proxy_url="http://127.0.0.1:7890"
+                    shift
+                fi
+                ;;
+            --no-proxy)
+                # 明确禁用代理
+                proxy_enabled=false
+                unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy
+                shift
+                ;;
+            *)
+                remaining_args+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    # 如果启用了运行时代理，设置环境变量
+    if [[ "$proxy_enabled" == "true" ]]; then
+        # 如果 proxy_url 不包含协议，添加 http://
+        if [[ ! "$proxy_url" =~ ^https?:// ]]; then
+            proxy_url="http://${proxy_url}"
+        fi
+
+        info_msg "🌐 运行时代理已启用: $proxy_url"
+        export http_proxy="$proxy_url"
+        export https_proxy="$proxy_url"
+        export HTTP_PROXY="$proxy_url"
+        export HTTPS_PROXY="$proxy_url"
+        export all_proxy="$proxy_url"
+    fi
+
     # 启动 Claude CLI
-    claude --settings "$config_file" "$@"
+    claude --settings "$config_file" "${remaining_args[@]}"
+
+    # 清理临时代理环境变量（如果是运行时设置的）
+    if [[ "$proxy_enabled" == "true" ]]; then
+        unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy
+    fi
 }
 
 # ============================================
@@ -118,9 +181,10 @@ cc-create() {
         warning_msg "模板文件不存在: $CLAUDE_TEMPLATE_FILE"
         info_msg "正在创建默认模板..."
 
-        # 创建默认模板（Claude Code CLI 格式）
+        # 创建默认模板（Claude Code CLI 格式，包含代理配置说明）
         cat > "$CLAUDE_TEMPLATE_FILE" <<'EOF'
 {
+  "_comment_proxy": "代理配置（可选）：如需使用代理访问 API，请在 env 中添加 http_proxy, https_proxy, all_proxy 字段，例如: \"http_proxy\": \"http://127.0.0.1:7890\"",
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "YOUR_AUTH_TOKEN_HERE",
     "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
@@ -193,10 +257,14 @@ cc-edit() {
     info_msg "正在编辑配置: $config_file"
     info_msg "编辑器: $CLAUDE_EDITOR"
     echo ""
-    warning_msg "⚠️  请确保配置以下字段:"
-    echo "  - api_key: 你的 API 密钥"
-    echo "  - base_url: API 服务器地址"
-    echo "  - model: 模型名称"
+    warning_msg "⚠️  请确保配置以下字段 (在 env 中):"
+    echo "  - ANTHROPIC_AUTH_TOKEN: 你的 API 密钥"
+    echo "  - ANTHROPIC_BASE_URL: API 服务器地址"
+    echo ""
+    info_msg "💡 可选字段 - 代理配置 (在 env 中):"
+    echo "  - http_proxy: \"http://127.0.0.1:7890\""
+    echo "  - https_proxy: \"http://127.0.0.1:7890\""
+    echo "  - all_proxy: \"http://127.0.0.1:7890\""
     echo ""
 
     # 记录修改前的时间戳（兼容 Linux 和 macOS）
@@ -531,13 +599,20 @@ _register_claude_help() {
     COMMAND_USAGES[cc-current]="cc-current"
 
     COMMAND_EXAMPLES[cc-create]="cc-create mymodel"
-    COMMAND_EXAMPLES[cc-edit]="cc-edit glm-4"
+    COMMAND_EXAMPLES[cc-edit]="cc-edit glm-4  # 编辑配置，可添加代理: http_proxy, https_proxy"
     COMMAND_EXAMPLES[cc-validate]="cc-validate mymodel"
     COMMAND_EXAMPLES[cc-list]="cc-list"
     COMMAND_EXAMPLES[cc-copy]="cc-copy glm-4 glm-test"
     COMMAND_EXAMPLES[cc-delete]="cc-delete oldconfig"
     COMMAND_EXAMPLES[cc-refresh]="cc-refresh"
     COMMAND_EXAMPLES[cc-current]="cc-current"
+
+    # 代理使用示例
+    COMMAND_CATEGORIES[cc-proxy]="AI工具"
+    COMMAND_DESCRIPTIONS[cc-proxy]="代理支持（配置级和运行时）"
+    COMMAND_USAGES[cc-proxy]="cc-<name> --proxy [地址] | cc-<name> --no-proxy"
+    COMMAND_EXAMPLES[cc-proxy]="cc-glm --proxy  # 使用默认代理\ncc-glm --proxy 192.168.1.1:8080  # 指定代理\ncc-glm --no-proxy  # 禁用代理"
+    ZSH_COMMANDS[cc-proxy]=1
 
     # 将所有命令添加到主数据库
     for cmd in cc-create cc-edit cc-validate cc-list cc-copy cc-delete cc-refresh cc-current; do
