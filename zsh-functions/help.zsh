@@ -59,6 +59,23 @@ init_help_database() {
     COMMAND_EXAMPLES[hrg]="hrg \"error\" ./logs"
     COMMAND_EXAMPLES[hirg]="hirg \"config\" /etc"
 
+    # AI 工具命令
+    COMMAND_CATEGORIES[claude-config]="AI工具"
+    COMMAND_CATEGORIES[ccfg]="AI工具"
+    COMMAND_CATEGORIES[cc-proxy]="AI工具"
+
+    COMMAND_DESCRIPTIONS[claude-config]="Claude CLI 配置管理（主命令）"
+    COMMAND_DESCRIPTIONS[ccfg]="claude-config 的简短别名"
+    COMMAND_DESCRIPTIONS[cc-proxy]="Claude CLI 代理支持（配置级和运行时）"
+
+    COMMAND_USAGES[claude-config]="claude-config <subcommand> [args]"
+    COMMAND_USAGES[ccfg]="ccfg <subcommand> [args]"
+    COMMAND_USAGES[cc-proxy]="cc-<name> --proxy [地址] | cc-<name> --no-proxy"
+
+    COMMAND_EXAMPLES[claude-config]="claude-config create mymodel\nclaude-config list\nclaude-config edit glm"
+    COMMAND_EXAMPLES[ccfg]="ccfg create mymodel  # 创建配置\nccfg edit glm  # 编辑配置\nccfg list  # 列出所有配置"
+    COMMAND_EXAMPLES[cc-proxy]="cc-glm --proxy  # 使用默认代理\ncc-glm --proxy 192.168.1.1:8080  # 指定代理\ncc-glm --no-proxy  # 禁用代理"
+
     # 实用工具命令
     COMMAND_CATEGORIES[proxy]="实用工具"
     COMMAND_CATEGORIES[unproxy]="实用工具"
@@ -135,7 +152,7 @@ zsh_help() {
     fi
 
     # 如果参数是类别，显示该类别的所有命令
-    if [[ "$topic" == "环境检测" ]] || [[ "$topic" == "搜索增强" ]] || [[ "$topic" == "实用工具" ]]; then
+    if [[ "$topic" == "环境检测" ]] || [[ "$topic" == "搜索增强" ]] || [[ "$topic" == "实用工具" ]] || [[ "$topic" == "AI工具" ]]; then
         show_category_help "$topic"
         return 0
     fi
@@ -147,11 +164,12 @@ zsh_help() {
     echo "  环境检测    - 环境检测相关命令"
     echo "  搜索增强    - 文件搜索相关命令"
     echo "  实用工具    - 实用工具命令"
+    echo "  AI工具      - Claude CLI 配置管理命令"
     echo ""
     echo "可用命令 (输入 'zsh_help <命令名>' 查看详细信息):"
 
     # 按类别显示命令
-    local categories=("环境检测" "搜索增强" "实用工具")
+    local categories=("环境检测" "搜索增强" "实用工具" "AI工具")
     for category in "${categories[@]}"; do
         echo ""
         echo "  $category:"
@@ -172,12 +190,13 @@ show_help_overview() {
     echo ""
 
     # 统计各类别命令数量
-    local env_count=0 search_count=0 util_count=0
+    local env_count=0 search_count=0 util_count=0 ai_count=0
     for cmd in "${(@k)COMMAND_CATEGORIES}"; do
         case "${COMMAND_CATEGORIES[$cmd]}" in
             "环境检测") ((env_count++)) ;;
             "搜索增强") ((search_count++)) ;;
             "实用工具") ((util_count++)) ;;
+            "AI工具") ((ai_count++)) ;;
         esac
     done
 
@@ -192,6 +211,12 @@ show_help_overview() {
     echo "   hig              - 递归搜索（忽略大小写）"
     echo "   hrg              - ripgrep搜索（区分大小写）"
     echo "   hirg             - ripgrep搜索（忽略大小写）"
+    echo ""
+
+    echo "🤖 AI工具 ($ai_count 个命令)"
+    echo "   claude-config    - Claude CLI 配置管理（主命令）"
+    echo "   ccfg             - claude-config 的简短别名"
+    echo "   cc-proxy         - 代理支持说明和示例"
     echo ""
 
     local minimal_hint=""
@@ -242,6 +267,7 @@ show_help_usage() {
     echo "  环境检测    - 环境检测和配置管理命令"
     echo "  搜索增强    - 文件内容搜索命令"
     echo "  实用工具    - 实用工具命令"
+    echo "  AI工具      - Claude CLI 配置管理命令"
     echo ""
     echo "示例:"
     echo "  zsh_help              # 显示概览"
@@ -259,6 +285,7 @@ show_category_help() {
         "环境检测") category_key="环境检测" ;;
         "搜索增强") category_key="搜索增强" ;;
         "实用工具") category_key="实用工具" ;;
+        "AI工具") category_key="AI工具" ;;
         *) category_key="$category" ;;
     esac
 
@@ -281,7 +308,7 @@ show_category_help() {
     if [[ "$found" == false ]]; then
         echo "❌ 未找到类别: $category"
         echo ""
-        echo "可用类别: 环境检测, 搜索增强, 实用工具"
+        echo "可用类别: 环境检测, 搜索增强, 实用工具, AI工具"
     fi
 }
 
@@ -301,6 +328,69 @@ show_command_help() {
 
     # 如果有相关工具，显示工具信息
     case "$cmd" in
+        claude-config|ccfg)
+            echo "🤖 功能: Claude CLI 多模型配置管理系统"
+            echo ""
+            echo "📋 管理子命令:"
+            echo "    create <name>       - 创建新配置"
+            echo "    edit <name>         - 编辑配置（热重载）"
+            echo "    validate <name>     - 验证配置格式和字段"
+            echo "    list                - 列出所有可用配置"
+            echo "    copy <src> <dst>    - 复制现有配置"
+            echo "    delete <name>       - 删除配置"
+            echo "    refresh             - 刷新别名"
+            echo "    current             - 显示 Claude CLI 版本"
+            echo "    help                - 显示帮助信息"
+            echo ""
+            echo "🤖 使用模型:"
+            echo "    cc-<model> \"prompt\"  - 使用指定配置的 AI 模型"
+            echo ""
+            echo "💡 命令示例:"
+            echo "    ccfg create mymodel          # 创建新配置"
+            echo "    ccfg edit glm                # 编辑 GLM 配置"
+            echo "    ccfg list                    # 列出所有配置"
+            echo "    cc-glm \"你好，请帮我写代码\"  # 使用 GLM 模型"
+            echo ""
+            echo "🌐 代理支持 (两种方式):"
+            echo "    1. 配置级代理（持久化）:"
+            echo "       ccfg edit <name>"
+            echo "       # 在 env 字段添加:"
+            echo "       # \"http_proxy\": \"http://127.0.0.1:7890\""
+            echo "       # \"https_proxy\": \"http://127.0.0.1:7890\""
+            echo ""
+            echo "    2. 运行时代理（临时）:"
+            echo "       cc-<model> --proxy \"prompt\"              # 使用默认代理"
+            echo "       cc-<model> --proxy 192.168.1.1:8080 \"prompt\"  # 指定代理"
+            echo "       cc-<model> --no-proxy \"prompt\"           # 禁用代理"
+            ;;
+        cc-proxy)
+            echo "🌐 功能: Claude CLI 代理支持说明"
+            echo ""
+            echo "📋 两种代理配置方式:"
+            echo ""
+            echo "1️⃣ 配置级代理（持久化，每次生效）:"
+            echo "    使用 'ccfg edit <配置名>' 编辑配置文件"
+            echo "    在 env 字段中添加代理环境变量:"
+            echo "    {"
+            echo "      \"env\": {"
+            echo "        \"http_proxy\": \"http://127.0.0.1:7890\","
+            echo "        \"https_proxy\": \"http://127.0.0.1:7890\","
+            echo "        \"all_proxy\": \"http://127.0.0.1:7890\""
+            echo "      }"
+            echo "    }"
+            echo ""
+            echo "2️⃣ 运行时代理（临时，仅当次生效）:"
+            echo "    cc-glm --proxy \"prompt\"              # 使用默认代理 (127.0.0.1:7890)"
+            echo "    cc-glm --proxy 10.0.0.1:8080 \"prompt\" # 使用指定代理"
+            echo "    cc-glm --no-proxy \"prompt\"           # 明确禁用代理"
+            echo ""
+            echo "🎯 优先级规则:"
+            echo "    --no-proxy 参数 > --proxy 参数 > 配置文件 env 字段"
+            echo ""
+            echo "💡 使用场景:"
+            echo "    - 配置级: 适合该模型总是需要代理的情况"
+            echo "    - 运行时: 适合临时测试、切换代理地址"
+            ;;
         hg|hig)
             echo "🔧 相关工具: grep (系统自带)"
             echo "⚠️  注意: 在大型项目中搜索可能较慢"

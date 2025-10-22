@@ -545,47 +545,6 @@ _cc_current() {
 }
 
 # ============================================
-# 帮助系统注册（集成到 help.zsh）
-# ============================================
-_register_claude_help() {
-    # 仅在 help.zsh 已加载时注册
-    if ! typeset -f init_help_database >/dev/null 2>&1; then
-        return 0
-    fi
-
-    # 确保关联数组已声明
-    typeset -gA COMMAND_CATEGORIES COMMAND_DESCRIPTIONS COMMAND_USAGES COMMAND_EXAMPLES ZSH_COMMANDS 2>/dev/null
-
-    # 主管理命令（推荐使用）
-    COMMAND_CATEGORIES[claude-config]="AI工具"
-    COMMAND_CATEGORIES[ccfg]="AI工具"
-
-    COMMAND_DESCRIPTIONS[claude-config]="Claude CLI 配置管理（主命令）"
-    COMMAND_DESCRIPTIONS[ccfg]="claude-config 的简短别名"
-
-    COMMAND_USAGES[claude-config]="claude-config <subcommand> [args]"
-    COMMAND_USAGES[ccfg]="ccfg <subcommand> [args]"
-
-    COMMAND_EXAMPLES[claude-config]="claude-config create mymodel\nclaude-config list\nclaude-config edit glm"
-    COMMAND_EXAMPLES[ccfg]="ccfg create mymodel  # 创建配置\nccfg edit glm  # 编辑配置\nccfg list  # 列出所有配置"
-
-    # 代理使用示例
-    COMMAND_CATEGORIES[cc-proxy]="AI工具"
-    COMMAND_DESCRIPTIONS[cc-proxy]="代理支持（配置级和运行时）"
-    COMMAND_USAGES[cc-proxy]="cc-<name> --proxy [地址] | cc-<name> --no-proxy"
-    COMMAND_EXAMPLES[cc-proxy]="cc-glm --proxy  # 使用默认代理\ncc-glm --proxy 192.168.1.1:8080  # 指定代理\ncc-glm --no-proxy  # 禁用代理"
-    ZSH_COMMANDS[cc-proxy]=1
-
-    # 将所有命令添加到主数据库
-    for cmd in claude-config ccfg; do
-        ZSH_COMMANDS[$cmd]=1
-    done
-}
-
-# 注册帮助信息
-_register_claude_help
-
-# ============================================
 # 主管理命令：claude-config (别名 ccfg)
 # ============================================
 claude-config() {
