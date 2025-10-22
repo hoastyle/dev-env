@@ -60,8 +60,8 @@ _claude_with_config() {
     # 检查配置文件是否存在
     if [[ ! -f "$config_file" ]]; then
         error_msg "Claude 配置文件不存在: $config_file"
-        info_msg "可用配置: $(cc-list 2>/dev/null | grep 'cc-' | awk '{print $1}' | tr '\n' ', ' | sed 's/,$//')"
-        info_msg "创建新配置: cc-create $config_name"
+        info_msg "可用配置: $(_cc_list 2>/dev/null | grep 'cc-' | awk '{print $1}' | tr '\n' ', ' | sed 's/,$//')"
+        info_msg "创建新配置: ccfg create $config_name"
         return 1
     fi
 
@@ -151,20 +151,16 @@ _setup_claude_aliases() {
 _setup_claude_aliases
 
 # ============================================
-# 配置创建功能
+# 内部函数：配置创建（被 claude-config create 调用）
 # ============================================
-cc-create() {
-    if handle_help_param "cc-create" "$1"; then
-        return 0
-    fi
-
+_cc_create() {
     local config_name="$1"
 
     # 参数检查
     if [[ -z "$config_name" ]]; then
         error_msg "缺少配置名称参数"
-        info_msg "使用方法: cc-create <config_name>"
-        info_msg "示例: cc-create mymodel"
+        info_msg "使用方法: ccfg create <config_name>"
+        info_msg "示例: ccfg create mymodel"
         return 1
     fi
 
@@ -221,7 +217,7 @@ EOF
     # 显示提示信息
     echo ""
     info_msg "📝 下一步操作:"
-    echo "  1. 编辑配置文件: cc-edit $config_name"
+    echo "  1. 编辑配置文件: ccfg edit $config_name"
     echo "  2. 配置 API Key 和 Base URL"
     echo "  3. 保存后自动生效: cc-${config_name:l}"
     echo ""
@@ -230,7 +226,7 @@ EOF
     echo -n "是否立即编辑配置? [Y/n]: "
     read -r response
     if [[ ! "$response" =~ ^[Nn]$ ]]; then
-        cc-edit "$config_name"
+        _cc_edit "$config_name"
     else
         # 不立即编辑，但刷新别名
         _setup_claude_aliases
@@ -239,21 +235,17 @@ EOF
 }
 
 # ============================================
-# 配置编辑功能（支持热重载）
+# 内部函数：配置编辑（支持热重载）
 # ============================================
-cc-edit() {
-    if handle_help_param "cc-edit" "$1"; then
-        return 0
-    fi
-
+_cc_edit() {
     local config_name="$1"
 
     # 参数检查
     if [[ -z "$config_name" ]]; then
         error_msg "缺少配置名称参数"
-        info_msg "使用方法: cc-edit <config_name>"
+        info_msg "使用方法: ccfg edit <config_name>"
         info_msg "可用配置:"
-        cc-list 2>/dev/null | grep 'cc-' | sed 's/  cc-/  - /' | head -10
+        _cc_list 2>/dev/null | grep 'cc-' | sed 's/  cc-/  - /' | head -10
         return 1
     fi
 
@@ -262,7 +254,7 @@ cc-edit() {
     # 检查配置文件是否存在
     if [[ ! -f "$config_file" ]]; then
         error_msg "配置文件不存在: $config_file"
-        info_msg "创建新配置: cc-create $config_name"
+        info_msg "创建新配置: ccfg create $config_name"
         return 1
     fi
 
@@ -299,7 +291,7 @@ cc-edit() {
                 success_msg "✓ JSON 格式验证通过"
             else
                 error_msg "✗ JSON 格式错误，请检查配置文件"
-                info_msg "重新编辑: cc-edit $config_name"
+                info_msg "重新编辑: ccfg edit $config_name"
                 return 1
             fi
         fi
@@ -320,18 +312,14 @@ cc-edit() {
 }
 
 # ============================================
-# 配置验证功能
+# 内部函数：配置验证
 # ============================================
-cc-validate() {
-    if handle_help_param "cc-validate" "$1"; then
-        return 0
-    fi
-
+_cc_validate() {
     local config_name="$1"
 
     if [[ -z "$config_name" ]]; then
         error_msg "缺少配置名称参数"
-        info_msg "使用方法: cc-validate <config_name>"
+        info_msg "使用方法: ccfg validate <config_name>"
         return 1
     fi
 
@@ -398,20 +386,16 @@ cc-validate() {
 }
 
 # ============================================
-# 配置复制功能
+# 内部函数：配置复制
 # ============================================
-cc-copy() {
-    if handle_help_param "cc-copy" "$1"; then
-        return 0
-    fi
-
+_cc_copy() {
     local source_config="$1"
     local target_config="$2"
 
     if [[ -z "$source_config" || -z "$target_config" ]]; then
         error_msg "缺少参数"
-        info_msg "使用方法: cc-copy <source_config> <target_config>"
-        info_msg "示例: cc-copy glm myglm"
+        info_msg "使用方法: ccfg copy <source_config> <target_config>"
+        info_msg "示例: ccfg copy glm myglm"
         return 1
     fi
 
@@ -441,18 +425,14 @@ cc-copy() {
 }
 
 # ============================================
-# 配置删除功能
+# 内部函数：配置删除
 # ============================================
-cc-delete() {
-    if handle_help_param "cc-delete" "$1"; then
-        return 0
-    fi
-
+_cc_delete() {
     local config_name="$1"
 
     if [[ -z "$config_name" ]]; then
         error_msg "缺少配置名称参数"
-        info_msg "使用方法: cc-delete <config_name>"
+        info_msg "使用方法: ccfg delete <config_name>"
         return 1
     fi
 
@@ -480,18 +460,12 @@ cc-delete() {
 }
 
 # ============================================
-# 辅助命令
+# 内部函数：列出所有可用配置
 # ============================================
-
-# 列出所有可用配置
-cc-list() {
-    if handle_help_param "cc-list" "$1"; then
-        return 0
-    fi
-
+_cc_list() {
     if [[ ! -d "$CLAUDE_CONFIG_DIR" ]]; then
         warning_msg "Claude 配置目录不存在: $CLAUDE_CONFIG_DIR"
-        info_msg "创建第一个配置: cc-create mymodel"
+        info_msg "创建第一个配置: ccfg create mymodel"
         return 1
     fi
 
@@ -534,37 +508,33 @@ cc-list() {
 
     if [[ $count -eq 0 ]]; then
         warning_msg "未找到任何配置文件"
-        info_msg "创建第一个配置: cc-create mymodel"
+        info_msg "创建第一个配置: ccfg create mymodel"
     else
         success_msg "共找到 ${count} 个配置"
         echo ""
         info_msg "管理命令:"
-        echo "  cc-create <name>    - 创建新配置"
-        echo "  cc-edit <name>      - 编辑配置（热重载）"
-        echo "  cc-validate <name>  - 验证配置"
-        echo "  cc-copy <src> <dst> - 复制配置"
-        echo "  cc-delete <name>    - 删除配置"
+        echo "  ccfg create <name>    - 创建新配置"
+        echo "  ccfg edit <name>      - 编辑配置（热重载）"
+        echo "  ccfg validate <name>  - 验证配置"
+        echo "  ccfg copy <src> <dst> - 复制配置"
+        echo "  ccfg delete <name>    - 删除配置"
     fi
 }
 
-# 刷新别名
-cc-refresh() {
-    if handle_help_param "cc-refresh" "$1"; then
-        return 0
-    fi
-
+# ============================================
+# 内部函数：刷新别名
+# ============================================
+_cc_refresh() {
     info_msg "正在刷新 Claude CLI 别名..."
     _setup_claude_aliases
     success_msg "别名刷新完成"
-    cc-list
+    _cc_list
 }
 
-# 显示当前配置
-cc-current() {
-    if handle_help_param "cc-current" "$1"; then
-        return 0
-    fi
-
+# ============================================
+# 内部函数：显示当前配置
+# ============================================
+_cc_current() {
     info_msg "当前 Claude CLI 信息:"
     if command -v claude &>/dev/null; then
         claude --version 2>/dev/null || warning_msg "无法获取版本信息"
@@ -599,43 +569,6 @@ _register_claude_help() {
     COMMAND_EXAMPLES[claude-config]="claude-config create mymodel\nclaude-config list\nclaude-config edit glm"
     COMMAND_EXAMPLES[ccfg]="ccfg create mymodel  # 创建配置\nccfg edit glm  # 编辑配置\nccfg list  # 列出所有配置"
 
-    # Claude CLI 配置管理命令（向后兼容）
-    COMMAND_CATEGORIES[cc-create]="AI工具"
-    COMMAND_CATEGORIES[cc-edit]="AI工具"
-    COMMAND_CATEGORIES[cc-validate]="AI工具"
-    COMMAND_CATEGORIES[cc-list]="AI工具"
-    COMMAND_CATEGORIES[cc-copy]="AI工具"
-    COMMAND_CATEGORIES[cc-delete]="AI工具"
-    COMMAND_CATEGORIES[cc-refresh]="AI工具"
-    COMMAND_CATEGORIES[cc-current]="AI工具"
-
-    COMMAND_DESCRIPTIONS[cc-create]="创建新的 Claude 配置（推荐用 ccfg create）"
-    COMMAND_DESCRIPTIONS[cc-edit]="编辑配置（推荐用 ccfg edit）"
-    COMMAND_DESCRIPTIONS[cc-validate]="验证配置格式和字段（推荐用 ccfg validate）"
-    COMMAND_DESCRIPTIONS[cc-list]="列出所有可用配置（推荐用 ccfg list）"
-    COMMAND_DESCRIPTIONS[cc-copy]="复制现有配置（推荐用 ccfg copy）"
-    COMMAND_DESCRIPTIONS[cc-delete]="删除配置（推荐用 ccfg delete）"
-    COMMAND_DESCRIPTIONS[cc-refresh]="刷新别名（推荐用 ccfg refresh）"
-    COMMAND_DESCRIPTIONS[cc-current]="显示 Claude CLI 版本信息（推荐用 ccfg current）"
-
-    COMMAND_USAGES[cc-create]="cc-create <config_name>  (或 ccfg create <config_name>)"
-    COMMAND_USAGES[cc-edit]="cc-edit <config_name>  (或 ccfg edit <config_name>)"
-    COMMAND_USAGES[cc-validate]="cc-validate <config_name>  (或 ccfg validate <config_name>)"
-    COMMAND_USAGES[cc-list]="cc-list  (或 ccfg list)"
-    COMMAND_USAGES[cc-copy]="cc-copy <source> <target>  (或 ccfg copy <source> <target>)"
-    COMMAND_USAGES[cc-delete]="cc-delete <config_name>  (或 ccfg delete <config_name>)"
-    COMMAND_USAGES[cc-refresh]="cc-refresh  (或 ccfg refresh)"
-    COMMAND_USAGES[cc-current]="cc-current  (或 ccfg current)"
-
-    COMMAND_EXAMPLES[cc-create]="cc-create mymodel  (推荐: ccfg create mymodel)"
-    COMMAND_EXAMPLES[cc-edit]="cc-edit glm-4  (推荐: ccfg edit glm-4)"
-    COMMAND_EXAMPLES[cc-validate]="cc-validate mymodel  (推荐: ccfg validate mymodel)"
-    COMMAND_EXAMPLES[cc-list]="cc-list  (推荐: ccfg list)"
-    COMMAND_EXAMPLES[cc-copy]="cc-copy glm-4 glm-test  (推荐: ccfg copy glm-4 glm-test)"
-    COMMAND_EXAMPLES[cc-delete]="cc-delete oldconfig  (推荐: ccfg delete oldconfig)"
-    COMMAND_EXAMPLES[cc-refresh]="cc-refresh  (推荐: ccfg refresh)"
-    COMMAND_EXAMPLES[cc-current]="cc-current  (推荐: ccfg current)"
-
     # 代理使用示例
     COMMAND_CATEGORIES[cc-proxy]="AI工具"
     COMMAND_DESCRIPTIONS[cc-proxy]="代理支持（配置级和运行时）"
@@ -644,7 +577,7 @@ _register_claude_help() {
     ZSH_COMMANDS[cc-proxy]=1
 
     # 将所有命令添加到主数据库
-    for cmd in claude-config ccfg cc-create cc-edit cc-validate cc-list cc-copy cc-delete cc-refresh cc-current; do
+    for cmd in claude-config ccfg; do
         ZSH_COMMANDS[$cmd]=1
     done
 }
@@ -661,28 +594,28 @@ claude-config() {
 
     case "$cmd" in
         create)
-            cc-create "$@"
+            _cc_create "$@"
             ;;
         edit)
-            cc-edit "$@"
+            _cc_edit "$@"
             ;;
         validate)
-            cc-validate "$@"
+            _cc_validate "$@"
             ;;
         list)
-            cc-list "$@"
+            _cc_list "$@"
             ;;
         copy)
-            cc-copy "$@"
+            _cc_copy "$@"
             ;;
         delete)
-            cc-delete "$@"
+            _cc_delete "$@"
             ;;
         refresh)
-            cc-refresh "$@"
+            _cc_refresh "$@"
             ;;
         current)
-            cc-current "$@"
+            _cc_current "$@"
             ;;
         help|--help|-h)
             cat <<'EOF'
