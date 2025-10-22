@@ -36,6 +36,7 @@ repos:
         description: 使用Prettier自动修复YAML文件格式问题
         files: \.(yaml|yml)$
         args: [--write, --tab-width=2, --print-width=100]
+        stages: [pre-commit]  # 仅在 pre-commit 阶段运行
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -130,6 +131,7 @@ repos:
   # 第四层: Shell脚本检查
   # ===========================================
   # Shell 脚本检查 - ShellCheck
+  # 注意: 仅在 pre-commit 阶段运行（ZSH 脚本不完全支持 ShellCheck）
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.6 # 使用最新版本
     hooks:
@@ -137,6 +139,7 @@ repos:
         name: "Validate: Shell脚本检查"
         description: 使用ShellCheck检查Shell脚本语法和最佳实践
         args: [--severity=warning, --external-sources]
+        stages: [pre-commit]  # 仅在 pre-commit 阶段运行，不在 push 时运行
 
   # ===========================================
   # 第五层: 专用文件格式化
@@ -157,7 +160,7 @@ repos:
         name: "Auto-fix: Markdown格式修复"
         description: 自动修复Markdown格式问题
         args: [--config=.markdownlint.yaml]
-        stages: [pre-commit]  # 仅在 pre-commit 阶段运行，不在 push 时运行
+        stages: [pre-commit] # 仅在 pre-commit 阶段运行，不在 push 时运行
 
   # ===========================================
   # 第六层: 项目特定检查
