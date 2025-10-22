@@ -3,6 +3,36 @@
 # 设计原则: 性能优先、自动修复、分层检查、智能排除
 # 项目定位: 帮助其他项目快速建立企业级代码质量检查体系
 
+# ===========================================
+# Hook 阶段策略说明
+# ===========================================
+#
+# 阶段分配原则:
+#
+# pre-commit 阶段 (本地提交时运行):
+#   用途: 提供快速反馈，改善开发体验
+#   特点: 执行时间短，自动修复问题
+#   包含:
+#     - 自动修复类 hook: prettier, markdownlint-cli2-fix (自动修复格式问题)
+#     - 部分验证类 hook: shellcheck (ZSH 脚本兼容性有限，避免误报)
+#   优点: 快速发现和修复问题，开发体验好
+#   风险: 较少（因为大多数问题都会被自动修复）
+#
+# pre-push 阶段 (推送到仓库前运行):
+#   用途: 最终质量门控，确保代码库高质量
+#   特点: 执行时间可能较长，深度检查
+#   包含:
+#     - 深度验证类 hook: flake8, mypy, bandit (Python)
+#       原因: 这些工具执行时间较长，涉及深度分析
+#     - 基础验证类 hook: YAML, JSON 验证
+#       原因: 确保配置文件正确性
+#   优点: 确保推送的代码达到高质量标准
+#   风险: 可能因为某些问题而阻止推送（这是预期的）
+#
+# 总体策略:
+#   - pre-commit: 快速 + 自动修复 (提升体验)
+#   - pre-push: 深度检查 + 质量保证 (保证质量)
+
 repos:
   # ===========================================
   # 第一层: 基础格式化和修复 (最快)
@@ -27,20 +57,6 @@ repos:
         description: 将行尾转换为Unix LF格式
         args: [--fix=lf]
 
-  # YAML 文件格式化 - 使用 prettier
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.3 # 使用最新稳定版本
-    hooks:
-      - id: prettier
-        name: "Auto-fix: YAML格式化"
-        description: 使用Prettier自动修复YAML文件格式问题
-        files: \.(yaml|yml)$
-        args: [--write, --tab-width=2, --print-width=100]
-        stages: [pre-commit] # 仅在 pre-commit 阶段运行
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
       # 验证: YAML语法
       - id: check-yaml
         name: "Validate: YAML语法检查"
@@ -66,6 +82,25 @@ repos:
       - id: check-executables-have-shebangs
         name: "Validate: 可执行文件权限"
         description: 确保可执行文件有正确的shebang
+
+  # YAML 文件格式化 - 使用 prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.0.3 # 使用最新稳定版本
+    hooks:
+      - id: prettier
+        name: "Auto-fix: YAML格式化"
+        description: 使用Prettier自动修复YAML文件格式问题
+        files: \.(yaml|yml)$
+        # 排除 pre-commit 和 markdownlint 配置文件
+        # 原因: 这些文件手动维护，格式已经稳定
+        # Prettier 的 YAML 支持还在完善中，避免意外修改关键配置
+        exclude: |
+          (?x)^(
+            \.pre-commit-config\.yaml|
+            \.markdownlint\.yaml
+          )$
+        args: [--write, --tab-width=2, --print-width=100]
+        stages: [pre-commit] # 仅在 pre-commit 阶段运行
 
   # ===========================================
   # 第二层: 代码格式化 (自动修复)
@@ -144,14 +179,6 @@ repos:
   # ===========================================
   # 第五层: 专用文件格式化
   # ===========================================
-  # CMake 文件格式化
-  - repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-      - id: cmake-format
-        name: "Auto-format: CMake文件格式化"
-        description: 自动格式化CMakeLists.txt文件
-
   # Markdown 文件自动修复
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.11.0 # 使用最新稳定版本
