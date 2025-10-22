@@ -255,6 +255,294 @@ cc-glm --no-proxy             # 明确禁用代理
 
 ---
 
+### 决策 6: Claude CLI 命令分类和 Tab 补全优化方案 (ADR-008)
+
+**日期**: 2025-10-22
+**状态**: ✅ 已实现
+**决策者**: Claude Code + 用户协作
+
+**问题**: Claude CLI 命令管理系统中，cc- 前缀命令混合了管理命令和模型配置别名，导致 Tab 补全时所有命令显示在一起，用户难以辨别命令类型和功能。
+
+**上下文**:
+- Claude CLI 配置管理系统（v2.1.6）已实现完整的配置管理功能
+- 现有命令包括：
+  - **配置管理命令**: cc-list, cc-new, cc-edit, cc-delete, cc-show, cc-validate
+  - **模型使用别名**: cc-opus, cc-sonnet, cc-haiku, cc-glm, cc-thinking (等自定义模型)
+- Tab 补全时两类命令混在一起，用户体验问题：
+  - **认知混淆**: 管理命令和模型别名无法区分
+  - **发现困难**: 新用户不知道有哪些管理命令
+  - **选择困难**: Tab 补全列表过长，难以快速找到目标命令
+
+**分析的方案**:
+
+**方案 A: 独立前缀（推荐）** ⭐⭐⭐⭐⭐
+- **原理**: 管理命令使用独立前缀 `claude-config` 或 `ccfg`
+- **设计**:
+  ```bash
+  # 管理命令
+  claude-config list             # 或 ccfg list
+  claude-config new <name>       # 或 ccfg new <name>
+  claude-config edit <name>      # 或 ccfg edit <name>
+
+  # 模型使用（保持不变）
+  cc-opus "prompt"
+  cc-sonnet "prompt"
+  cc-glm "prompt"
+  ```
+- **优点**:
+  - ✅ 完全独立的命令空间，清晰分类
+  - ✅ 高频操作（模型使用）保持简洁
+  - ✅ 管理命令易于发现和记忆
+  - ✅ 符合命令行工具命名惯例（如 `git config`）
+- **缺点**:
+  - ⚠️ 管理命令名称变长（但可用简写 ccfg 缓解）
+  - ⚠️ 需要用户学习新命令名称（但有向后兼容）
+
+**方案 B: ZSH 分组补全** ⭐⭐⭐⭐
+- **原理**: 使用 ZSH 的 `_describe` 实现分组显示
+- **设计**:
+  ```zsh
+  _describe -t management 'Configuration Management' \
+      'list[列出所有配置]' 'new[创建新配置]' ...
+  _describe -t models 'Model Shortcuts' \
+      'opus[Claude 3 Opus]' 'sonnet[Claude 3.5 Sonnet]' ...
+  ```
+- **优点**:
+  - ✅ Tab 补全时自动分组显示
+  - ✅ 保持现有命令名称不变
+  - ✅ 视觉效果好，易于区分
+- **缺点**:
+  - ⚠️ 只解决视觉问题，命令名称仍然混在一起
+  - ⚠️ 需要学习 ZSH 补全系统
+
+**方案 C: 符号差异化** ⭐⭐
+- **原理**: 使用符号区分两类命令
+- **设计**:
+  ```bash
+  # 管理命令（使用中划线）
+  cc-list, cc-new, cc-edit
+
+  # 模型别名（使用下划线）
+  cc_opus, cc_sonnet, cc_glm
+  ```
+- **优点**:
+  - ✅ 视觉上有所区分
+- **缺点**:
+  - ❌ 区分度不够明显
+  - ❌ 不符合命令行工具命名惯例
+  - ❌ 增加记忆负担
+
+**最终决策**: **方案 A + B 组合**
+
+**实施方案**:
+
+**核心设计理念**:
+1. **清晰的命令分类**: 管理命令和模型使用完全分离
+2. **高频操作优化**: 模型使用命令保持简洁（cc-<model>）
+3. **向后兼容**: 旧命令保持可用，逐步引导用户迁移
+4. **美观的帮助系统**: 分类显示，易于学习
+
+**命令体系架构**:
+```bash
+# Layer 1: 管理命令（新前缀）
+claude-config <subcommand> [args]   # 完整命令
+ccfg <subcommand> [args]           # 简写别名
+
+# 子命令列表
+list              # 列出所有配置
+new <name>        # 创建新配置
+edit <name>       # 编辑配置
+delete <name>     # 删除配置
+show <name>       # 显示配置详情
+validate [name]   # 验证配置
+proxy             # 代理快速参考
+import <file>     # 导入配置
+export <name>     # 导出配置
+help [cmd]        # 帮助系统
+
+# Layer 2: 模型使用（保持不变）
+cc-opus "prompt"          # Claude 3 Opus
+cc-sonnet "prompt"        # Claude 3.5 Sonnet
+cc-haiku "prompt"         # Claude 3 Haiku
+cc-glm "prompt"           # GLM-4-Plus
+cc-thinking "prompt"      # DeepSeek R1
+
+# Layer 3: 向后兼容（逐步废弃）
+cc-list           → claude-config list
+cc-new            → claude-config new
+cc-edit           → claude-config edit
+# ... 显示迁移提示
+```
+
+**实施细节**:
+
+**1. 主命令函数实现**
+```zsh
+# claude-config 主函数
+claude-config() {
+    local subcommand="$1"
+    shift
+
+    case "$subcommand" in
+        list)      _cc_list "$@" ;;
+        new)       _cc_new "$@" ;;
+        edit)      _cc_edit "$@" ;;
+        delete)    _cc_delete "$@" ;;
+        show)      _cc_show "$@" ;;
+        validate)  _cc_validate "$@" ;;
+        proxy)     _cc_proxy_help "$@" ;;
+        import)    _cc_import "$@" ;;
+        export)    _cc_export "$@" ;;
+        help)      _cc_help "$@" ;;
+        *)
+            echo "❌ 未知子命令: $subcommand"
+            echo "运行 'claude-config help' 查看可用命令"
+            return 1
+            ;;
+    esac
+}
+
+# 简写别名
+alias ccfg='claude-config'
+```
+
+**2. 子命令路由系统**
+- 使用 `case` 语句实现清晰的路由逻辑
+- 所有实际功能封装在 `_cc_*` 私有函数中
+- 统一的错误处理和帮助提示
+
+**3. Tab 补全优化**
+```zsh
+# claude-config 补全函数
+_claude_config() {
+    local -a subcommands
+    subcommands=(
+        'list:列出所有配置'
+        'new:创建新配置'
+        'edit:编辑配置文件'
+        'delete:删除配置'
+        'show:显示配置详情'
+        'validate:验证配置'
+        'proxy:代理快速参考'
+        'import:导入配置'
+        'export:导出配置'
+        'help:显示帮助信息'
+    )
+
+    if (( CURRENT == 2 )); then
+        _describe -t commands '配置管理子命令' subcommands
+    else
+        # 根据子命令提供相应的参数补全
+        case "$words[2]" in
+            edit|delete|show|export)
+                _cc_complete_config_names
+                ;;
+            new|import)
+                _files
+                ;;
+        esac
+    fi
+}
+
+compdef _claude_config claude-config
+compdef _claude_config ccfg
+```
+
+**4. 帮助系统集成**
+```bash
+# claude-config help 显示
+📦 Claude CLI 配置管理系统
+
+用法:
+    claude-config <子命令> [参数]
+    ccfg <子命令> [参数]           # 简写形式
+
+配置管理子命令:
+    list              列出所有配置
+    new <name>        创建新配置
+    edit <name>       编辑配置文件
+    delete <name>     删除配置
+    show <name>       显示配置详情
+    validate [name]   验证配置
+    proxy             代理快速参考
+    import <file>     导入配置
+    export <name>     导出配置
+    help [cmd]        显示帮助信息
+
+模型使用命令（独立）:
+    cc-opus           Claude 3 Opus
+    cc-sonnet         Claude 3.5 Sonnet
+    cc-haiku          Claude 3 Haiku
+    cc-glm            GLM-4-Plus
+    cc-thinking       DeepSeek R1
+
+示例:
+    ccfg list                     # 列出所有配置
+    ccfg new my-config            # 创建新配置
+    ccfg edit my-config           # 编辑配置
+    cc-sonnet "Hello world"       # 使用 Sonnet 模型
+```
+
+**5. 向后兼容机制**
+```zsh
+# 保留旧命令，显示迁移提示
+cc-list() {
+    echo "💡 提示: 'cc-list' 已更名为 'claude-config list' 或 'ccfg list'"
+    echo "   旧命令仍可使用，但建议迁移到新命令"
+    _cc_list "$@"
+}
+
+# 所有旧管理命令同理
+cc-new() {
+    echo "💡 提示: 使用 'ccfg new' 代替 'cc-new'"
+    _cc_new "$@"
+}
+```
+
+**实施结果**:
+- ✅ 代码变更: +194, -37 lines (净增 157 lines)
+- ✅ 主命令函数: claude-config + ccfg 别名
+- ✅ 子命令路由: 10 个子命令完整支持
+- ✅ Tab 补全: 分组显示，智能参数补全
+- ✅ 帮助系统: 美观的分类帮助
+- ✅ 向后兼容: 100% 保持旧命令可用
+- ✅ 文档更新: README.md 完整更新
+- ✅ 实施提交: f1c46ea
+
+**技术亮点**:
+1. **清晰的命令分类**: 管理命令（claude-config/ccfg）vs 模型使用（cc-<model>）
+2. **高频操作保持简洁**: 模型使用命令保持 2-3 个字符前缀
+3. **完全向后兼容**: 旧命令仍可使用，逐步引导迁移
+4. **美观的帮助系统**: 分类清晰，示例丰富
+5. **智能子命令路由**: 使用 case 分支，易于扩展
+6. **Tab 补全优化**: ZSH _describe 实现分组显示
+
+**权衡与折中**:
+- ✅ **命令名称长度 vs 清晰度**: 选择清晰度，但提供 ccfg 简写
+- ✅ **向后兼容 vs 代码复杂度**: 选择兼容性，保留旧命令桥接
+- ✅ **功能完整性 vs 实现成本**: 157 行代码换来完整的命令体系
+
+**经验教训**:
+1. **用户体验优先**: 认知清晰度比技术实现复杂度更重要
+2. **组合方案优于单一方案**: A+B 组合解决了命名和补全两个层面的问题
+3. **向后兼容确保平滑迁移**: 旧命令保留 + 迁移提示 = 零风险升级
+4. **Tab 补全优化显著提升 UX**: 分组显示让命令发现变得简单
+5. **架构咨询流程的价值**: wf_04_ask 提供的系统性分析帮助做出最优决策
+
+**影响范围**:
+- 核心文件: `zsh-functions/claude.zsh`
+- 代码变更: +194, -37 lines
+- 向后兼容: 100%
+- 用户体验: 显著提升
+
+**未来优化空间**:
+- 可选: 添加 `ccfg switch <name>` 快速切换默认配置
+- 可选: `ccfg stats` 显示使用统计
+- 可选: `ccfg backup` 和 `ccfg restore` 配置备份恢复
+- 可选: 逐步废弃旧命令（设置日落期）
+
+---
+
 ## 🎓 最佳实践
 
 ### 脚本编写最佳实践
