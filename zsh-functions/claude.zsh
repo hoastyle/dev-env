@@ -5,15 +5,28 @@
 # 功能: Claude CLI 多模型配置管理 + 代理支持
 # 特性: 动态别名生成、配置创建、热重载、生命周期管理、运行时代理控制
 #
-# 基础命令:
-#   cc-create <name>     - 创建新配置
-#   cc-edit <name>       - 编辑配置（热重载）
-#   cc-validate <name>   - 验证配置
-#   cc-list              - 列出所有配置
-#   cc-copy <src> <dst>  - 复制配置
-#   cc-delete <name>     - 删除配置
-#   cc-refresh           - 刷新别名
-#   cc-current           - 显示版本信息
+# 主命令（推荐）:
+#   claude-config <cmd>  或  ccfg <cmd>   - 统一管理入口
+#
+# 管理子命令:
+#   ccfg create <name>     - 创建新配置
+#   ccfg edit <name>       - 编辑配置（热重载）
+#   ccfg validate <name>   - 验证配置
+#   ccfg list              - 列出所有配置
+#   ccfg copy <src> <dst>  - 复制配置
+#   ccfg delete <name>     - 删除配置
+#   ccfg refresh           - 刷新别名
+#   ccfg current           - 显示版本信息
+#   ccfg help              - 显示帮助
+#
+# 快速命令（向后兼容）:
+#   cc-create <name>       - 创建新配置（等同于 ccfg create）
+#   cc-edit <name>         - 编辑配置（等同于 ccfg edit）
+#   ... 其他管理命令保持兼容
+#
+# 使用模型:
+#   cc-<name> "prompt"     - 使用指定配置的模型
+#   示例: cc-glm "你好"
 #
 # 代理支持:
 #   方式1 (配置级) - 在 settings.json 的 env 字段中添加:
@@ -570,7 +583,23 @@ _register_claude_help() {
         return 0
     fi
 
-    # Claude CLI 配置管理命令
+    # 确保关联数组已声明
+    typeset -gA COMMAND_CATEGORIES COMMAND_DESCRIPTIONS COMMAND_USAGES COMMAND_EXAMPLES ZSH_COMMANDS 2>/dev/null
+
+    # 主管理命令（推荐使用）
+    COMMAND_CATEGORIES[claude-config]="AI工具"
+    COMMAND_CATEGORIES[ccfg]="AI工具"
+
+    COMMAND_DESCRIPTIONS[claude-config]="Claude CLI 配置管理（主命令）"
+    COMMAND_DESCRIPTIONS[ccfg]="claude-config 的简短别名"
+
+    COMMAND_USAGES[claude-config]="claude-config <subcommand> [args]"
+    COMMAND_USAGES[ccfg]="ccfg <subcommand> [args]"
+
+    COMMAND_EXAMPLES[claude-config]="claude-config create mymodel\nclaude-config list\nclaude-config edit glm"
+    COMMAND_EXAMPLES[ccfg]="ccfg create mymodel  # 创建配置\nccfg edit glm  # 编辑配置\nccfg list  # 列出所有配置"
+
+    # Claude CLI 配置管理命令（向后兼容）
     COMMAND_CATEGORIES[cc-create]="AI工具"
     COMMAND_CATEGORIES[cc-edit]="AI工具"
     COMMAND_CATEGORIES[cc-validate]="AI工具"
@@ -580,32 +609,32 @@ _register_claude_help() {
     COMMAND_CATEGORIES[cc-refresh]="AI工具"
     COMMAND_CATEGORIES[cc-current]="AI工具"
 
-    COMMAND_DESCRIPTIONS[cc-create]="创建新的 Claude 配置"
-    COMMAND_DESCRIPTIONS[cc-edit]="编辑配置（热重载）"
-    COMMAND_DESCRIPTIONS[cc-validate]="验证配置格式和字段"
-    COMMAND_DESCRIPTIONS[cc-list]="列出所有可用配置"
-    COMMAND_DESCRIPTIONS[cc-copy]="复制现有配置"
-    COMMAND_DESCRIPTIONS[cc-delete]="删除配置"
-    COMMAND_DESCRIPTIONS[cc-refresh]="刷新别名"
-    COMMAND_DESCRIPTIONS[cc-current]="显示 Claude CLI 版本信息"
+    COMMAND_DESCRIPTIONS[cc-create]="创建新的 Claude 配置（推荐用 ccfg create）"
+    COMMAND_DESCRIPTIONS[cc-edit]="编辑配置（推荐用 ccfg edit）"
+    COMMAND_DESCRIPTIONS[cc-validate]="验证配置格式和字段（推荐用 ccfg validate）"
+    COMMAND_DESCRIPTIONS[cc-list]="列出所有可用配置（推荐用 ccfg list）"
+    COMMAND_DESCRIPTIONS[cc-copy]="复制现有配置（推荐用 ccfg copy）"
+    COMMAND_DESCRIPTIONS[cc-delete]="删除配置（推荐用 ccfg delete）"
+    COMMAND_DESCRIPTIONS[cc-refresh]="刷新别名（推荐用 ccfg refresh）"
+    COMMAND_DESCRIPTIONS[cc-current]="显示 Claude CLI 版本信息（推荐用 ccfg current）"
 
-    COMMAND_USAGES[cc-create]="cc-create <config_name>"
-    COMMAND_USAGES[cc-edit]="cc-edit <config_name>"
-    COMMAND_USAGES[cc-validate]="cc-validate <config_name>"
-    COMMAND_USAGES[cc-list]="cc-list"
-    COMMAND_USAGES[cc-copy]="cc-copy <source> <target>"
-    COMMAND_USAGES[cc-delete]="cc-delete <config_name>"
-    COMMAND_USAGES[cc-refresh]="cc-refresh"
-    COMMAND_USAGES[cc-current]="cc-current"
+    COMMAND_USAGES[cc-create]="cc-create <config_name>  (或 ccfg create <config_name>)"
+    COMMAND_USAGES[cc-edit]="cc-edit <config_name>  (或 ccfg edit <config_name>)"
+    COMMAND_USAGES[cc-validate]="cc-validate <config_name>  (或 ccfg validate <config_name>)"
+    COMMAND_USAGES[cc-list]="cc-list  (或 ccfg list)"
+    COMMAND_USAGES[cc-copy]="cc-copy <source> <target>  (或 ccfg copy <source> <target>)"
+    COMMAND_USAGES[cc-delete]="cc-delete <config_name>  (或 ccfg delete <config_name>)"
+    COMMAND_USAGES[cc-refresh]="cc-refresh  (或 ccfg refresh)"
+    COMMAND_USAGES[cc-current]="cc-current  (或 ccfg current)"
 
-    COMMAND_EXAMPLES[cc-create]="cc-create mymodel"
-    COMMAND_EXAMPLES[cc-edit]="cc-edit glm-4  # 编辑配置，可添加代理: http_proxy, https_proxy"
-    COMMAND_EXAMPLES[cc-validate]="cc-validate mymodel"
-    COMMAND_EXAMPLES[cc-list]="cc-list"
-    COMMAND_EXAMPLES[cc-copy]="cc-copy glm-4 glm-test"
-    COMMAND_EXAMPLES[cc-delete]="cc-delete oldconfig"
-    COMMAND_EXAMPLES[cc-refresh]="cc-refresh"
-    COMMAND_EXAMPLES[cc-current]="cc-current"
+    COMMAND_EXAMPLES[cc-create]="cc-create mymodel  (推荐: ccfg create mymodel)"
+    COMMAND_EXAMPLES[cc-edit]="cc-edit glm-4  (推荐: ccfg edit glm-4)"
+    COMMAND_EXAMPLES[cc-validate]="cc-validate mymodel  (推荐: ccfg validate mymodel)"
+    COMMAND_EXAMPLES[cc-list]="cc-list  (推荐: ccfg list)"
+    COMMAND_EXAMPLES[cc-copy]="cc-copy glm-4 glm-test  (推荐: ccfg copy glm-4 glm-test)"
+    COMMAND_EXAMPLES[cc-delete]="cc-delete oldconfig  (推荐: ccfg delete oldconfig)"
+    COMMAND_EXAMPLES[cc-refresh]="cc-refresh  (推荐: ccfg refresh)"
+    COMMAND_EXAMPLES[cc-current]="cc-current  (推荐: ccfg current)"
 
     # 代理使用示例
     COMMAND_CATEGORIES[cc-proxy]="AI工具"
@@ -615,10 +644,138 @@ _register_claude_help() {
     ZSH_COMMANDS[cc-proxy]=1
 
     # 将所有命令添加到主数据库
-    for cmd in cc-create cc-edit cc-validate cc-list cc-copy cc-delete cc-refresh cc-current; do
+    for cmd in claude-config ccfg cc-create cc-edit cc-validate cc-list cc-copy cc-delete cc-refresh cc-current; do
         ZSH_COMMANDS[$cmd]=1
     done
 }
 
 # 注册帮助信息
 _register_claude_help
+
+# ============================================
+# 主管理命令：claude-config (别名 ccfg)
+# ============================================
+claude-config() {
+    local cmd="${1:-help}"
+    shift
+
+    case "$cmd" in
+        create)
+            cc-create "$@"
+            ;;
+        edit)
+            cc-edit "$@"
+            ;;
+        validate)
+            cc-validate "$@"
+            ;;
+        list)
+            cc-list "$@"
+            ;;
+        copy)
+            cc-copy "$@"
+            ;;
+        delete)
+            cc-delete "$@"
+            ;;
+        refresh)
+            cc-refresh "$@"
+            ;;
+        current)
+            cc-current "$@"
+            ;;
+        help|--help|-h)
+            cat <<'EOF'
+┌─────────────────────────────────────────────────────────┐
+│      Claude CLI 配置管理系统 (v2.1.9)                   │
+└─────────────────────────────────────────────────────────┘
+
+📋 管理命令 (Configuration Management):
+  create <name>       创建新配置
+  edit <name>         编辑配置（热重载）
+  validate <name>     验证配置格式和字段
+  list                列出所有可用配置
+  copy <src> <dst>    复制现有配置
+  delete <name>       删除配置
+  refresh             刷新别名
+  current             显示 Claude CLI 版本信息
+  help                显示此帮助信息
+
+🤖 使用模型 (Using AI Models):
+  cc-<model> "prompt"  - 使用指定配置的 AI 模型
+
+  可用模型列表：
+    运行 'ccfg list' 查看所有已配置的模型
+
+💡 命令示例:
+  # 管理配置
+  ccfg create mymodel           # 创建新配置
+  ccfg edit glm                 # 编辑 GLM 配置
+  ccfg list                     # 列出所有配置
+
+  # 使用模型
+  cc-glm "你好，请帮我写代码"   # 使用 GLM 模型
+  cc-yhlxj "翻译这段话"         # 使用 yhlxj 模型
+
+🌐 代理支持 (Proxy Support):
+  配置级代理（持久化）:
+    ccfg edit <name>
+    # 在 env 字段添加:
+    # "http_proxy": "http://127.0.0.1:7890"
+    # "https_proxy": "http://127.0.0.1:7890"
+
+  运行时代理（临时）:
+    cc-<model> --proxy "prompt"              # 使用默认代理
+    cc-<model> --proxy 192.168.1.1:8080 "prompt"  # 指定代理
+    cc-<model> --no-proxy "prompt"           # 禁用代理
+
+📚 详细帮助:
+  ccfg <command> --help    查看具体命令的详细帮助
+
+  示例:
+    ccfg create --help
+    ccfg edit --help
+
+🔗 快捷命令（向后兼容）:
+  cc-create <name>      等同于 ccfg create <name>
+  cc-edit <name>        等同于 ccfg edit <name>
+  ... 其他管理命令同理
+
+EOF
+            ;;
+        *)
+            error_msg "未知命令: $cmd"
+            info_msg "使用 'ccfg help' 查看可用命令"
+            echo ""
+            info_msg "常用命令:"
+            echo "  ccfg list      - 列出所有配置"
+            echo "  ccfg create    - 创建新配置"
+            echo "  ccfg edit      - 编辑配置"
+            return 1
+            ;;
+    esac
+}
+
+# 简短别名
+alias ccfg='claude-config'
+
+# ============================================
+# Tab 补全：claude-config/ccfg 子命令
+# ============================================
+_ccfg_completion() {
+    local -a cmds
+    cmds=(
+        'create:创建新配置'
+        'edit:编辑配置（热重载）'
+        'validate:验证配置格式和字段'
+        'list:列出所有可用配置'
+        'copy:复制现有配置'
+        'delete:删除配置'
+        'refresh:刷新别名'
+        'current:显示 Claude CLI 版本'
+        'help:显示帮助信息'
+    )
+    _describe 'claude-config 管理命令' cmds
+}
+
+compdef _ccfg_completion claude-config ccfg
