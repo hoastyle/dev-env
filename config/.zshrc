@@ -265,3 +265,13 @@ unset -f _dev_env_init_completion
 # The theme provides its own visual feedback
 # To re-enable, uncomment the following line:
 # echo "🎉 Development Environment ZSH Configuration Loaded"
+
+# ===============================================
+# User-Local Binary PATH (~/.local/bin)
+# ===============================================
+# Add ~/.local/bin to PATH for user-installed tools (e.g., uv, pipx, etc.)
+# This script uses intelligent PATH management to avoid duplicate entries
+# Source: uv installer and XDG Base Directory Specification
+if [[ -f "$HOME/.local/bin/env" ]]; then
+    source "$HOME/.local/bin/env"
+fi

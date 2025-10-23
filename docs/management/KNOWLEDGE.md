@@ -1049,6 +1049,121 @@ j() {
 
 ---
 
+### Q6: 如何正确集成用户工具路径 (~/.local/bin)
+
+**症状**:
+
+* 用户安装的工具（如 `uv`, `pipx`, `poetry` 等）无法直接调用
+* 运行命令时提示 "command not found"
+* 需要使用完整路径（如 `~/.local/bin/uv`）才能运行
+
+**根本原因**:
+用户工具通常安装在 `~/.local/bin` 目录，但该目录默认不在 `PATH` 环境变量中。需要在 shell 配置中添加此路径。
+
+**诊断**:
+
+```bash
+# 检查 uv 是否在 PATH 中
+which uv
+# 如果返回 "command not found"，说明 ~/.local/bin 不在 PATH
+
+# 检查 PATH 内容
+echo $PATH | tr ':' '\n' | grep .local
+# 如果无输出，说明 ~/.local/bin 未添加到 PATH
+```
+
+**解决方案**:
+
+**方案 A: 使用智能 PATH 管理脚本** ⭐⭐⭐⭐⭐ (推荐)
+
+uv 等现代 Python 工具安装时会自动创建 `~/.local/bin/env` 脚本，使用智能的防重复机制：
+
+```sh
+#!/bin/sh
+# add binaries to PATH if they aren't added yet
+# affix colons on either side of $PATH to simplify matching
+case ":${PATH}:" in
+    *:"$HOME/.local/bin":*)
+        ;;
+    *)
+        # Prepending path in case a system-installed binary needs to be overridden
+        export PATH="$HOME/.local/bin:$PATH"
+        ;;
+esac
+```
+
+**技术细节**:
+
+1. **模式匹配技巧** (`:${PATH}:`)
+   * 在 PATH 两端添加冒号，简化匹配
+   * 避免误匹配子字符串（如 `/home/user/.local/bin2`）
+
+2. **防重复机制**
+   * 使用 `case` 语句检查 PATH 中是否已存在 `~/.local/bin`
+   * 只在不存在时才添加，避免重复
+
+3. **优先级策略**
+   * 添加到 PATH **开头** (`$HOME/.local/bin:$PATH`)
+   * 用户安装的工具优先于系统工具
+   * 符合 [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+
+**集成到 .zshrc**:
+
+```zsh
+# ===============================================
+# User-Local Binary PATH (~/.local/bin)
+# ===============================================
+# Add ~/.local/bin to PATH for user-installed tools (e.g., uv, pipx, etc.)
+# This script uses intelligent PATH management to avoid duplicate entries
+# Source: uv installer and XDG Base Directory Specification
+if [[ -f "$HOME/.local/bin/env" ]]; then
+    source "$HOME/.local/bin/env"
+fi
+```
+
+**方案 B: 直接添加到 PATH** ⭐⭐⭐ (简单但可能重复)
+
+```zsh
+# 直接添加（可能导致重复）
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+**缺点**: 每次加载 `.zshrc` 都会重复添加，导致 PATH 越来越长。
+
+**方案 C: 手动防重复检查** ⭐⭐⭐⭐ (推荐替代方案)
+
+```zsh
+# 检查后再添加
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+```
+
+**实施结果** (dev-env v2.1.10):
+
+* ✅ 所有 4 个配置版本已集成 `~/.local/bin/env` 支持
+* ✅ 使用 `if [[ -f ... ]]` 检查文件存在性（兼容未安装 uv 的系统）
+* ✅ 支持 uv, pipx, poetry 等用户工具
+* ✅ 符合 XDG 规范
+
+**适用工具**:
+
+* **uv**: Python 包管理器
+* **pipx**: Python 应用安装器
+* **poetry**: Python 依赖管理
+* **ruff**: Python linter
+* **black**: Python formatter
+* 其他安装在 `~/.local/bin` 的用户工具
+
+**参考**:
+
+* 实施 commit: (本次提交)
+* 相关文件: `config/.zshrc`, `.zshrc.optimized`, `.zshrc.ultra-optimized`, `.zshrc.nvm-optimized`
+* XDG 规范: <https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html>
+* uv 文档: <https://github.com/astral-sh/uv>
+
+---
+
 ## 📖 文档组织结构
 
 ### 文档体系
