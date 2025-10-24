@@ -272,3 +272,261 @@ EOF
     cd "$target_dir"
     success_msg "Jumped to: $target_dir"
 }
+
+# ===============================================
+# Lazy Loading Functions (Cross-platform)
+# ===============================================
+
+# Lazy load Autojump (Cross-platform)
+autojump-lazy() {
+    # Handle help parameter
+    if handle_help_param "autojump-lazy" "$1"; then
+        cat << 'EOF'
+USAGE: autojump-lazy
+DESCRIPTION: Load Autojump dynamically (useful in minimal mode)
+
+This function loads Autojump and its shell integration, enabling:
+- j command for directory jumping
+- jdev command for development directory jumping
+- autojump statistics and history
+
+PLATFORMS:
+- macOS: Loads from Homebrew or default paths
+- Linux: Loads from system package manager paths
+
+EXAMPLES:
+    autojump-lazy && j workspace    # Load autojump then jump
+    autojump-lazy && jdev dev       # Load autojump then use jdev
+
+NOTES:
+    Use this in minimal mode when autojump isn't automatically loaded
+    After running once, autojump remains available for the session
+EOF
+        return 0
+    fi
+
+    # Check if autojump is already loaded
+    if command -v autojump &> /dev/null; then
+        info_msg "Autojump is already loaded"
+        return 0
+    fi
+
+    # Try to load autojump based on platform
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - try multiple possible locations
+        local autojump_paths=(
+            "/opt/homebrew/etc/profile.d/autojump.sh"
+            "/usr/local/etc/profile.d/autojump.sh"
+            "$HOME/.autojump/etc/profile.d/autojump.sh"
+        )
+
+        for path in "${autojump_paths[@]}"; do
+            if [[ -f "$path" ]]; then
+                source "$path"
+                success_msg "Autojump loaded from: $path"
+                return 0
+            fi
+        done
+
+        # Try homebrew package
+        if command -v brew &> /dev/null && brew list autojump &> /dev/null; then
+            local brew_prefix=$(brew --prefix)
+            if [[ -f "$brew_prefix/etc/profile.d/autojump.sh" ]]; then
+                source "$brew_prefix/etc/profile.d/autojump.sh"
+                success_msg "Autojump loaded from Homebrew"
+                return 0
+            fi
+        fi
+    else
+        # Linux - try system paths
+        local autojump_paths=(
+            "/usr/share/autojump/autojump.sh"
+            "/etc/profile.d/autojump.sh"
+            "$HOME/.autojump/etc/profile.d/autojump.sh"
+        )
+
+        for path in "${autojump_paths[@]}"; do
+            if [[ -f "$path" ]]; then
+                source "$path"
+                success_msg "Autojump loaded from: $path"
+                return 0
+            fi
+        done
+    fi
+
+    # If we reach here, autojump installation wasn't found
+    error_msg "Autojump installation not found"
+    echo ""
+    echo "Install Autojump:"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "  brew install autojump"
+    else
+        echo "  Ubuntu/Debian: sudo apt-get install autojump"
+        echo "  Fedora: sudo dnf install autojump"
+        echo "  Arch: sudo pacman -S autojump"
+    fi
+    echo ""
+    echo "After installation, run: exec zsh"
+    return 1
+}
+
+# Lazy load NVM (Cross-platform)
+nvm-lazy() {
+    # Handle help parameter
+    if handle_help_param "nvm-lazy" "$1"; then
+        cat << 'EOF'
+USAGE: nvm-lazy
+DESCRIPTION: Load NVM and Node.js environment dynamically
+
+This function loads Node Version Manager (NVM) and enables:
+- node command
+- npm command
+- nvm commands for version management
+- npm tab completion
+
+PLATFORMS:
+- macOS: Loads from standard NVM installation paths
+- Linux: Loads from standard NVM installation paths
+
+EXAMPLES:
+    nvm-lazy && node -v         # Load NVM then check Node version
+    nvm-lazy && nvm use 18      # Load NVM then use Node 18
+
+NOTES:
+    Use this in minimal mode when NVM isn't automatically loaded
+    After running once, NVM remains available for the session
+EOF
+        return 0
+    fi
+
+    # Check if NVM is already loaded
+    if command -v nvm &> /dev/null; then
+        info_msg "NVM is already loaded"
+        return 0
+    fi
+
+    # Try to load NVM
+    local nvm_dir="$HOME/.nvm"
+    if [[ -d "$nvm_dir" ]]; then
+        export NVM_DIR="$nvm_dir"
+
+        # Load NVM
+        if [[ -f "$nvm_dir/nvm.sh" ]]; then
+            source "$nvm_dir/nvm.sh"
+
+            # Load completion if available
+            if [[ -f "$nvm_dir/bash_completion" ]]; then
+                source "$nvm_dir/bash_completion"
+            fi
+
+            success_msg "NVM loaded successfully"
+
+            # Show current Node version if available
+            if command -v node &> /dev/null; then
+                local node_version=$(node --version)
+                info_msg "Current Node.js version: $node_version"
+            else
+                info_msg "No Node.js version installed. Use 'nvm install <version>' to install."
+            fi
+
+            return 0
+        fi
+    fi
+
+    error_msg "NVM installation not found"
+    echo ""
+    echo "Install NVM:"
+    echo "  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash"
+    echo ""
+    echo "After installation, run: exec zsh"
+    return 1
+}
+
+# Lazy load Conda (Cross-platform)
+conda-init() {
+    # Handle help parameter
+    if handle_help_param "conda-init" "$1"; then
+        cat << 'EOF'
+USAGE: conda-init
+DESCRIPTION: Initialize Conda environment dynamically
+
+This function initializes Conda (Miniconda/Anaconda) and enables:
+- conda command
+- environment management
+- package management
+
+PLATFORMS:
+- macOS: Detects Miniconda3/Anaconda3 in common locations
+- Linux: Detects Miniconda3/Anaconda3 in standard locations
+
+EXAMPLES:
+    conda-init && conda info       # Initialize conda then show info
+    conda-init && conda env list   # Initialize conda then list environments
+
+NOTES:
+    Use this in minimal mode when Conda isn't automatically loaded
+    After running once, Conda remains available for the session
+EOF
+        return 0
+    fi
+
+    # Check if conda is already available
+    if command -v conda &> /dev/null; then
+        info_msg "Conda is already loaded"
+        return 0
+    fi
+
+    # Try to find and initialize conda
+    local conda_prefix=""
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - check common locations
+        local conda_paths=(
+            "$HOME/Software/miniforge3"
+            "$HOME/anaconda3"
+            "$HOME/miniforge3"
+            "/opt/miniforge3"
+            "/opt/anaconda3"
+        )
+    else
+        # Linux - check common locations
+        local conda_paths=(
+            "$HOME/anaconda3"
+            "$HOME/miniconda3"
+            "/opt/anaconda3"
+            "/opt/miniconda3"
+        )
+    fi
+
+    for path in "${conda_paths[@]}"; do
+        if [[ -d "$path" ]]; then
+            conda_prefix="$path"
+            break
+        fi
+    done
+
+    if [[ -n "$conda_prefix" ]]; then
+        # Initialize conda
+        if [[ -f "$conda_prefix/etc/profile.d/conda.sh" ]]; then
+            source "$conda_prefix/etc/profile.d/conda.sh"
+            success_msg "Conda initialized from: $conda_prefix"
+
+            # Show conda info
+            if command -v conda &> /dev/null; then
+                info_msg "Conda version: $(conda --version 2>/dev/null | cut -d' ' -f2-)"
+                echo "Current environment: $CONDA_DEFAULT_ENV"
+            fi
+
+            return 0
+        fi
+    fi
+
+    error_msg "Conda installation not found"
+    echo ""
+    echo "Install Conda:"
+    echo "  Miniconda: https://docs.conda.io/en/latest/miniconda.html"
+    echo "  Anaconda: https://www.anaconda.com/products/distribution"
+    echo ""
+    echo "After installation, run: exec zsh"
+    return 1
+}

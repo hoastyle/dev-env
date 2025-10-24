@@ -298,31 +298,92 @@ install_dev_tools() {
             sudo apt-get update
             for tool in "${tools_to_install[@]}"; do
                 log_info "安装 $tool..."
-                sudo apt-get install -y "$tool"
+                case "$tool" in
+                    "fd-find")
+                        sudo apt-get install -y fd-find
+                        ;;
+                    "ripgrep")
+                        sudo apt-get install -y ripgrep
+                        ;;
+                    *)
+                        sudo apt-get install -y "$tool"
+                        ;;
+                esac
             done
         elif command -v dnf &> /dev/null; then
             # Fedora
             for tool in "${tools_to_install[@]}"; do
                 log_info "安装 $tool..."
-                sudo dnf install -y "$tool"
+                case "$tool" in
+                    "fd-find")
+                        sudo dnf install -y fd-find
+                        ;;
+                    "ripgrep")
+                        sudo dnf install -y ripgrep
+                        ;;
+                    *)
+                        sudo dnf install -y "$tool"
+                        ;;
+                esac
             done
         elif command -v pacman &> /dev/null; then
             # Arch Linux
             for tool in "${tools_to_install[@]}"; do
                 log_info "安装 $tool..."
-                sudo pacman -S --noconfirm "$tool"
+                case "$tool" in
+                    "fd-find")
+                        sudo pacman -S --noconfirm fd
+                        ;;
+                    "ripgrep")
+                        sudo pacman -S --noconfirm ripgrep
+                        ;;
+                    *)
+                        sudo pacman -S --noconfirm "$tool"
+                        ;;
+                esac
             done
         else
             log_warn "无法自动安装工具，请手动安装: ${tools_to_install[*]}"
         fi
     elif [[ "$SYSTEM" == "macos" ]]; then
         if command -v brew &> /dev/null; then
+            # 确保 Homebrew 是最新的
+            log_info "更新 Homebrew..."
+            brew update
+
             for tool in "${tools_to_install[@]}"; do
                 log_info "安装 $tool..."
-                brew install "$tool"
+                case "$tool" in
+                    "fd")
+                        brew install fd
+                        ;;
+                    "ripgrep")
+                        brew install ripgrep
+                        ;;
+                    "fzf")
+                        # FZF 可能有多种安装方式，优先使用 Homebrew
+                        if ! brew install fzf; then
+                            log_warn "通过 Homebrew 安装 FZF 失败，尝试其他方式..."
+                            # 如果失败，检查是否已经在 Vim 插件中安装
+                            if [[ -f "$HOME/.vim/plugged/fzf/bin/fzf" ]]; then
+                                log_info "发现 Vim 插件中的 FZF，创建链接..."
+                                mkdir -p "$HOME/.local/bin"
+                                ln -sf "$HOME/.vim/plugged/fzf/bin/fzf" "$HOME/.local/bin/fzf"
+                            else
+                                log_error "FZF 安装失败，请手动安装"
+                            fi
+                        fi
+                        ;;
+                    *)
+                        if ! brew install "$tool"; then
+                            log_warn "安装 $tool 失败，请手动检查"
+                        fi
+                        ;;
+                esac
             done
         else
             log_warn "未找到 Homebrew，请先安装 Homebrew 或手动安装工具"
+            log_info "安装 Homebrew: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
         fi
     fi
 
@@ -455,7 +516,7 @@ FUNC_EOF
     log_info "环境指示符将显示在提示符第一行右侧"
 }
 
-# 设置 FZF
+# 设置 FZF (Cross-platform)
 setup_fzf() {
     log_step "配置 FZF..."
 
@@ -463,12 +524,53 @@ setup_fzf() {
     if command -v fzf &> /dev/null; then
         # 检查是否已经设置过
         if [[ ! -f "$HOME/.fzf.zsh" ]]; then
-            # 安装 FZF shell 集成
-            if [[ -d "/usr/share/doc/fzf/examples" ]]; then
-                cp /usr/share/doc/fzf/examples/key-bindings.zsh "$HOME/.fzf.zsh"
-            elif command -v brew &> /dev/null && [[ -d "$(brew --prefix)/opt/fzf/shell" ]]; then
-                cp "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh" "$HOME/.fzf.zsh"
+            # 跨平台 FZF shell 集成设置
+            local fzf_key_bindings=""
+
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                # macOS - check multiple possible locations
+                if command -v brew &> /dev/null; then
+                    local brew_prefix=$(brew --prefix)
+                    if [[ -f "$brew_prefix/opt/fzf/shell/key-bindings.zsh" ]]; then
+                        fzf_key_bindings="$brew_prefix/opt/fzf/shell/key-bindings.zsh"
+                    elif [[ -f "$brew_prefix/share/fzf/shell/key-bindings.zsh" ]]; then
+                        fzf_key_bindings="$brew_prefix/share/fzf/shell/key-bindings.zsh"
+                    fi
+                fi
+
+                # Check for fzf installed in Vim plugins
+                if [[ -z "$fzf_key_bindings" && -f "$HOME/.vim/plugged/fzf/shell/key-bindings.zsh" ]]; then
+                    fzf_key_bindings="$HOME/.vim/plugged/fzf/shell/key-bindings.zsh"
+                fi
+            else
+                # Linux - check typical locations
+                if [[ -f "/usr/share/doc/fzf/examples/key-bindings.zsh" ]]; then
+                    fzf_key_bindings="/usr/share/doc/fzf/examples/key-bindings.zsh"
+                elif [[ -f "/usr/share/fzf/shell/key-bindings.zsh" ]]; then
+                    fzf_key_bindings="/usr/share/fzf/shell/key-bindings.zsh"
+                fi
             fi
+
+            # Copy key bindings if found
+            if [[ -n "$fzf_key_bindings" && -f "$fzf_key_bindings" ]]; then
+                cp "$fzf_key_bindings" "$HOME/.fzf.zsh"
+                log_success "FZF shell 集成已配置: $fzf_key_bindings"
+            else
+                # Create a basic .fzf.zsh if no key bindings found
+                cat > "$HOME/.fzf.zsh" << 'EOF'
+# FZF configuration
+if [[ -f "/usr/share/fzf/completion.zsh" ]]; then
+    source "/usr/share/fzf/completion.zsh"
+fi
+
+if [[ -f "/usr/share/fzf/key-bindings.zsh" ]]; then
+    source "/usr/share/fzf/key-bindings.zsh"
+fi
+EOF
+                log_info "创建了基础的 FZF 配置文件"
+            fi
+        else
+            log_info "FZF 已配置，跳过"
         fi
         log_success "FZF 配置完成"
     else

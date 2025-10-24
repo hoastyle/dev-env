@@ -69,16 +69,31 @@ fi
 alias python=python3
 alias pip=pip3
 
-# Conda Environment
-__conda_setup="$(CONDA_REPORT_ERRORS=false "$HOME/anaconda3/bin/conda" shell.bash hook 2> /dev/null)"
+# Conda Environment (Cross-platform)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - check for miniforge3 or anaconda3
+    CONDA_PREFIX="$HOME/Software/miniforge3"
+    if [[ ! -d "$CONDA_PREFIX" ]]; then
+        CONDA_PREFIX="$HOME/anaconda3"
+    fi
+    if [[ ! -d "$CONDA_PREFIX" ]]; then
+        CONDA_PREFIX="$HOME/miniforge3"
+    fi
+else
+    # Linux - default to anaconda3
+    CONDA_PREFIX="$HOME/anaconda3"
+fi
+
+# Try to initialize conda
+__conda_setup="$(CONDA_REPORT_ERRORS=false "$CONDA_PREFIX/bin/conda" shell.zsh hook 2> /dev/null)"
 if [ $? -eq 0 ]; then
     \eval "$__conda_setup"
 else
-    if [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/anaconda3/etc/profile.d/conda.sh"
+    if [ -f "$CONDA_PREFIX/etc/profile.d/conda.sh" ]; then
+        . "$CONDA_PREFIX/etc/profile.d/conda.sh"
         CONDA_CHANGEPS1=false conda activate base
     else
-        \export PATH="$HOME/anaconda3/bin:$PATH"
+        \export PATH="$CONDA_PREFIX/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -95,17 +110,38 @@ export NVM_DIR="$HOME/.nvm"
 # Enable FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# FZF Configuration
-export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home'
+# FZF Configuration (Cross-platform)
+if command -v fd &> /dev/null; then
+    export FZF_DEFAULT_COMMAND='fd --hidden --follow -E ".git" -E "node_modules" . "$HOME"'
+elif command -v fdfind &> /dev/null; then
+    export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . "$HOME"'
+else
+    export FZF_DEFAULT_COMMAND='find "$HOME" -name ".git" -prune -o -name "node_modules" -prune -o -type f -print'
+fi
+
 export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:up,alt-i:toggle+down --border --preview "echo {} | ~/.fzf/fzf_preview.py" --preview-window=down'
 
-# FZF Completion Functions
+# FZF Completion Functions (Cross-platform)
 _fzf_compgen_path() {
-  fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home
+  # Use fd on macOS, fdfind on Linux, fallback to find
+  if command -v fd &> /dev/null; then
+    fd --hidden --follow -E ".git" -E "node_modules" . "$HOME"
+  elif command -v fdfind &> /dev/null; then
+    fdfind --hidden --follow -E ".git" -E "node_modules" . "$HOME"
+  else
+    find "$HOME" -name ".git" -prune -o -name "node_modules" -prune -o -type f -print
+  fi
 }
 
 _fzf_compgen_dir() {
-  fdfind --type d --hidden --follow -E ".git" -E "node_modules" . /etc /home
+  # Use fd on macOS, fdfind on Linux, fallback to find
+  if command -v fd &> /dev/null; then
+    fd --type d --hidden --follow -E ".git" -E "node_modules" . "$HOME"
+  elif command -v fdfind &> /dev/null; then
+    fdfind --type d --hidden --follow -E ".git" -E "node_modules" . "$HOME"
+  else
+    find "$HOME" -name ".git" -prune -o -name "node_modules" -prune -o -type d -print
+  fi
 }
 
 # ===============================================
@@ -114,9 +150,33 @@ _fzf_compgen_dir() {
 
 # Search Tools and Network Proxy functions are loaded from ~/.zsh/functions/
 
-# CUDA & TensorRT
-export LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH
-export PATH=/usr/local/cuda-11.1/bin/:$PATH
+# CUDA & TensorRT (Cross-platform)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - Apple Silicon or Intel
+    if [[ -d "/opt/homebrew/cuda" ]]; then
+        # Apple Silicon
+        export CUDA_HOME="/opt/homebrew/cuda"
+    elif [[ -d "/usr/local/cuda" ]]; then
+        # Intel
+        export CUDA_HOME="/usr/local/cuda"
+    fi
+
+    if [[ -n "$CUDA_HOME" && -d "$CUDA_HOME" ]]; then
+        export PATH="$CUDA_HOME/bin:$PATH"
+        export DYLD_LIBRARY_PATH="$CUDA_HOME/lib:$DYLD_LIBRARY_PATH"
+    fi
+else
+    # Linux
+    if [[ -d "/usr/local/cuda-11.1" ]]; then
+        export CUDA_HOME="/usr/local/cuda-11.1"
+        export LD_LIBRARY_PATH="/usr/local/cuda-11.1/lib64/:/usr/local/TensorRT/targets/x86_64-linux-gnu/lib/:$LD_LIBRARY_PATH"
+        export PATH="/usr/local/cuda-11.1/bin/:$PATH"
+    elif [[ -d "/usr/local/cuda" ]]; then
+        export CUDA_HOME="/usr/local/cuda"
+        export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+        export PATH="/usr/local/cuda/bin:$PATH"
+    fi
+fi
 
 # Autojump Configuration
 # ===============================================
@@ -238,6 +298,44 @@ _dev_env_init_completion() {
 
 _dev_env_init_completion
 unset -f _dev_env_init_completion
+
+# ===============================================
+# Platform-Specific Configurations
+# ===============================================
+
+# iTerm2 Shell Integration (macOS only)
+if [[ "$OSTYPE" == "darwin"* ]] && [[ -f "${HOME}/.iterm2_shell_integration.zsh" ]]; then
+    source "${HOME}/.iterm2_shell_integration.zsh"
+fi
+
+# Point Cloud Tools (if pcl_viewer is available)
+if command -v pcl_viewer &> /dev/null; then
+    alias pm="pcl_viewer -use_point_picking -ax 4 -multiview 1"
+    alias pa="pcl_viewer -ax 4 -use_point_picking"
+fi
+
+# Platform-specific PATH additions
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS-specific paths
+    if [[ -d "/opt/homebrew/opt/qt@5/bin" ]]; then
+        export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+    fi
+    if [[ -d "/opt/homebrew/Cellar/pcl" ]]; then
+        # Find PCL viewer app and add to PATH if exists
+        local pcl_path=$(find /opt/homebrew/Cellar/pcl -name "pcl_viewer.app" 2>/dev/null | head -1)
+        if [[ -n "$pcl_path" && -d "$pcl_path/Contents/MacOS" ]]; then
+            export PATH="$pcl_path/Contents/MacOS:$PATH"
+        fi
+    fi
+else
+    # Linux-specific paths can be added here
+    :
+fi
+
+# Google Cloud Project (if gcloud is available)
+if command -v gcloud &> /dev/null; then
+    export GOOGLE_CLOUD_PROJECT="gen-lang-client-0165913056"
+fi
 
 # ===============================================
 # Powerlevel10k Configuration
