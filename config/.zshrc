@@ -62,6 +62,29 @@ if [[ -z "$PROMPT" ]]; then
 fi
 
 # ===============================================
+# Environment Variables & Colors
+# ===============================================
+
+# Basic environment
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export EDITOR=vim
+
+# Color support for terminal commands
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
+# Use GNU coreutils if available (for better color support)
+if command -v gls >/dev/null 2>&1; then
+    alias ls='gls --color=auto'
+    # Set LS_COLORS for GNU ls
+    export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+else
+    # Fallback to macOS ls with basic colors
+    alias ls='ls -G'
+fi
+
+# ===============================================
 # Python Environment
 # ===============================================
 
@@ -178,42 +201,55 @@ else
     fi
 fi
 
+# ===============================================
 # Autojump Configuration
 # ===============================================
 # Fast directory jumping with autojump
-# Install: apt-get install autojump OR brew install autojump
-# NOTE: Do NOT create aliases j='autojump' as they override autojump.zsh function definitions!
-#       The autojump.sh script provides the j() function with proper cd integration.
-if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
-    source "$HOME/.autojump/etc/profile.d/autojump.sh"
-    # Note: autojump.zsh defines j() function with cd integration
-    # No need to create aliases - the function handles all j commands
-elif command -v autojump &> /dev/null; then
-    # Fallback: autojump installed but not in expected location
-    # Try to find autojump from PATH
-    if [[ -n "$(command -v autojump)" ]]; then
-        # Source autojump shell integration if available
-        [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
-            source "$(dirname $(command -v autojump))/../share/autojump/autojump.sh"
-        # If autojump shell integration failed, provide fallback
-        if ! command -v j &> /dev/null; then
-            alias j='autojump'
-            alias jhistory='autojump -s'
-        fi
+# Install: brew install autojump (macOS) OR apt-get install autojump (Linux)
+#
+# HOW AUTOJUMP WORKS:
+# - As you navigate directories, autojump builds a database of your most visited paths
+# - Use 'j <partial-name>' to jump to frequently visited directories
+# - Example: After visiting ~/Software/dev_utility several times, you can use 'j dev' to jump there
+# - The database builds automatically as you cd into directories
+
+# Remove any existing j aliases that could conflict with autojump's function
+unalias j jhistory 2>/dev/null || true
+
+# Directly source the autojump shell integration for the current platform
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: Try Homebrew installation paths
+    if [[ -f "/opt/homebrew/etc/profile.d/autojump.sh" ]]; then
+        source "/opt/homebrew/etc/profile.d/autojump.sh"
+    elif [[ -f "/usr/local/etc/profile.d/autojump.sh" ]]; then
+        source "/usr/local/etc/profile.d/autojump.sh"
     fi
 else
-    # Autojump not installed - provide helpful message
-    j() {
-        echo "❌ autojump is not installed" >&2
-        echo "Install with: apt-get install autojump (Ubuntu/Debian) or brew install autojump (macOS)" >&2
-        echo "After installation, restart your shell with: exec zsh" >&2
-        return 1
-    }
-    jhistory() {
-        echo "❌ autojump is not installed" >&2
-        echo "Install autojump to use this feature" >&2
-        return 1
-    }
+    # Linux: Try standard installation paths
+    if [[ -f "/usr/share/autojump/autojump.sh" ]]; then
+        source "/usr/share/autojump/autojump.sh"
+    elif [[ -f "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
+        source "$HOME/.autojump/etc/profile.d/autojump.sh"
+    fi
+fi
+
+# Verify autojump is properly loaded, otherwise provide helpful fallback
+if ! typeset -f j &>/dev/null; then
+    if command -v autojump &>/dev/null; then
+        # Autojump binary exists but shell integration failed - provide basic alias
+        alias j='autojump'
+        alias jhistory='autojump -s'
+        echo "⚠️  Note: Autojump shell integration not loaded. Directory tracking may not work." >&2
+        echo "   Try: exec zsh" >&2
+    else
+        # Autojump not installed - provide informative error function
+        j() {
+            echo "❌ autojump is not installed" >&2
+            echo "   macOS: brew install autojump" >&2
+            echo "   Linux: apt-get install autojump" >&2
+            return 1
+        }
+    fi
 fi
 
 # ===============================================
