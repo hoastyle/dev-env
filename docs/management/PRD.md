@@ -1,7 +1,7 @@
 # PRD (Product Requirements Document) - dev-env 模块
 
-**版本**: 2.1.1
-**最后更新**: 2025-10-19
+**版本**: 2.2.0
+**最后更新**: 2025-10-25
 **维护者**: Development Team
 
 ---
@@ -73,12 +73,36 @@
 * [ ] 统一帮助系统
 * [ ] 性能分析系统
 
-#### 6. 跨平台支持
+#### 6. 跨平台支持 ⭐
 
-* [ ] Linux 系统支持 (Ubuntu/Debian/Fedora/Arch)
-* [ ] macOS 系统支持
-* [ ] Docker 容器环境检测
-* [ ] 自动包管理器识别
+**核心要求**: 所有功能和脚本必须同时支持 Linux 和 macOS，保证一致的用户体验。
+
+* [x] **Linux 系统支持** (Ubuntu/Debian/Fedora/Arch)
+  * [x] GNU ls 颜色配置 (`ls --color=auto`)
+  * [x] 标准 Linux 工具路径检测
+  * [x] 包管理器自动检测（apt-get/dnf/pacman）
+  * [x] Linux 特定环境变量设置
+
+* [x] **macOS 系统支持**
+  * [x] BSD ls 和 GNU ls (gls) 双重支持
+  * [x] Homebrew 集成和路径检测
+  * [x] macOS 特定环境变量（CLICOLOR/LSCOLORS）
+  * [x] Intel 和 Apple Silicon 架构支持
+
+* [x] **平台差异处理**
+  * [x] 工具名称差异（fd vs fd-find）
+  * [x] 路径差异（/usr/share vs /opt/homebrew）
+  * [x] 包名称差异（自动映射）
+  * [x] OSTYPE 自动检测和适配
+
+* [x] **Docker 容器环境检测**
+* [x] **自动包管理器识别**
+
+**验证标准**:
+- ✅ 所有脚本必须通过 Linux 和 macOS 测试
+- ✅ 颜色配置在两个平台上均正常显示
+- ✅ 安装脚本自动适配平台差异
+- ✅ 文档明确标注跨平台说明
 
 #### 7. 错误处理
 
@@ -250,13 +274,22 @@
 * 代理功能全面优化
 * 完整文档体系
 
-### v2.1.1 (已完成) ⭐
+### v2.1.1 (已完成)
 
 * 硬编码路径消除
 * 错误处理完善
 * 文档版本统一
 
-### v2.2 (规划)
+### v2.2.0 (已完成) ⭐
+
+* **完整的跨平台支持** (Linux + macOS)
+* 跨平台颜色配置系统
+* 平台差异自动适配
+* autojump 跨平台集成优化
+* Conda/CUDA/FZF 跨平台路径检测
+* GNU coreutils 和 BSD 工具兼容
+
+### v2.3 (规划)
 
 * 自动化测试套件
 * CI/CD 集成

@@ -70,18 +70,24 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export EDITOR=vim
 
-# Color support for terminal commands
-export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
+# Color support for terminal commands (Cross-platform)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: Use GNU coreutils if available (better colors), otherwise BSD ls
+    export CLICOLOR=1
+    export LSCOLORS=GxFxCxDxBxegedabagaced
 
-# Use GNU coreutils if available (for better color support)
-if command -v gls >/dev/null 2>&1; then
-    alias ls='gls --color=auto'
-    # Set LS_COLORS for GNU ls
-    export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+    if command -v gls >/dev/null 2>&1; then
+        # Prefer GNU ls (gls) for consistent colors across platforms
+        alias ls='gls --color=auto'
+        export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+    else
+        # Fallback to macOS BSD ls with -G flag
+        alias ls='ls -G'
+    fi
 else
-    # Fallback to macOS ls with basic colors
-    alias ls='ls -G'
+    # Linux: Use GNU ls (default on Linux)
+    alias ls='ls --color=auto'
+    export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
 fi
 
 # ===============================================
