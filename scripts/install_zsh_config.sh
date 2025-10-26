@@ -209,35 +209,35 @@ backup_existing_config() {
     if [[ -f "$HOME/.zshrc" ]]; then
         cp "$HOME/.zshrc" "$backup_dir/"
         log_info "已备份 .zshrc"
-        ((backed_up_count++))
+        ((backed_up_count++)) || true
     fi
 
     # 备份 .p10k.zsh
     if [[ -f "$HOME/.p10k.zsh" ]]; then
         cp "$HOME/.p10k.zsh" "$backup_dir/"
         log_info "已备份 .p10k.zsh"
-        ((backed_up_count++))
+        ((backed_up_count++)) || true
     fi
 
     # 备份 .antigen.zsh
     if [[ -f "$HOME/.antigen.zsh" ]]; then
         cp "$HOME/.antigen.zsh" "$backup_dir/"
         log_info "已备份 .antigen.zsh"
-        ((backed_up_count++))
+        ((backed_up_count++)) || true
     fi
 
     # 备份 .antigen 目录
     if [[ -d "$HOME/.antigen" ]]; then
         cp -r "$HOME/.antigen" "$backup_dir/"
         log_info "已备份 .antigen 目录"
-        ((backed_up_count++))
+        ((backed_up_count++)) || true
     fi
 
     # 备份自定义函数目录
     if [[ -d "$HOME/.zsh" ]]; then
         cp -r "$HOME/.zsh" "$backup_dir/"
         log_info "已备份 .zsh 目录"
-        ((backed_up_count++))
+        ((backed_up_count++)) || true
     fi
 
     if (( backed_up_count > 0 )); then
