@@ -17,6 +17,10 @@ CYAN='\033[0;36m'
 PURPLE='\033[0;35m'
 NC='\033[0m'
 
+# Load backup manager library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/backup_manager.sh"
+
 # 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -53,6 +57,9 @@ show_help() {
     echo "  validate          验证 ZSH 配置"
     echo "  backup            备份 ZSH 配置"
     echo "  restore           恢复 ZSH 配置"
+    echo "  list              列出所有备份"
+    echo "  clean-old         清理旧备份 (保留最新N个)"
+    echo "  migrate           迁移旧备份到统一目录"
     echo "  update            更新 Antigen 插件"
     echo "  clean             清理插件缓存"
     echo "  benchmark         性能基准测试"
@@ -71,6 +78,9 @@ show_help() {
     echo "  $0 --dry-run backup             # 预览备份操作"
     echo "  $0 backup                        # 备份配置"
     echo "  $0 restore /path/to/backup       # 恢复配置"
+    echo "  $0 list                          # 列出所有备份"
+    echo "  $0 clean-old tools 5             # 清理 tools 类别，保留最新 5 个"
+    echo "  $0 migrate                       # 迁移旧备份到新目录结构"
     echo "  $0 update                        # 更新插件"
     echo ""
 }
@@ -174,12 +184,12 @@ validate_config() {
     fi
 }
 
-# 备份配置
+# 备份配置 (使用统一备份系统)
 backup_config() {
     log_header "备份 ZSH 配置"
 
-    local backup_dir="$HOME/zsh-backup-$(date +%Y%m%d-%H%M%S)"
-    mkdir -p "$backup_dir"
+    # Create backup directory using centralized system
+    local backup_dir=$(create_backup_dir "tools")
 
     log_info "备份目录: $backup_dir"
 
@@ -190,6 +200,7 @@ backup_config() {
         ".fzf.zsh"
         ".zsh_profile"
         ".zshenv"
+        ".p10k.zsh"
     )
 
     local dirs=(
@@ -234,31 +245,32 @@ ZSH 版本: $(zsh --version)
 备份目录数量: $backed_up_dirs
 
 恢复方法:
-1. 运行: $0 restore $backup_dir
+1. 运行: $0 restore
 2. 或手动复制文件到 HOME 目录
 EOF
 
-    # 保存备份路径
-    echo "$backup_dir" > "$HOME/.zsh_last_backup"
+    # Update index and create 'latest' symlink
+    update_backup_index "tools" "$backup_dir"
 
     log_success "备份完成: $backup_dir"
     log_info "已备份 $backed_up_files 个文件，$backed_up_dirs 个目录"
 
     # 显示恢复命令
     echo ""
-    log_info "恢复命令: $0 restore $backup_dir"
+    log_info "恢复命令: $0 restore"
+    log_info "查看所有备份: $0 list"
 }
 
-# 恢复配置
+# 恢复配置 (使用统一备份系统)
 restore_config() {
     local backup_dir="$1"
 
     if [[ -z "$backup_dir" ]]; then
-        # 使用最新备份
-        if [[ -f "$HOME/.zsh_last_backup" ]]; then
-            backup_dir=$(cat "$HOME/.zsh_last_backup")
-        else
+        # 使用最新备份（从统一备份系统）
+        backup_dir=$(get_latest_backup "tools")
+        if [[ -z "$backup_dir" ]]; then
             log_error "未指定备份目录，且未找到最新备份"
+            log_info "使用 '$0 list' 查看可用备份"
             return 1
         fi
     fi
@@ -293,6 +305,10 @@ restore_config() {
 
     for dir in "$backup_dir"/*; do
         if [[ -d "$dir" ]] && [[ "$(basename "$dir")" != "." ]] && [[ "$(basename "$dir")" != ".." ]]; then
+            # Skip backup_info.txt file
+            if [[ "$(basename "$dir")" == "backup_info.txt" ]]; then
+                continue
+            fi
             rm -rf "$HOME/$(basename "$dir")" 2>/dev/null || true
             cp -r "$dir" "$HOME/"
             log_success "✓ $(basename "$dir")/"
@@ -675,6 +691,26 @@ main() {
             ;;
         "restore")
             restore_config "$1"
+            ;;
+        "list")
+            show_backup_summary
+            ;;
+        "clean-old")
+            local category="$1"
+            local keep_count="${2:-5}"
+
+            if [[ -z "$category" ]]; then
+                log_error "请指定备份类别 (install/tools/optimizer/launcher)"
+                echo ""
+                echo "用法: $0 clean-old <category> [keep_count]"
+                echo "示例: $0 clean-old tools 5"
+                exit 1
+            fi
+
+            clean_old_backups "$category" "$keep_count"
+            ;;
+        "migrate")
+            migrate_old_backups
             ;;
         "update")
             update_plugins

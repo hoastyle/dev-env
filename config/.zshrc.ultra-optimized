@@ -230,6 +230,10 @@ enable_completion() {
     if [[ -z "$COMPLETION_ENABLED" ]]; then
         echo "🔄 Enabling ZSH completion system..."
         _dev_env_cached_compinit
+
+        # Case-insensitive Tab completion (safe and convenient)
+        zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
         COMPLETION_ENABLED=true
 
         # Load Antigen completion plugins if available

@@ -17,6 +17,10 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Load backup manager library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/backup_manager.sh"
+
 # 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -183,47 +187,69 @@ check_dependencies() {
     log_success "基础依赖检查通过"
 }
 
-# 备份现有配置
+# 备份现有配置 (使用统一备份系统)
 backup_existing_config() {
     log_step "备份现有配置..."
 
-    local backup_dir="$HOME/zsh-backup-$(date +%Y%m%d-%H%M%S)"
-    dry_mkdir "$backup_dir"
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "DRY-RUN: 将备份以下文件到 $BACKUP_ROOT/install/"
+        [[ -f "$HOME/.zshrc" ]] && log_info "  - .zshrc"
+        [[ -f "$HOME/.p10k.zsh" ]] && log_info "  - .p10k.zsh"
+        [[ -f "$HOME/.antigen.zsh" ]] && log_info "  - .antigen.zsh"
+        [[ -d "$HOME/.antigen" ]] && log_info "  - .antigen/ (directory)"
+        [[ -d "$HOME/.zsh" ]] && log_info "  - .zsh/ (directory)"
+        return 0
+    fi
+
+    # Create backup directory using centralized system
+    local backup_dir=$(create_backup_dir "install")
+    local backed_up_count=0
 
     # 备份 .zshrc
     if [[ -f "$HOME/.zshrc" ]]; then
-        dry_cp "$HOME/.zshrc" "$backup_dir/"
+        cp "$HOME/.zshrc" "$backup_dir/"
         log_info "已备份 .zshrc"
+        ((backed_up_count++))
     fi
 
     # 备份 .p10k.zsh
     if [[ -f "$HOME/.p10k.zsh" ]]; then
-        dry_cp "$HOME/.p10k.zsh" "$backup_dir/"
+        cp "$HOME/.p10k.zsh" "$backup_dir/"
         log_info "已备份 .p10k.zsh"
+        ((backed_up_count++))
     fi
 
     # 备份 .antigen.zsh
     if [[ -f "$HOME/.antigen.zsh" ]]; then
-        dry_cp "$HOME/.antigen.zsh" "$backup_dir/"
+        cp "$HOME/.antigen.zsh" "$backup_dir/"
         log_info "已备份 .antigen.zsh"
+        ((backed_up_count++))
     fi
 
     # 备份 .antigen 目录
     if [[ -d "$HOME/.antigen" ]]; then
-        dry_cp_r "$HOME/.antigen" "$backup_dir/"
+        cp -r "$HOME/.antigen" "$backup_dir/"
         log_info "已备份 .antigen 目录"
+        ((backed_up_count++))
     fi
 
     # 备份自定义函数目录
     if [[ -d "$HOME/.zsh" ]]; then
-        dry_cp_r "$HOME/.zsh" "$backup_dir/"
+        cp -r "$HOME/.zsh" "$backup_dir/"
         log_info "已备份 .zsh 目录"
+        ((backed_up_count++))
     fi
 
-    if [[ "$DRY_RUN" != "true" ]]; then
-        echo "$backup_dir" > "$HOME/.zsh_backup_dir"
+    if (( backed_up_count > 0 )); then
+        # Update index and create 'latest' symlink
+        update_backup_index "install" "$backup_dir"
+        log_success "配置已备份到: $backup_dir"
+        log_info "可使用 './scripts/zsh_tools.sh list' 查看所有备份"
+    else
+        # No files to backup, remove empty directory
+        rm -rf "$backup_dir"
+        log_info "无需备份（未找到现有配置文件）"
     fi
-    log_success "配置已备份到: $backup_dir"
 }
 
 # 安装 Antigen

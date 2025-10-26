@@ -4,6 +4,7 @@
 
 **变更记录 (Changelog):**
 
+* 2025-10-26: v2.3.0 版本发布 - 完成大小写不敏感补全和统一备份系统
 * 2025-10-24: v2.2.0 版本发布 - 完整的跨平台支持 (Linux + macOS)
 * 2025-10-19: v2.1 版本发布 - 消除硬编码路径，完善错误处理机制
 * 2025-10-17: 代理功能全面优化，完成文档体系
@@ -199,6 +200,9 @@ brew install fzf fd ripgrep
 ./scripts/zsh_tools.sh validate          # 验证配置
 ./scripts/zsh_tools.sh backup            # 备份配置
 ./scripts/zsh_tools.sh restore           # 恢复配置
+./scripts/zsh_tools.sh list              # 列出所有备份
+./scripts/zsh_tools.sh clean-old <category> [keep_count]  # 清理旧备份 (默认保留5个)
+./scripts/zsh_tools.sh migrate           # 迁移旧备份到统一目录
 ./scripts/zsh_tools.sh update            # 更新插件
 ./scripts/zsh_tools.sh doctor            # 系统诊断
 ./scripts/zsh_tools.sh benchmark         # 性能测试
@@ -522,6 +526,8 @@ dev-env/
 │   ├── zsh_optimizer.sh                # 性能优化工具 ⭐
 │   ├── install_zsh_config.sh          # 自动安装脚本
 │   ├── zsh_tools.sh                   # 配置管理工具集
+│   ├── lib/                           # 共享库目录 ⭐
+│   │   └── backup_manager.sh          # 统一备份管理库 ⭐
 │   └── ssh/                           # SSH相关配置 (可选)
 ├── zsh-functions/                      # 自定义ZSH函数目录
 │   ├── environment.zsh                # 环境检测函数
@@ -564,11 +570,28 @@ dev-env/
 * **性能优化工具**: 深度性能分析，智能优化建议，配置自动优化
 * **自动化安装**: 一键安装完整ZSH环境
 * **配置验证**: 全面的配置检查和语法验证
+* **统一备份系统**: 集中式备份管理，支持列表、清理、迁移功能 ⭐
 * **备份恢复**: 安全的配置备份和恢复机制
 * **性能监控**: 毫秒级精度的启动时间和内存使用监控
 * **系统诊断**: 全面的环境问题诊断和故障排除
 
 ## 变更记录 (Changelog)
+
+### v2.3.0 (2025-10-26)
+
+* 🔧 **Tab补全增强**: 实现大小写不敏感的Tab补全功能
+  * 所有 .zshrc 配置模板支持忽略大小写的文件和命令补全
+  * 使用保守策略：仅补全系统大小写不敏感，通配符保持大小写敏感
+  * 避免误操作风险（如同时存在 Documents 和 documents 时的安全删除）
+* 🗂️ **统一备份系统**: 完整的集中式备份管理架构
+  * 创建 scripts/lib/backup_manager.sh 共享库
+  * 所有备份集中到 ~/.dev-env-backups/ 隐藏目录
+  * 支持备份分类管理 (install/tools/optimizer/launcher)
+  * 新增三个备份管理命令：list (列表)、clean-old (清理)、migrate (迁移)
+  * 自动化备份索引和 latest 符号链接管理
+* 📚 **文档更新**: 完善 CLAUDE.md 和 README.md 文档
+  * 添加新功能使用说明和示例
+  * 更新命令参考和接口文档
 
 ### v2.0 (2025-10-16)
 

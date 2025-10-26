@@ -137,6 +137,16 @@ else
 fi
 
 # ===============================================
+# ZSH Completion Configuration
+# ===============================================
+
+# Case-insensitive Tab completion (safe and convenient)
+# This makes Tab completion ignore case for file names and commands
+# Example: "cd doc<Tab>" will match "Documents", "downloads", "DOCS"
+# Note: Wildcards (*.jpg) remain case-sensitive to avoid accidental file operations
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# ===============================================
 # 环境变量和别名
 # ===============================================
 

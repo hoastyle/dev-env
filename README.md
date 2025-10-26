@@ -41,6 +41,8 @@ dev-env/
 │   ├── zsh_optimizer.sh          # 性能优化工具
 │   ├── zsh_launcher.sh           # 多模式启动器
 │   ├── zsh_minimal.sh            # 极简模式启动器
+│   ├── lib/                      # 共享库目录 (v2.3.0 新增)
+│   │   └── backup_manager.sh    # 统一备份管理库
 │   └── ssh/                      # SSH 相关配置
 ├── docs/                          # 文档目录
 │   ├── README.md                  # 文档中心索引
@@ -311,6 +313,15 @@ source ~/.zshrc
 # 恢复配置
 ./scripts/zsh_tools.sh restore
 
+# 列出所有备份
+./scripts/zsh_tools.sh list
+
+# 清理旧备份 (保留最新N个)
+./scripts/zsh_tools.sh clean-old <category> [keep_count]
+
+# 迁移旧备份到统一目录
+./scripts/zsh_tools.sh migrate
+
 # 更新插件
 ./scripts/zsh_tools.sh update
 
@@ -349,6 +360,28 @@ source ~/.zshrc
 
 # 恢复指定备份
 ./scripts/zsh_tools.sh restore /path/to/backup
+
+# 列出所有备份
+./scripts/zsh_tools.sh list
+# 输出示例:
+# === Backup Summary ===
+# Backup Root: ~/.dev-env-backups
+#
+# [install]
+#   Backups: 3
+#   Total Size: 125KB
+#   Latest: 20251026-120530
+#
+# [tools]
+#   Backups: 2
+#   Total Size: 80KB
+#   Latest: 20251026-115823
+
+# 清理旧备份 (保留最新5个)
+./scripts/zsh_tools.sh clean-old tools 5
+
+# 迁移旧备份到统一目录
+./scripts/zsh_tools.sh migrate
 
 # 重置配置
 ./scripts/zsh_tools.sh reset
@@ -829,6 +862,9 @@ proxy_status             # 显示完整配置
 # 配置管理
 ./scripts/zsh_tools.sh validate      # 验证配置
 ./scripts/zsh_tools.sh backup        # 备份配置
+./scripts/zsh_tools.sh list          # 列出备份
+./scripts/zsh_tools.sh clean-old <category> [N]  # 清理旧备份
+./scripts/zsh_tools.sh migrate       # 迁移旧备份
 ./scripts/zsh_tools.sh update        # 更新插件
 ./scripts/zsh_tools.sh doctor        # 系统诊断
 ./scripts/zsh_tools.sh benchmark     # 性能测试

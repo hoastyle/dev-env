@@ -378,6 +378,16 @@ _dev_env_init_completion
 unset -f _dev_env_init_completion
 
 # ===============================================
+# ZSH Completion Configuration
+# ===============================================
+
+# Case-insensitive Tab completion (safe and convenient)
+# This makes Tab completion ignore case for file names and commands
+# Example: "cd doc<Tab>" will match "Documents", "downloads", "DOCS"
+# Note: Wildcards (*.jpg) remain case-sensitive to avoid accidental file operations
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# ===============================================
 # Platform-Specific Configurations
 # ===============================================
 
