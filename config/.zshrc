@@ -79,7 +79,25 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     if command -v gls >/dev/null 2>&1; then
         # Prefer GNU ls (gls) for consistent colors across platforms
         alias ls='gls --color=auto'
-        export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+        # Enhanced LS_COLORS with 70+ file types for development
+        export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'\
+'*.tar=1;31:*.tgz=1;31:*.zip=1;31:*.gz=1;31:*.bz2=1;31:*.7z=1;31:*.rar=1;31:*.deb=1;31:*.rpm=1;31:'\
+'*.jpg=1;35:*.jpeg=1;35:*.png=1;35:*.gif=1;35:*.svg=1;35:*.webp=1;35:*.ico=1;35:'\
+'*.mp3=1;36:*.mp4=1;36:*.avi=1;36:*.mkv=1;36:*.wav=1;36:*.flac=1;36:'\
+'*.pdf=1;33:*.doc=1;33:*.docx=1;33:*.ppt=1;33:*.pptx=1;33:*.xls=1;33:*.xlsx=1;33:'\
+'*.py=1;33:*.js=1;33:*.ts=1;33:*.jsx=1;33:*.tsx=1;33:*.go=1;33:*.rs=1;33:*.java=1;33:*.c=1;33:*.cpp=1;33:*.h=1;33:*.hpp=1;33:*.cs=1;33:*.php=1;33:*.rb=1;33:*.swift=1;33:*.kt=1;33:*.scala=1;33:'\
+'*.sh=1;32:*.bash=1;32:*.zsh=1;32:*.fish=1;32:*.vim=1;32:'\
+'*.json=1;33:*.yaml=1;33:*.yml=1;33:*.toml=1;33:*.xml=1;33:*.html=1;33:*.css=1;33:*.scss=1;33:*.sass=1;33:'\
+'*.md=1;37:*.txt=1;37:*.rst=1;37:*.org=1;37:'\
+'*.log=0;37:*.out=0;37:'\
+'*.conf=1;33:*.config=1;33:*.ini=1;33:*.cfg=1;33:'\
+'*Dockerfile=1;36:*.dockerfile=1;36:*Makefile=1;36:*.mk=1;36:'\
+'*.sql=1;33:*.db=1;35:*.sqlite=1;35:*.sqlite3=1;35:'\
+'*.lock=0;90:*.bak=0;90:*.tmp=0;90:*.temp=0;90:*.swp=0;90:*.swo=0;90:*~=0;90:'\
+'*.git=0;90:*.gitignore=0;90:*.gitmodules=0;90:*.gitattributes=0;90:'\
+'*.env=1;31:*.key=1;31:*.pem=1;31:*.crt=1;31:*.cer=1;31:*.p12=1;31:'\
+'*.dmg=1;31:*.iso=1;31:*.img=1;31:'\
+'*.app=1;32:*.exe=1;32:*.msi=1;32:*.bat=1;32:*.cmd=1;32:'
     else
         # Fallback to macOS BSD ls with -G flag
         alias ls='ls -G'
@@ -87,7 +105,25 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     # Linux: Use GNU ls (default on Linux)
     alias ls='ls --color=auto'
-    export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+    # Enhanced LS_COLORS with 70+ file types for development
+    export LS_COLORS='di=1;34:ln=1;36:so=1;35:pi=1;33:ex=1;32:bd=1;33;1:cd=1;33;1:su=0;41:sg=0;46:tw=0;42:ow=0;43:'\
+'*.tar=1;31:*.tgz=1;31:*.zip=1;31:*.gz=1;31:*.bz2=1;31:*.7z=1;31:*.rar=1;31:*.deb=1;31:*.rpm=1;31:'\
+'*.jpg=1;35:*.jpeg=1;35:*.png=1;35:*.gif=1;35:*.svg=1;35:*.webp=1;35:*.ico=1;35:'\
+'*.mp3=1;36:*.mp4=1;36:*.avi=1;36:*.mkv=1;36:*.wav=1;36:*.flac=1;36:'\
+'*.pdf=1;33:*.doc=1;33:*.docx=1;33:*.ppt=1;33:*.pptx=1;33:*.xls=1;33:*.xlsx=1;33:'\
+'*.py=1;33:*.js=1;33:*.ts=1;33:*.jsx=1;33:*.tsx=1;33:*.go=1;33:*.rs=1;33:*.java=1;33:*.c=1;33:*.cpp=1;33:*.h=1;33:*.hpp=1;33:*.cs=1;33:*.php=1;33:*.rb=1;33:*.swift=1;33:*.kt=1;33:*.scala=1;33:'\
+'*.sh=1;32:*.bash=1;32:*.zsh=1;32:*.fish=1;32:*.vim=1;32:'\
+'*.json=1;33:*.yaml=1;33:*.yml=1;33:*.toml=1;33:*.xml=1;33:*.html=1;33:*.css=1;33:*.scss=1;33:*.sass=1;33:'\
+'*.md=1;37:*.txt=1;37:*.rst=1;37:*.org=1;37:'\
+'*.log=0;37:*.out=0;37:'\
+'*.conf=1;33:*.config=1;33:*.ini=1;33:*.cfg=1;33:'\
+'*Dockerfile=1;36:*.dockerfile=1;36:*Makefile=1;36:*.mk=1;36:'\
+'*.sql=1;33:*.db=1;35:*.sqlite=1;35:*.sqlite3=1;35:'\
+'*.lock=0;90:*.bak=0;90:*.tmp=0;90:*.temp=0;90:*.swp=0;90:*.swo=0;90:*~=0;90:'\
+'*.git=0;90:*.gitignore=0;90:*.gitmodules=0;90:*.gitattributes=0;90:'\
+'*.env=1;31:*.key=1;31:*.pem=1;31:*.crt=1;31:*.cer=1;31:*.p12=1;31:'\
+'*.dmg=1;31:*.iso=1;31:*.img=1;31:'\
+'*.app=1;32:*.exe=1;32:*.msi=1;32:*.bat=1;32:*.cmd=1;32:'
 fi
 
 # ===============================================
