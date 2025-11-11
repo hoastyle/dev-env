@@ -1,3 +1,17 @@
+---
+title: "代理功能集成指南"
+description: "在开发环境中集成和使用优化后的代理功能的完整指南"
+type: "系统集成"
+status: "完成"
+priority: "中"
+created_date: "2025-10-17"
+last_updated: "2025-10-17"
+related_documents: ["PROXY_ENHANCEMENT_SUMMARY.md", "PROXY_OPTIMIZATION.md", "PROXY_QUICK_REFERENCE.md"]
+related_code: ["zsh-functions/utils.zsh"]
+tags: ["代理", "网络", "集成"]
+version: "1.0"
+---
+
 # 代理功能集成指南
 
 ## 📋 概述

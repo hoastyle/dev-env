@@ -1,3 +1,17 @@
+---
+title: "自动化测试套件构建计划"
+description: "dev-env 项目的测试策略、框架和执行计划"
+type: "技术设计"
+status: "完成"
+priority: "高"
+created_date: "2025-10-19"
+last_updated: "2025-10-19"
+related_documents: ["TEST_SUITE_COMPLETION.md"]
+related_code: ["scripts/", "config/", "zsh-functions/"]
+tags: ["测试", "自动化", "CI/CD"]
+version: "1.0"
+---
+
 # 自动化测试套件构建计划
 
 **版本**: 1.0

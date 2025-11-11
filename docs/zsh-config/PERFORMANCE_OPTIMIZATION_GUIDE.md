@@ -1,8 +1,18 @@
-# ZSH 性能优化指南
+---
+title: "ZSH 性能优化指南"
+description: "详细介绍 ZSH 启动性能优化的完整解决方案，从 1.5s 优化到 2ms"
+type: "技术设计"
+status: "完成"
+priority: "高"
+created_date: "2025-10-16"
+last_updated: "2025-10-16"
+related_documents: ["ZSH_CONFIG_ANALYSIS.md", "TROUBLESHOOTING_DEBUG_GUIDE.md"]
+related_code: ["config/.zshrc.optimized", "config/.zshrc.ultra-optimized"]
+tags: ["性能", "ZSH", "优化", "启动时间"]
+version: "1.0"
+---
 
-**文档版本**: 1.0
-**创建日期**: 2025-10-16
-**维护者**: Development Team
+# ZSH 性能优化指南
 
 ---
 

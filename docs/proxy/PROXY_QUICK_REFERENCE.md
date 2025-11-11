@@ -1,3 +1,17 @@
+---
+title: "代理功能快速参考指南"
+description: "代理功能的快速参考指南，包括启用、检查、配置等常用命令"
+type: "API参考"
+status: "完成"
+priority: "中"
+created_date: "2025-10-17"
+last_updated: "2025-10-17"
+related_documents: ["PROXY_INTEGRATION_GUIDE.md", "PROXY_ENHANCEMENT_SUMMARY.md", "PROXY_OPTIMIZATION.md"]
+related_code: ["zsh-functions/utils.zsh"]
+tags: ["代理", "参考", "快速查询"]
+version: "1.0"
+---
+
 # 代理功能快速参考指南
 
 ## 🚀 快速开始

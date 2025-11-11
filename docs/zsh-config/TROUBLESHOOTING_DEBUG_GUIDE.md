@@ -1,3 +1,17 @@
+---
+title: "ZSH 帮助系统调试指南"
+description: "ZSH 帮助系统开发过程中的问题诊断和修复案例，展示系统化的调试方法"
+type: "故障排查"
+status: "完成"
+priority: "中"
+created_date: "2025-10-16"
+last_updated: "2025-10-16"
+related_documents: ["ZSH_CONFIG_ANALYSIS.md", "PERFORMANCE_OPTIMIZATION_GUIDE.md"]
+related_code: ["zsh-functions/help.zsh", "config/.zshrc"]
+tags: ["ZSH", "调试", "故障排查", "帮助系统"]
+version: "1.0"
+---
+
 # ZSH 帮助系统调试指南
 
 **文档版本**: 1.0

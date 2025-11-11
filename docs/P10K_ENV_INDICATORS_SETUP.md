@@ -1,3 +1,17 @@
+---
+title: "在 Powerlevel10k 中集成环境指示符"
+description: "环境指示符的设置、定制化和使用说明"
+type: "教程"
+status: "完成"
+priority: "中"
+created_date: "2025-10-20"
+last_updated: "2025-10-20"
+related_documents: ["ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md", "ADRs/001-powerlevel10k-integration.md"]
+related_code: ["config/.p10k.zsh"]
+tags: ["Powerlevel10k", "环境指示符", "配置"]
+version: "1.0"
+---
+
 # 在 Powerlevel10k 中集成环境指示符
 
 本指南说明如何在 Powerlevel10k 提示符中显示环境指示符（🖥️ 🌐 🔐）在第一行右侧。

@@ -1,3 +1,17 @@
+---
+title: "ZSH 配置模板与使用指南"
+description: "完整的 ZSH 配置模板和使用指南，包含安装步骤、配置说明和最佳实践"
+type: "教程"
+status: "完成"
+priority: "中"
+created_date: "2025-10-15"
+last_updated: "2025-10-15"
+related_documents: ["ZSH_CONFIG_ANALYSIS.md", "PERFORMANCE_OPTIMIZATION_GUIDE.md", "TROUBLESHOOTING_DEBUG_GUIDE.md"]
+related_code: ["config/.zshrc", "scripts/install_zsh_config.sh", "zsh-functions/"]
+tags: ["ZSH", "配置", "模板", "教程"]
+version: "1.0"
+---
+
 # ZSH 配置模板与使用指南
 
 **模板版本**: 1.0

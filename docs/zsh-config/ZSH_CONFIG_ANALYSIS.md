@@ -1,9 +1,18 @@
-# ZSH 配置分析与审核报告
+---
+title: "ZSH 配置分析与审核报告"
+description: "深度分析 ZSH 配置结构、性能影响和最佳实践"
+type: "技术设计"
+status: "完成"
+priority: "高"
+created_date: "2025-10-14"
+last_updated: "2025-10-14"
+related_documents: ["PERFORMANCE_OPTIMIZATION_GUIDE.md", "ZSH_CONFIG_TEMPLATE.md", "TROUBLESHOOTING_DEBUG_GUIDE.md"]
+related_code: ["config/.zshrc", "config/.zshrc.optimized", "zsh-functions/"]
+tags: ["ZSH", "配置", "分析", "审核"]
+version: "1.0"
+---
 
-**文档版本**: 1.0
-**创建日期**: 2025-10-14
-**审核人**: Claude AI Assistant
-**配置文件**: `~/.zshrc`
+# ZSH 配置分析与审核报告
 
 ---
 

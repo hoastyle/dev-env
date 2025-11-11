@@ -1,3 +1,17 @@
+---
+title: "ADR-001: Powerlevel10k 环境指示符集成方案"
+description: "选择 Powerlevel10k 作为默认 ZSH 主题的架构决策记录"
+type: "架构决策"
+status: "完成"
+priority: "高"
+created_date: "2025-10-19"
+last_updated: "2025-10-19"
+related_documents: ["../ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md", "../P10K_ENV_INDICATORS_SETUP.md"]
+related_code: ["config/.p10k.zsh", "config/.zshrc"]
+tags: ["架构决策", "Powerlevel10k", "主题"]
+version: "1.0"
+---
+
 # ADR-001: Powerlevel10k 环境指示符集成方案
 
 **状态**: 已实现

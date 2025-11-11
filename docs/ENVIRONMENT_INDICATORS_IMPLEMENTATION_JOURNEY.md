@@ -1,3 +1,17 @@
+---
+title: "环境指示符实现全程记录"
+description: "ZSH 环境指示符（物理主机/Docker、SSH/本地、代理状态）的完整实现过程记录"
+type: "系统集成"
+status: "完成"
+priority: "高"
+created_date: "2025-10-16"
+last_updated: "2025-10-16"
+related_documents: ["P10K_ENV_INDICATORS_SETUP.md", "ADRs/001-powerlevel10k-integration.md"]
+related_code: ["config/.p10k.zsh", "zsh-functions/environment.zsh"]
+tags: ["环境指示符", "Powerlevel10k", "ZSH", "提示符"]
+version: "1.0"
+---
+
 # 环境指示符实现全程记录
 
 **项目**: ZSH 开发环境配置

@@ -1186,8 +1186,12 @@ docs/
 │   ├── PROXY_OPTIMIZATION.md        # 代理优化
 │   ├── PROXY_INTEGRATION_GUIDE.md    # 代理集成指南
 │   └── PROXY_ENHANCEMENT_SUMMARY.md  # 代理完成报告
-└── ADRs/
-    └── 001-powerlevel10k-integration.md  # 技术决策记录
+├── ADRs/
+│   └── 001-powerlevel10k-integration.md  # 技术决策记录
+├── ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md  # 环境指示符实现记录
+├── P10K_ENV_INDICATORS_SETUP.md          # Powerlevel10k 环境指示符设置
+├── TEST_SUITE_PLAN.md                    # 自动化测试套件计划
+└── TEST_SUITE_COMPLETION.md              # 测试套件完成报告
 ```
 
 ### 文档用途
@@ -1199,6 +1203,24 @@ docs/
 | TASK.md | 任务追踪和进度 | 开发者、项目经理 |
 | CONTEXT.md | 当前工作状态 | 开发者 |
 | KNOWLEDGE.md | 最佳实践和知识 | 开发者、贡献者 |
+
+### 📚 文档索引 (新增/更新)
+
+| 主题 | 文档路径 | 说明 | 优先级 | 最后更新 |
+|------|---------|------|--------|---------|
+| 环境指示符 | docs/ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md | 完整实现过程记录 | 高 | 2025-10-16 |
+| Powerlevel10k配置 | docs/P10K_ENV_INDICATORS_SETUP.md | 环境指示符设置指南 | 中 | 2025-10-20 |
+| 性能优化 | docs/zsh-config/PERFORMANCE_OPTIMIZATION_GUIDE.md | ZSH 启动性能优化指南 | 高 | 2025-10-16 |
+| 配置分析 | docs/zsh-config/ZSH_CONFIG_ANALYSIS.md | ZSH 配置审核报告 | 高 | 2025-10-14 |
+| 配置模板 | docs/zsh-config/ZSH_CONFIG_TEMPLATE.md | 完整配置模板和使用指南 | 中 | 2025-10-15 |
+| 调试指南 | docs/zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md | ZSH 调试和问题排查 | 中 | 2025-10-16 |
+| 代理功能 | docs/proxy/PROXY_INTEGRATION_GUIDE.md | 代理功能集成指南 | 中 | 2025-10-17 |
+| 代理优化 | docs/proxy/PROXY_ENHANCEMENT_SUMMARY.md | 代理优化完成报告 | 中 | 2025-10-17 |
+| 代理优化 | docs/proxy/PROXY_OPTIMIZATION.md | 代理优化分析 | 低 | 2025-10-17 |
+| 代理参考 | docs/proxy/PROXY_QUICK_REFERENCE.md | 代理快速参考指南 | 中 | 2025-10-17 |
+| 测试计划 | docs/TEST_SUITE_PLAN.md | 自动化测试套件计划 | 高 | 2025-10-19 |
+| 测试完成 | docs/TEST_SUITE_COMPLETION.md | 测试套件完成报告 | 中 | 2025-10-22 |
+| 架构决策 | docs/ADRs/001-powerlevel10k-integration.md | Powerlevel10k 主题集成决策 | 高 | 2025-10-19 |
 
 ---
 
