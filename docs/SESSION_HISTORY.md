@@ -1,3 +1,15 @@
+---
+title: "会话历史记录"
+description: "工作会话的历史记录和进度追踪"
+type: "教程"
+status: "完成"
+priority: "低"
+created_date: "2025-11-11"
+last_updated: "2025-11-11"
+tags: []
+version: "1.0"
+---
+
 # CONTEXT.md - dev-env 项目当前上下文
 
 **版本**: 2.1.9

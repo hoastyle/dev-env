@@ -1,3 +1,15 @@
+---
+title: "ZSH配置文档导航"
+description: "ZSH配置文档的分类和导航"
+type: "教程"
+status: "完成"
+priority: "中"
+created_date: "2025-11-11"
+last_updated: "2025-11-11"
+tags: []
+version: "1.0"
+---
+
 # ZSH 配置文档
 
 本目录包含 dev-env 项目 ZSH Shell 配置的完整文档。

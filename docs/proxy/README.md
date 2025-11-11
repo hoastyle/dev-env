@@ -1,3 +1,15 @@
+---
+title: "代理功能文档导航"
+description: "代理功能相关文档的分类和导航"
+type: "教程"
+status: "完成"
+priority: "中"
+created_date: "2025-11-11"
+last_updated: "2025-11-11"
+tags: []
+version: "1.0"
+---
+
 # 代理功能文档
 
 本目录包含 dev-env 项目代理功能（v2.1）的完整文档。

@@ -1,3 +1,15 @@
+---
+title: "文档导航"
+description: "项目文档的总体导航和快速参考"
+type: "教程"
+status: "完成"
+priority: "中"
+created_date: "2025-11-11"
+last_updated: "2025-11-11"
+tags: []
+version: "1.0"
+---
+
 # 文档中心 (Documentation Center)
 
 欢迎来到 dev-env 项目的完整文档中心。本目录包含所有主要功能模块的详细文档。

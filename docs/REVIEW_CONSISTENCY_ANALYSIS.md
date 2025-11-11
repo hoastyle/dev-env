@@ -1,3 +1,15 @@
+---
+title: "审查一致性分析"
+description: "代码审查流程和标准的一致性分析"
+type: "系统集成"
+status: "完成"
+priority: "低"
+created_date: "2025-11-11"
+last_updated: "2025-11-11"
+tags: []
+version: "1.0"
+---
+
 # 审查报告与 TASK.md 一致性分析
 
 **分析日期**: 2025-10-19
