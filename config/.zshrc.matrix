@@ -1,0 +1,200 @@
+# ===============================================
+# Matrix System Status for ZSH
+# Compatible version of ~/.rc for zsh
+# Source this from ~/.zshrc: source ~/.zshrc.matrix
+# ===============================================
+
+# PATH Protection: Ensure essential system paths are available
+# This is needed because antigen adds bundle dirs to PATH, breaking command lookup
+typeset -g _MATRIX_SAFE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin"
+if [[ ":$PATH:" != *":/usr/bin:"* ]]; then
+    export PATH="$_MATRIX_SAFE_PATH:$PATH"
+fi
+
+# Command helper for safe execution - uses absolute paths
+_matrix_safe_cmd() {
+    local cmd="$1"
+    shift
+    case "$cmd" in
+        awk)      /usr/bin/awk "$@" ;;
+        getconf)  /usr/bin/getconf "$@" ;;
+        date)     /bin/date "$@" ;;
+        pgrep)    /usr/bin/pgrep "$@" ;;
+        df)       /bin/df "$@" ;;
+        tr)       /usr/bin/tr "$@" ;;
+        readlink) /bin/readlink "$@" ;;
+        *)        command "$cmd" "$@" ;;
+    esac
+}
+
+# 设置计算机ID
+export COMPUTER_ID="sim"
+
+# 设置进程名称为变量
+export CRANE_PROCESS_NAME="crane"
+export SERVICES_PROCESS_NAME="ecsTransceiver"
+
+# ===============================================
+# Process Status Functions
+# ===============================================
+
+# 显示进程路径的函数
+_show_process_path() {
+    local proc_name="$1"
+    local pid=$(/usr/bin/pgrep -x "$proc_name")
+    if [[ -n "$pid" ]]; then
+        local proc_path=$(/bin/readlink /proc/"$pid"/cwd)
+        if [[ -n "$proc_path" ]]; then
+            # Extract folder name (e.g., matrix/icrane2_xxx)
+            local folder_name=("${(@s:/:)proc_path}")
+            if [[ ${#folder_name} -ge 4 ]]; then
+                echo "${folder_name[3]}/${folder_name[4]}"
+            else
+                echo "$proc_path"
+            fi
+        fi
+    fi
+}
+
+# 显示正在运行的进程信息的函数
+_show_process_paths() {
+    local boot_time=$(/usr/bin/awk '/btime/ {print $2}' /proc/stat)
+    local current_time=$(/bin/date +%s)
+    echo -e "\033[1;33mCurrent running processes:\033[0m"
+
+    for proc in "$CRANE_PROCESS_NAME" "$SERVICES_PROCESS_NAME"; do
+        local pid=$(/usr/bin/pgrep -x "$proc")
+        if [[ -n "$pid" ]]; then
+            local proc_path=$(/bin/readlink /proc/"$pid"/cwd)
+            local proc_start_time_ticks=$(/usr/bin/awk '{print $22}' /proc/"$pid"/stat)
+            local clk_tck=$(/usr/bin/getconf CLK_TCK)
+            local proc_start_time_seconds=$((proc_start_time_ticks / clk_tck))
+            local total_start_time=$((boot_time + proc_start_time_seconds))
+            local start_time_human=$(/bin/date -d @$total_start_time +"%Y-%m-%d %H:%M:%S")
+            local run_time_seconds=$((current_time - total_start_time))
+            local days=$((run_time_seconds / 86400))
+            local hours=$((run_time_seconds % 86400 / 3600))
+            local minutes=$((run_time_seconds % 3600 / 60))
+            local seconds=$((run_time_seconds % 60))
+            local run_time_human="${days}d:${hours}h:${minutes}m:${seconds}s"
+
+            local folder=$(_show_process_path "$proc")
+            echo -e "\033[1;35m$proc\033[0m (PID: $pid) \033[1;36m[$folder]\033[0m"
+            echo -e "\tStarted: \033[1;32m$start_time_human\033[0m | Running: \033[1;34m$run_time_human\033[0m"
+        else
+            echo -e "\033[1;31m$proc is not running.\033[0m"
+        fi
+    done
+
+    # 显示磁盘空间
+    _disk_space_prompt
+    echo ""
+}
+
+# 显示磁盘空间提示的函数
+_disk_space_prompt() {
+    local available_space=$(/bin/df -h / | /usr/bin/awk 'NR==2 {print $4}')
+    # Extract numeric value (remove G suffix)
+    local space_value=$(echo $available_space | /usr/bin/tr -d 'G')
+    # Compare with threshold
+    if [[ $available_space =~ 'G$' ]] && (( space_value < 50 )); then
+        echo -e "\033[1;31m(Disk: $available_space left)\033[0m"
+    else
+        echo -e "\033[1;32m(Disk: $available_space left)\033[0m"
+    fi
+}
+
+# ===============================================
+# Process Management Functions
+# ===============================================
+
+# 重启 crane 进程的函数
+restartCrane() {
+    local process_name="crane"
+    local script_name="crane.sh"
+    local force_kill=false
+
+    if [[ "$1" == "-f" ]]; then
+        force_kill=true
+        echo "[INFO] 强制重启模式（-f）已启用。"
+    fi
+
+    local crane_pid=$(/usr/bin/pgrep -x "$process_name")
+
+    if [[ ! -f "$script_name" ]]; then
+        echo "[ERROR] 当前目录没有找到 $script_name 文件，禁止重启。"
+        return 1
+    fi
+
+    if [[ -n "$crane_pid" ]]; then
+        echo "[INFO] crane 进程正在运行，PID: $crane_pid"
+
+        local crane_process_dir=$(/bin/readlink /proc/$crane_pid/cwd)
+        crane_process_dir=$(echo "$crane_process_dir" | /usr/bin/sed 's:/*$::')
+        local current_dir=$(/bin/pwd | /usr/bin/sed 's:/*$::')
+
+        echo "[INFO] crane 进程所在的目录：$crane_process_dir"
+        echo "[INFO] 当前目录：$current_dir"
+
+        if [[ "$crane_process_dir" == "$current_dir" && "$force_kill" == false ]]; then
+            echo "[INFO] 当前目录与 crane.sh 所在目录一致，进行重启..."
+        elif [[ "$crane_process_dir" != "$current_dir" && "$force_kill" == false ]]; then
+            echo "[INFO] 当前目录与 crane.sh 所在目录不一致，请使用 '-f' 强制重启。"
+            return 1
+        fi
+
+        echo "[INFO] 终止 crane 进程（PID: $crane_pid）..."
+        /usr/bin/pkill -9 -x "$process_name"
+        /bin/sleep 2
+        echo "[INFO] crane 进程已强制终止。"
+    else
+        echo "[INFO] 当前没有运行中的 crane 进程。"
+    fi
+
+    echo "[INFO] 正在启动 crane.sh 进程..."
+    local log_dir="./log_crane_$(/bin/date +%Y%m%d)/"
+    echo "[INFO] 日志将保存在目录：$log_dir"
+
+    /usr/bin/nohup /bin/bash "$script_name" --sinktype=GLog --toFile=debug --file=true --debugSwitch=true --filepath="$log_dir" > /dev/null 2>&1 &
+
+    if [[ $? -eq 0 ]]; then
+        echo "[INFO] crane.sh 进程已成功启动。"
+    else
+        echo "[ERROR] 启动 crane.sh 进程失败。"
+    fi
+}
+
+# ===============================================
+# Session Info Display
+# ===============================================
+
+_show_session_info() {
+    local unique_ips=$(/usr/bin/who | /usr/bin/grep -Eo '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | /usr/bin/sort -u | /usr/bin/wc -l)
+    local total_connections=$(/usr/bin/who | /usr/bin/wc -l)
+    local tmux_windows=$(/usr/bin/tmux ls 2>/dev/null | /usr/bin/wc -l)
+
+    echo -e "\e[1;32m在线用户数:$unique_ips\e[0m , \e[1;34m总连接数:$total_connections\e[0m , \e[1;36mtmux 窗口:$tmux_windows\e[0m"
+}
+
+# ===============================================
+# Aliases
+# ===============================================
+
+# Use existing cdlog/cdcrane from .zshrc, don't redefine
+# These are additional aliases
+alias showpaths='_show_process_paths'
+alias s='_show_process_paths'
+alias cdsetting='cdcrane && cd ../settings 2>/dev/null || echo "Failed to switch to settings directory."'
+alias status='_show_process_paths'
+alias restart='restartCrane'
+
+# ===============================================
+# Auto-display on shell startup
+# ===============================================
+
+# Display status when starting a new shell session
+_show_session_info
+_show_process_paths
+
+# Display available custom commands
+echo -e "\033[1;33mYou can now use custom commands: cdlog, cdcrane, showpaths (alias: s), status, restart.\033[0m"

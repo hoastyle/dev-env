@@ -99,3 +99,6 @@ docs/build/
 .parcel-cache/
 .eslintcache
 tags
+
+# MCP本地配置（包含API密钥）
+.mcp.json.local

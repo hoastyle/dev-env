@@ -184,8 +184,102 @@ if [[ -d "$HOME/.zsh/functions" ]]; then
 fi
 
 # ===============================================
+# Matrix iCrane2 Navigation Functions (Optional)
+# ===============================================
+# These functions provide quick navigation to Matrix/iCrane2 project directories
+# Requires: .zshrc.matrix file in home directory
+# To enable: Copy .zshrc.matrix to your home directory
+
+# Get current running crane instance directory
+_get_crane_run_dir() {
+    # Method 1: Get from iCraneMonitor.sh process (most reliable)
+    local monitor_cmd=$(pgrep -af 'iCraneMonitor.sh' 2>/dev/null | head -1 | grep -o '/home/ubuntu/matrix/icrane[^ ]*')
+    if [ -n "$monitor_cmd" ]; then
+        # Check if the path already ends with build/Debug/install/bin
+        if [[ "$monitor_cmd" =~ "build/Debug/install/bin" ]]; then
+            echo "$monitor_cmd"
+        else
+            echo "${monitor_cmd}/build/Debug/install/bin"
+        fi
+        return 0
+    fi
+
+    # Method 2: Get from crane process cwd (most reliable fallback)
+    local crane_pid=$(pgrep -f 'crane --' | head -1)
+    if [ -n "$crane_pid" ]; then
+        ls -l /proc/$crane_pid/cwd 2>/dev/null | awk '{print $NF}'
+        return 0
+    fi
+
+    # Method 3: Get from crane process exe path
+    local crane_exe=$(pgrep -f 'crane --' | head -1 | xargs -I {} ls -l /proc/{}/exe 2>/dev/null | awk '{print $NF}')
+    if [ -n "$crane_exe" ]; then
+        dirname "$crane_exe"
+        return 0
+    fi
+
+    return 1
+}
+
+# cdlog - Change to current running crane's log directory
+cdlog() {
+    local run_dir=$(_get_crane_run_dir)
+    if [ $? -ne 0 ] || [ -z "$run_dir" ]; then
+        echo "Error: No running crane instance found"
+        return 1
+    fi
+
+    local today=$(date "+%Y-%m-%d")
+    local log_dir="$run_dir/log_crane_$today"
+
+    if [ -d "$log_dir" ]; then
+        cd "$log_dir" && pwd
+    else
+        # Try to find the latest log directory
+        local latest_log=$(ls -dt $run_dir/log_crane_* 2>/dev/null | head -1)
+        if [ -n "$latest_log" ]; then
+            echo "Warning: Today's log not found, using latest: $latest_log"
+            cd "$latest_log" && pwd
+        else
+            echo "Error: No log directory found in $run_dir"
+            return 1
+        fi
+    fi
+}
+
+# cdcrane - Change to current running project's runtime directory
+cdcrane() {
+    local run_dir=$(_get_crane_run_dir)
+    if [ $? -ne 0 ] || [ -z "$run_dir" ]; then
+        echo "Error: No running crane instance found"
+        return 1
+    fi
+
+    if [ -d "$run_dir" ]; then
+        cd "$run_dir" && pwd
+    else
+        echo "Error: Run directory not found: $run_dir"
+        return 1
+    fi
+}
+
+# ===============================================
 # Additional Aliases
 # ===============================================
+
+# Enable color support for ls and also add handy aliases
+if command -v dircolors &> /dev/null; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# Some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
 
 # ROS (commented out, enable if needed)
 # source /opt/ros/noetic/setup.zsh
@@ -275,3 +369,21 @@ unset -f _dev_env_init_completion
 if [[ -f "$HOME/.local/bin/env" ]]; then
     source "$HOME/.local/bin/env"
 fi
+
+# ===============================================
+# Matrix System Status (Optional)
+# ===============================================
+# Load additional Matrix system functions if available
+# This provides process status, restart functions, and session info
+if [[ -f "$HOME/.zshrc.matrix" ]]; then
+    source "$HOME/.zshrc.matrix"
+fi
+
+# ===============================================
+# Case-Insensitive Completion
+# ===============================================
+# Enable case-insensitive tab completion for convenience
+# Example: typing 'cd Doc' + Tab will complete to 'Documents'
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors ''
