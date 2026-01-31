@@ -21,6 +21,9 @@
 * ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
 * ⚡ **极速启动**: 多模式启动器，启动速度提升高达99.9%
 * ✅ **性能优化**: 深度性能分析和智能优化建议
+* ✅ **模板系统**: 4种预设配置模板（dev-full, dev-minimal, server, docker）
+* ✅ **跨平台库**: 统一的日志、性能监控、平台兼容性库
+* ✅ **单元测试**: 完整的测试套件和 CI/CD 集成
 * ✅ **文档完善**: 详细的使用文档和配置说明
 
 ---
@@ -31,17 +34,47 @@
 dev-env/
 ├── config/                        # 配置文件目录
 │   ├── .zshrc                    # ZSH 主配置文件
-│   └── .zshrc.nvm-optimized      # NVM 优化版本配置文件
+│   ├── .zshrc.optimized          # 性能优化配置
+│   └── .zshrc.ultra-optimized    # 超高性能配置
 ├── scripts/                       # 脚本工具目录
-│   ├── install_zsh_config.sh     # 自动安装脚本 (集成环境指示符)
+│   ├── install_zsh_config.sh     # 自动安装脚本
 │   ├── zsh_tools.sh              # 配置管理工具集
 │   ├── zsh_optimizer.sh          # 性能优化工具
 │   ├── zsh_launcher.sh           # 多模式启动器
 │   ├── zsh_minimal.sh            # 极简模式启动器
+│   ├── zsh_template_selector.sh  # 模板选择器 (v2.2 新增)
+│   ├── lib_platform_compat.sh    # 平台兼容性库 (v2.2 新增)
+│   ├── lib_logging.sh            # 日志库 (v2.2 新增)
+│   ├── lib_performance.sh        # 性能监控库 (v2.2 新增)
 │   └── ssh/                      # SSH 相关配置
+├── templates/                     # 配置模板目录 (v2.2 新增)
+│   ├── dev/                      # 开发环境模板
+│   │   ├── dev-full.zshrc        # 完整开发环境
+│   │   └── dev-minimal.zshrc     # 轻量开发环境
+│   ├── server/                   # 服务器环境模板
+│   │   └── server.zshrc          # 生产服务器配置
+│   ├── docker/                   # Docker 模板
+│   │   └── docker.zshrc          # 容器优化配置
+│   ├── custom/                   # 自定义模板目录
+│   └── README.md                 # 模板系统文档
+├── tests/                         # 测试目录 (v2.2 新增)
+│   ├── unit/                     # 单元测试
+│   │   ├── test_path_detection.sh
+│   │   ├── test_error_handling.sh
+│   │   └── test_config_validation.sh
+│   ├── performance/              # 性能测试
+│   │   ├── test_startup_benchmark.sh
+│   │   └── test_memory_usage.sh
+│   └── lib/                      # 测试库
+│       ├── test_utils.sh
+│       ├── assertions.sh
+│       └── fixtures.sh
+├── .github/                       # GitHub 配置 (v2.2 新增)
+│   └── workflows/
+│       └── test.yml              # CI/CD 测试流程
 ├── docs/                          # 文档目录
 │   ├── README.md                  # 文档中心索引
-│   ├── management/                # 项目管理文档 (v2.1.1 新增)
+│   ├── management/                # 项目管理文档
 │   │   ├── PRD.md                # 产品需求文档
 │   │   ├── PLANNING.md           # 架构规划文档
 │   │   ├── TASK.md               # 任务追踪文档
@@ -49,18 +82,18 @@ dev-env/
 │   │   ├── KNOWLEDGE.md          # 知识库
 │   │   ├── HOTFIX_2_1_1.md       # 高优先级修复说明
 │   │   └── REVIEW_CONSISTENCY_ANALYSIS.md  # 审查一致性分析
-│   ├── ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md  # 环境指示符全程记录
-│   ├── P10K_ENV_INDICATORS_SETUP.md  # Powerlevel10k 设置指南
+│   ├── ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md
+│   ├── P10K_ENV_INDICATORS_SETUP.md
 │   ├── ADRs/                      # 技术决策记录
 │   │   └── 001-powerlevel10k-integration.md
 │   ├── proxy/                     # 代理功能文档
 │   └── zsh-config/               # ZSH 配置文档
 ├── zsh-functions/                 # 模块化自定义函数目录
-│   ├── context.zsh                # 环境检测和指示符核心逻辑
-│   ├── search.zsh                 # 搜索增强函数 (hg, hig, hrg, hirg)
-│   ├── utils.zsh                  # 实用工具函数 (proxy, unproxy)
+│   ├── context.zsh                # 环境检测和指示符
+│   ├── search.zsh                 # 搜索增强函数
+│   ├── utils.zsh                  # 实用工具函数
 │   ├── help.zsh                   # 统一命令帮助系统
-│   └── performance.zsh            # 性能分析和优化建议系统
+│   └── performance.zsh            # 性能分析系统
 ├── examples/                      # 配置示例目录
 ├── .gitignore                     # Git 忽略文件
 └── README.md                      # 项目主文档
@@ -315,6 +348,198 @@ source ~/.zshrc
 
 # 重置配置
 ./scripts/zsh_tools.sh reset
+```
+
+---
+
+## 🎨 模板系统
+
+### 📋 **配置模板**
+
+项目提供4种预设配置模板，满足不同使用场景：
+
+| 模板 | 启动时间 | 内存占用 | 适用场景 |
+|------|---------|---------|----------|
+| **dev-full** | ~1.5s | ~35MB | 日常开发，完整功能 |
+| **dev-minimal** | ~100ms | ~20MB | 快速开发任务 |
+| **server** | ~50ms | ~15MB | 服务器/生产环境 |
+| **docker** | ~20ms | ~10MB | Docker容器，CI/CD |
+
+### 🔧 **模板选择器**
+
+使用交互式模板选择器：
+
+```bash
+# 交互式选择模板
+./scripts/zsh_template_selector.sh
+
+# 直接应用模板
+./scripts/zsh_template_selector.sh apply dev-full
+./scripts/zsh_template_selector.sh apply dev-minimal
+./scripts/zsh_template_selector.sh apply server
+./scripts/zsh_template_selector.sh apply docker
+
+# 查看可用模板
+./scripts/zsh_template_selector.sh list
+
+# 预览模板内容
+./scripts/zsh_template_selector.sh preview dev-full
+
+# 比较模板特性
+./scripts/zsh_template_selector.sh compare
+
+# 性能基准测试
+./scripts/zsh_template_selector.sh benchmark
+```
+
+### 📊 **模板对比**
+
+```bash
+# 查看详细对比矩阵
+./scripts/zsh_template_selector.sh compare
+```
+
+**特性对比**：
+
+| 特性 | dev-full | dev-minimal | server | docker |
+|------|----------|-------------|--------|--------|
+| Powerlevel10k | ✓ | ✗ | ✗ | ✗ |
+| 补全系统 | ✓ | Lazy | Basic | ✗ |
+| FZF | ✓ | Lazy | ✗ | ✗ |
+| Autojump | ✓ | Lazy | ✗ | ✗ |
+| Python 环境 | ✓ | Lazy | ✗ | ✗ |
+| 自定义函数 | ✓ | ✓ | ✓ | Optional |
+
+### 📁 **自定义模板**
+
+创建自定义模板：
+
+```bash
+# 复制基础模板
+cp templates/dev/dev-minimal.zshrc templates/custom/my-template.zshrc
+
+# 编辑模板
+vim templates/custom/my-template.zshrc
+
+# 应用自定义模板
+./scripts/zsh_template_selector.sh apply custom:my-template
+```
+
+详见: [templates/README.md](templates/README.md)
+
+---
+
+## 🧪 测试与质量保证
+
+### 📋 **单元测试**
+
+完整的单元测试套件，覆盖核心功能：
+
+```bash
+# 运行所有单元测试
+cd tests/unit
+./test_path_detection.sh
+./test_error_handling.sh
+./test_config_validation.sh
+```
+
+**测试覆盖**：
+- 路径检测和解析
+- 错误处理机制
+- 配置文件验证
+- 语法正确性检查
+
+### 📊 **性能测试**
+
+高精度性能基准测试：
+
+```bash
+# 启动时间基准测试
+./tests/performance/test_startup_benchmark.sh
+
+# 内存使用测试
+./tests/performance/test_memory_usage.sh
+
+# 冷启动测试
+./tests/performance/test_startup_benchmark.sh cold
+
+# 热启动测试
+./tests/performance/test_startup_benchmark.sh warm
+```
+
+### 🔄 **CI/CD 集成**
+
+项目集成了 GitHub Actions 自动化测试流程：
+
+* **多平台测试**: Ubuntu, macOS
+* **单元测试**: 自动运行所有测试
+* **性能测试**: 启动时间和内存使用测试
+* **脚本验证**: 语法检查和权限验证
+* **配置验证**: 所有配置文件语法检查
+
+详见: [.github/workflows/test.yml](.github/workflows/test.yml)
+
+---
+
+## 📚 核心库
+
+### 🔧 **平台兼容性库** (lib_platform_compat.sh)
+
+跨平台兼容性层，统一 macOS/Linux 差异：
+
+```bash
+# 使用方式
+source scripts/lib_platform_compat.sh
+
+# 检测操作系统类型
+get_os_type    # 返回: macos 或 linux
+is_macos       # 返回: true/false
+
+# 跨平台文件操作
+get_file_size "file.txt"      # 获取文件大小
+get_timestamp_ms              # 获取毫秒时间戳
+get_date_relative "-7 days"   # 获取相对日期
+```
+
+### 📝 **日志库** (lib_logging.sh)
+
+结构化日志系统，支持日志轮转：
+
+```bash
+# 使用方式
+source scripts/lib_logging.sh
+init_logging
+
+# 日志级别
+log_debug "Debug message"
+log_info "Info message"
+log_success "Success message"
+log_warn "Warning message"
+log_error "Error message"
+
+# 日志管理
+view_logs      # 查看日志
+tail_logs      # 尾部日志
+clean_old_logs # 清理旧日志
+```
+
+### 📊 **性能监控库** (lib_performance.sh)
+
+性能数据记录和趋势分析：
+
+```bash
+# 使用方式
+source scripts/lib_performance.sh
+
+# 记录启动时间
+record_startup_time "minimal" 50
+
+# 查看性能趋势
+perf_show_trend "minimal" 7    # 最近7天
+perf_detect_regression "minimal" 7  # 检测性能回归
+
+# 生成报告
+perf_generate_report
 ```
 
 ---
@@ -670,6 +895,20 @@ git push origin feature/new-feature
 ---
 
 ## 🔄 版本历史
+
+### v2.2.0 (2026-01-31) - 模板系统与质量保证版 ⭐
+
+* ✨ **配置模板系统**: 4种预设配置模板（dev-full, dev-minimal, server, docker）
+* ✅ **模板选择器**: 交互式模板选择和对比工具
+* ✅ **跨平���库**: lib_platform_compat.sh 统一 macOS/Linux 差异
+* ✅ **结构化日志**: lib_logging.sh 支持日志轮转和多级别输出
+* ✅ **性能监控**: lib_performance.sh 提供趋势分析和回归检测
+* ✅ **单元测试**: 完整的测试套件（路径检测、错误处理、配置验证）
+* ✅ **性能测试**: 启动时间和内存使用基准测试
+* ✅ **CI/CD 集���**: GitHub Actions 自动化测试流程
+* ✅ **文档完善**: 更新 README 和创建模板系统文档
+* 📋 新增 tests/ 目录结构（unit, performance, integration）
+* 📋 新增 templates/ 目录结构（dev, server, docker, custom）
 
 ### v2.1.1 (2025-10-19) - 稳定性增强版 ⭐
 
