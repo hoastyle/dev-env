@@ -1,20 +1,19 @@
 ═══════════════════════════════════════════════════════════════
-         ZSH Startup Performance Benchmark Summary
+              ZSH Memory Usage Summary
 ═══════════════════════════════════════════════════════════════
 
-Date: Sat Jan 31 08:35:08 PM CST 2026
-Iterations per mode: 5
+Date: Sat Jan 31 08:43:53 PM CST 2026
 Platform: Linux x86_64
 ZSH Version: zsh 5.9 (x86_64-ubuntu-linux-gnu)
 
 ───────────────────────────────────────────────────────────────
-Mode       │ Avg (ms) │ Min (ms) │ Max (ms) │ StdDev
+Mode       │ Idle (MB) │ Active (MB) │ Peak (MB)
 ───────────────────────────────────────────────────────────────
-mode       │ average_ms │   min_ms │   max_ms │ stddev
-minimal    │       74 │       70 │       79 │ 3.00
-fast       │       94 │       83 │      126 │ 15.93
-normal     │      115 │      102 │      136 │ 14.38
+mode       │      0.00 │       0.00 │      0.00
+minimal    │      0.00 │       6.96 │      6.96
+fast       │      0.00 │       7.42 │      7.42
+normal     │      0.00 │       7.40 │      7.40
 ───────────────────────────────────────────────────────────────
 
-Results saved to: /home/howie/Workspace/Utility/dev-env/test-results/performance/startup_benchmark_20260131_203506.csv
+Results saved to: /home/howie/Workspace/Utility/dev-env/test-results/performance/memory_usage_20260131_204338.csv
 ═══════════════════════════════════════════════════════════════

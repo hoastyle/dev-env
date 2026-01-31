@@ -64,21 +64,31 @@ fi
 get_memory_kb() {
     local pid="$1"
 
-    if [[ ! -d "/proc/$pid" ]]; then
-        echo "N/A"
+    # Check if process exists
+    if [[ ! -d "/proc/$pid" ]] || ! kill -0 "$pid" 2>/dev/null; then
+        echo "0"
         return 1
     fi
 
     # Read RSS (Resident Set Size) from status file
     local rss=$(grep -E '^VmRSS:' "/proc/$pid/status" 2>/dev/null | awk '{print $2}')
 
-    if [[ -n "$rss" ]]; then
+    # Validate RSS is numeric
+    if [[ -n "$rss" && "$rss" =~ ^[0-9]+$ ]]; then
         echo "$rss"
-    else
-        # Fallback to stat
-        local rss=$(grep -E '^rss:' "/proc/$pid/statm" 2>/dev/null | awk '{print $2 * 4}')  # pages to KB
-        echo "${rss:-0}"
+        return 0
     fi
+
+    # Fallback: use statm if available
+    local statm_data=$(cat "/proc/$pid/statm" 2>/dev/null)
+    if [[ -n "$statm_data" ]]; then
+        local rss=$(echo "$statm_data" | awk '{print $2 * 4}')  # pages to KB
+        echo "${rss:-0}"
+        return 0
+    fi
+
+    echo "0"
+    return 1
 }
 
 # Get memory usage in MB
@@ -101,22 +111,42 @@ measure_memory_usage() {
         return 1
     fi
 
-    # Start ZSH in background with config
+    # Start ZSH in background with config (isolated from user config)
     local temp_script=$(mktemp)
-    echo "#!/bin/zsh" > "$temp_script"
-    echo "source '$config_file'" >> "$temp_script"
-    echo "sleep 10" >> "$temp_script"  # Reduced from 300 to 10 seconds
+    cat > "$temp_script" << 'TEMPEOF'
+#!/bin/zsh
+# Isolate from all user configuration
+ZDOTDIR=/dev/null
+setopt NO_GLOBAL_RCS
+setopt NO_RCS
+
+# Source the test config file
+source '$config_file'
+sleep 5
+TEMPEOF
     chmod +x "$temp_script"
 
-    # Launch ZSH
-    zsh "$temp_script" &
+    # Launch ZSH - using -Z and -o NO_RCS for isolation
+    zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
     local zsh_pid=$!
 
-    # Wait for initialization
-    sleep 2
+    # Wait for initialization and check process is still running
+    sleep 3
+    if ! kill -0 "$zsh_pid" 2>/dev/null; then
+        log_warn "ZSH process exited early, using default values"
+        echo "0,0,0"
+        return 1
+    fi
 
     # Measure memory at idle
     local idle_memory=$(get_memory_kb "$zsh_pid")
+
+    # Check process still exists before second measurement
+    if ! kill -0 "$zsh_pid" 2>/dev/null; then
+        log_warn "ZSH process exited during measurement"
+        echo "${idle_memory:-0},0,0"
+        return 1
+    fi
 
     # Measure memory after activity
     local active_memory=$(get_memory_kb "$zsh_pid")
@@ -229,15 +259,20 @@ compare_memory() {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
-    if [[ $minimal_idle -gt 0 && $normal_idle -gt 0 ]]; then
-        local saving=$((normal_idle - minimal_idle))
-        local percent=$((saving * 100 / normal_idle))
+    # Convert to integers for comparison (remove decimal points)
+    local normal_idle_int=${normal_idle%.*}
+    local fast_idle_int=${fast_idle%.*}
+    local minimal_idle_int=${minimal_idle%.*}
+
+    if [[ $minimal_idle_int -gt 0 && $normal_idle_int -gt 0 ]]; then
+        local saving=$((normal_idle_int - minimal_idle_int))
+        local percent=$((saving * 100 / normal_idle_int))
         echo "Minimal mode saves ${saving}KB (${percent}%) compared to Normal"
     fi
 
-    if [[ $fast_idle -gt 0 && $normal_idle -gt 0 ]]; then
-        local saving=$((normal_idle - fast_idle))
-        local percent=$((saving * 100 / normal_idle))
+    if [[ $fast_idle_int -gt 0 && $normal_idle_int -gt 0 ]]; then
+        local saving=$((normal_idle_int - fast_idle_int))
+        local percent=$((saving * 100 / normal_idle_int))
         echo "Fast mode saves ${saving}KB (${percent}%) compared to Normal"
     fi
 
@@ -293,14 +328,20 @@ test_ps_based_memory() {
 
         log_info "Testing mode: $mode"
 
-        # Start ZSH and measure with ps
+        # Start ZSH and measure with ps (isolated from user config)
         local temp_script=$(mktemp)
-        echo "#!/bin/zsh" > "$temp_script"
-        echo "source '$config_file'" >> "$temp_script"
-        echo "sleep 5" >> "$temp_script"  # Reduced from 60 to 5 seconds
+        cat > "$temp_script" << 'TEMPEOF'
+#!/bin/zsh
+ZDOTDIR=/dev/null
+setopt NO_GLOBAL_RCS
+setopt NO_RCS
+source '$config_file'
+sleep 3
+TEMPEOF
         chmod +x "$temp_script"
 
-        zsh "$temp_script" &
+        # Launch ZSH with isolation
+        zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
         local zsh_pid=$!
         sleep 2
 

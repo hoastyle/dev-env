@@ -1,0 +1,4 @@
+mode,idle_kb,active_kb,peak_kb
+minimal,4184,4184,4184
+fast,4208,4208,4208
+normal,4216,4216,4216
