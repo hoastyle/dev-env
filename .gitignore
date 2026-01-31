@@ -105,3 +105,8 @@ tags
 
 # MCP本地配置（包含API密钥）
 .mcp.json.local
+
+# Serena MCP 项目管理目录
+.serena/
+.serena/cache/
+.serena/memories/
