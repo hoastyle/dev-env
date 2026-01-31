@@ -1,0 +1,517 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "project": {
+    "name": "dev-env",
+    "version": "2.3.0",
+    "description": "ZSH 配置生命周期管理系统 - Configuration Lifecycle Management for ZSH",
+    "type": "shell_configuration",
+    "language": "bash",
+    "license": "MIT"
+  },
+  "structure": {
+    "scripts/": {
+      "type": "libraries",
+      "description": "核心库文件 - Core library files",
+      "purpose": "提供可复用的基础功能",
+      "files": {
+        "lib_version.sh": {
+          "category": "version_management",
+          "description": "版本跟踪和比较 - Version tracking and comparison",
+          "exports": [
+            "get_current_version",
+            "set_version",
+            "compare_versions",
+            "needs_migration",
+            "generate_version_report",
+            "update_last_migration",
+            "get_version_file_path",
+            "get_version_json",
+            "mark_user_customizations"
+          ],
+          "depends_on": [],
+          "provides": "version_management",
+          "environment_variables": {
+            "VERSION_FILE": "版本文件路径",
+            "PROJECT_ROOT": "项目根目录"
+          }
+        },
+        "lib_migration.sh": {
+          "category": "migration_engine",
+          "description": "迁移执行引擎 - Migration execution engine",
+          "exports": [
+            "get_pending_migrations",
+            "execute_migration",
+            "run_migrations",
+            "rollback_migration",
+            "log_migration",
+            "create_migration",
+            "get_migration_history",
+            "get_migration_version",
+            "migration_was_executed"
+          ],
+          "depends_on": ["lib_version.sh", "lib_logging.sh"],
+          "provides": "migration_engine"
+        },
+        "lib_health.sh": {
+          "category": "health_checking",
+          "description": "健康检查系统 - Health checking system",
+          "exports": [
+            "run_health_check",
+            "check_syntax",
+            "check_plugins",
+            "check_dependencies",
+            "check_version_file",
+            "generate_health_report",
+            "display_health_report"
+          ],
+          "depends_on": ["lib_logging.sh"],
+          "provides": "health_checking"
+        },
+        "lib_backup.sh": {
+          "category": "backup_restore",
+          "description": "备份恢复系统 - Backup and restore system",
+          "exports": [
+            "create_backup",
+            "list_backups",
+            "get_backup_info",
+            "restore_backup",
+            "delete_backup",
+            "cleanup_old_backups"
+          ],
+          "depends_on": ["lib_logging.sh", "lib_platform_compat.sh"],
+          "provides": "backup_restore"
+        },
+        "lib_logging.sh": {
+          "category": "logging",
+          "description": "结构化日志系统 - Structured logging system",
+          "exports": [
+            "init_logging",
+            "log_info",
+            "log_success",
+            "log_warn",
+            "log_error",
+            "log_debug",
+            "log_with_level",
+            "log_section",
+            "log_start",
+            "log_end",
+            "rotate_logs",
+            "view_logs",
+            "clear_logs",
+            "ensure_log_dir",
+            "tail_logs"
+          ],
+          "depends_on": [],
+          "provides": "logging",
+          "environment_variables": {
+            "LOG_DIR": "日志目录",
+            "LOG_FILE": "日志文件名",
+            "LOG_LEVEL": "日志级别"
+          }
+        },
+        "lib_performance.sh": {
+          "category": "performance_monitoring",
+          "description": "性能监控和分析 - Performance monitoring and analysis",
+          "exports": [
+            "record_startup_time",
+            "get_performance_stats",
+            "detect_performance_regression",
+            "generate_performance_report",
+            "perf_show_info",
+            "perf_show_trend",
+            "perf_has_data",
+            "perf_get_record_count",
+            "perf_get_recent_time",
+            "perf_get_best_time",
+            "perf_calculate_stats",
+            "perf_compare_modes",
+            "perf_detect_regression",
+            "perf_export_json",
+            "perf_cleanup",
+            "ensure_perf_dir"
+          ],
+          "depends_on": [],
+          "provides": "performance_monitoring"
+        },
+        "lib_platform_compat.sh": {
+          "category": "platform_abstraction",
+          "description": "跨平台兼容性层 - Cross-platform compatibility layer",
+          "exports": [
+            "get_os_type",
+            "is_macos",
+            "is_linux",
+            "get_os_version",
+            "get_file_size",
+            "get_file_perms",
+            "get_file_mtime",
+            "get_timestamp_ms",
+            "get_date_relative",
+            "realpath_compat",
+            "get_gnu_tool",
+            "get_compat_sed",
+            "get_time_command",
+            "supports_color",
+            "set_color_support",
+            "get_current_shell",
+            "get_shell_version",
+            "detect_package_manager",
+            "install_package",
+            "command_exists"
+          ],
+          "depends_on": [],
+          "provides": "platform_abstraction"
+        },
+        "lib_dryrun.sh": {
+          "category": "testing",
+          "description": "干运行模式 - Dry run mode for testing",
+          "exports": [
+            "is_dry_run",
+            "dry_run_notice",
+            "dry_exec",
+            "dry_chmod",
+            "dry_chown",
+            "dry_mkdir",
+            "dry_cp",
+            "dry_mv",
+            "dry_rm",
+            "dry_ln",
+            "dry_cat",
+            "dry_echo",
+            "dry_export",
+            "dry_print_action",
+            "dry_print_command",
+            "dry_run_get_count",
+            "dry_run_increment",
+            "dry_run_complete",
+            "dry_run_print_stats",
+            "get_dry_run_status"
+          ],
+          "depends_on": [],
+          "provides": "dry_run_support"
+        },
+        "zsh_config_manager.sh": {
+          "category": "cli_tool",
+          "description": "CLM CLI 工具 - Configuration Lifecycle Manager CLI",
+          "exports": [
+            "show_help",
+            "cmd_version",
+            "cmd_migrate",
+            "cmd_health",
+            "cmd_backup",
+            "cmd_list_backups",
+            "cmd_restore",
+            "cmd_rollback",
+            "cmd_history",
+            "cmd_validate",
+            "main"
+          ],
+          "depends_on": [
+            "lib_version.sh",
+            "lib_migration.sh",
+            "lib_health.sh",
+            "lib_backup.sh"
+          ],
+          "provides": "clm_cli",
+          "is_entry_point": true
+        },
+        "zsh_tools.sh": {
+          "category": "cli_tool",
+          "description": "配置管理工具集 - Configuration management tools",
+          "exports": [
+            "show_help",
+            "validate_config",
+            "backup_config",
+            "restore_config",
+            "update_plugins",
+            "clean_cache",
+            "run_benchmark",
+            "run_detailed_benchmark",
+            "run_doctor",
+            "show_perf_report",
+            "show_perf_trend",
+            "show_perf_info",
+            "reset_config",
+            "main"
+          ],
+          "depends_on": [
+            "lib_logging.sh",
+            "lib_performance.sh",
+            "lib_platform_compat.sh",
+            "lib_dryrun.sh"
+          ],
+          "provides": "config_tools",
+          "is_entry_point": true
+        },
+        "zsh_launcher.sh": {
+          "category": "cli_tool",
+          "description": "多模式启动器 - Multi-mode launcher",
+          "exports": ["main"],
+          "depends_on": ["lib_performance.sh", "lib_logging.sh"],
+          "provides": "mode_launcher",
+          "is_entry_point": true
+        },
+        "zsh_optimizer.sh": {
+          "category": "cli_tool",
+          "description": "性能优化工具 - Performance optimization tool",
+          "exports": ["main"],
+          "depends_on": ["lib_performance.sh", "lib_logging.sh"],
+          "provides": "optimizer",
+          "is_entry_point": true
+        },
+        "zsh_template_selector.sh": {
+          "category": "cli_tool",
+          "description": "模板选择器 - Template selector",
+          "exports": ["main"],
+          "depends_on": [],
+          "provides": "template_selector",
+          "is_entry_point": true
+        },
+        "install_zsh_config.sh": {
+          "category": "installer",
+          "description": "自动安装脚本 - Automatic installation script",
+          "exports": ["main"],
+          "depends_on": [],
+          "provides": "installer",
+          "is_entry_point": true
+        }
+      }
+    },
+    "zsh-functions/": {
+      "type": "user_functions",
+      "description": "用户自定义函数 - User-defined ZSH functions",
+      "purpose": "提供日常开发中的快捷命令",
+      "files": {
+        "search.zsh": {
+          "category": "search_enhancement",
+          "description": "搜索增强函数 - Search enhancement functions",
+          "exports": ["hg", "hig", "hrg", "hirg"],
+          "depends_on": ["validation.zsh"],
+          "provides": "search"
+        },
+        "utils.zsh": {
+          "category": "utilities",
+          "description": "实用工具函数 - Utility functions",
+          "exports": [
+            "proxy",
+            "unproxy",
+            "proxy_status",
+            "_get_proxy_config",
+            "_init_proxy_config",
+            "_check_proxy_availability",
+            "check_environment",
+            "reload_zsh"
+          ],
+          "depends_on": [],
+          "provides": "utils"
+        },
+        "help.zsh": {
+          "category": "help_system",
+          "description": "统一命令帮助系统 - Unified command help system",
+          "exports": [
+            "zsh_help",
+            "handle_help_param",
+            "init_help_database",
+            "show_help_overview",
+            "show_category_help",
+            "show_command_help",
+            "show_help_usage",
+            "validate_command"
+          ],
+          "depends_on": [],
+          "provides": "help_system"
+        },
+        "performance.zsh": {
+          "category": "performance_analysis",
+          "description": "性能分析系统 - Performance analysis system",
+          "exports": [
+            "performance_detailed",
+            "test_segmented_startup",
+            "test_plugin_performance",
+            "test_memory_usage",
+            "generate_performance_report",
+            "provide_optimization_suggestions"
+          ],
+          "depends_on": [],
+          "provides": "performance_analysis"
+        },
+        "environment.zsh": {
+          "category": "environment_detection",
+          "description": "环境检测函数 - Environment detection functions",
+          "exports": [
+            "check_environment",
+            "env_status",
+            "test_environment_setup"
+          ],
+          "depends_on": [],
+          "provides": "environment_detection"
+        },
+        "context.zsh": {
+          "category": "context_display",
+          "description": "上下文显示 - Context indicators for prompt",
+          "exports": [
+            "_get_env_indicators",
+            "prompt_env_indicators",
+            "_is_in_container",
+            "_is_in_ssh",
+            "_is_using_proxy",
+            "check_proxy"
+          ],
+          "depends_on": [],
+          "provides": "context_indicators"
+        },
+        "validation.zsh": {
+          "category": "validation",
+          "description": "参数验证函数 - Parameter validation functions",
+          "exports": [
+            "assert_param",
+            "assert_directory",
+            "assert_file",
+            "assert_command",
+            "assert_pattern",
+            "validate_directory",
+            "validate_file",
+            "validate_not_empty",
+            "validate_param_count",
+            "validate_pattern"
+          ],
+          "depends_on": [],
+          "provides": "validation"
+        },
+        "claude.zsh": {
+          "category": "claude_integration",
+          "description": "Claude AI 集成 - Claude AI assistant integration",
+          "exports": [
+            "claude",
+            "_claude_with_config",
+            "_setup_claude_aliases",
+            "_cc_list",
+            "_cc_create",
+            "_cc_edit",
+            "_cc_copy",
+            "_cc_delete",
+            "_cc_current",
+            "_cc_refresh",
+            "_cc_validate",
+            "_ccfg_completion"
+          ],
+          "depends_on": [],
+          "provides": "claude_integration"
+        }
+      }
+    },
+    "config/": {
+      "type": "configuration",
+      "description": "配置文件 - Configuration files",
+      "files": {
+        ".zshrc": {
+          "type": "main_config",
+          "description": "主配置文件 - Main ZSH configuration"
+        },
+        ".zshrc.version": {
+          "type": "version_metadata",
+          "description": "版本元数据 - Version metadata file"
+        },
+        "migrations/": {
+          "type": "migration_scripts",
+          "description": "迁移脚本目录 - Migration scripts directory"
+        }
+      }
+    },
+    "templates/": {
+      "type": "templates",
+      "description": "配置模板 - Configuration templates",
+      "categories": ["dev", "server", "docker", "custom"]
+    },
+    "tests/": {
+      "type": "tests",
+      "description": "测试套件 - Test suite",
+      "subdirectories": {
+        "unit/": "单元测试 - Unit tests",
+        "integration/": "集成测试 - Integration tests",
+        "performance/": "性能测试 - Performance tests",
+        "lib/": "测试库 - Test libraries"
+      }
+    },
+    "docs/": {
+      "type": "documentation",
+      "description": "文档 - Documentation",
+      "subdirectories": {
+        "design/": "设计文档 - Design documents",
+        "management/": "项目管理 - Project management",
+        "proxy/": "代理功能 - Proxy documentation",
+        "zsh-config/": "ZSH配置 - ZSH configuration docs"
+      }
+    },
+    "data/": {
+      "type": "data",
+      "description": "数据存储 - Data storage",
+      "contents": ["migration_history.log", "performance/", "logs/"]
+    },
+    "backups/": {
+      "type": "backups",
+      "description": "配置备份 - Configuration backups"
+    }
+  },
+  "entry_points": {
+    "cli": [
+      "scripts/zsh_config_manager.sh",
+      "scripts/zsh_tools.sh",
+      "scripts/zsh_launcher.sh",
+      "scripts/zsh_optimizer.sh",
+      "scripts/zsh_template_selector.sh"
+    ],
+    "installer": ["scripts/install_zsh_config.sh"],
+    "libraries": ["scripts/lib_*.sh"],
+    "user_functions": ["zsh-functions/*.zsh"]
+  },
+  "dependency_graph": {
+    "core": {
+      "lib_logging.sh": [],
+      "lib_platform_compat.sh": [],
+      "lib_version.sh": [],
+      "lib_performance.sh": [],
+      "lib_dryrun.sh": []
+    },
+    "intermediate": {
+      "lib_health.sh": ["lib_logging.sh"],
+      "lib_backup.sh": ["lib_logging.sh", "lib_platform_compat.sh"],
+      "lib_migration.sh": ["lib_version.sh", "lib_logging.sh"]
+    },
+    "tools": {
+      "zsh_config_manager.sh": [
+        "lib_version.sh",
+        "lib_migration.sh",
+        "lib_health.sh",
+        "lib_backup.sh"
+      ],
+      "zsh_tools.sh": [
+        "lib_logging.sh",
+        "lib_performance.sh",
+        "lib_platform_compat.sh",
+        "lib_dryrun.sh"
+      ],
+      "zsh_launcher.sh": ["lib_performance.sh", "lib_logging.sh"],
+      "zsh_optimizer.sh": ["lib_performance.sh", "lib_logging.sh"]
+    }
+  },
+  "function_categories": {
+    "version_management": ["get_current_version", "set_version", "compare_versions", "needs_migration"],
+    "migration_engine": ["get_pending_migrations", "execute_migration", "run_migrations", "rollback_migration"],
+    "health_checking": ["run_health_check", "check_syntax", "check_plugins", "check_dependencies"],
+    "backup_restore": ["create_backup", "list_backups", "restore_backup", "delete_backup"],
+    "logging": ["log_info", "log_success", "log_warn", "log_error", "log_debug"],
+    "performance_monitoring": ["record_startup_time", "get_performance_stats", "detect_performance_regression"],
+    "platform_abstraction": ["get_os_type", "is_macos", "is_linux", "get_file_size"],
+    "search_enhancement": ["hg", "hig", "hrg", "hirg"],
+    "proxy_management": ["proxy", "unproxy", "proxy_status"],
+    "help_system": ["zsh_help", "handle_help_param", "show_command_help"]
+  },
+  "metadata": {
+    "total_functions": 150,
+    "total_libraries": 9,
+    "total_cli_tools": 5,
+    "total_user_functions": 50,
+    "documentation_coverage": "85%",
+    "last_updated": "2026-01-31"
+  }
+}

@@ -27,6 +27,7 @@
 * ✅ **配置生命周期管理 (CLM)**: 版本管理、自动迁移、健康检查、备份恢复
 * ✅ **单元测试**: 完整的测试套件和 CI/CD 集成
 * ✅ **文档完善**: 详细的使用文档和配置说明
+* ✅ **大模型友好**: CODEMAP.json、函数索引、类型注解，专为 AI 辅助开发优化
 
 ---
 
@@ -45,6 +46,12 @@ dev-env/
 ├── data/                          # 数据存储目录 (v2.3 新增)
 │   └── migration_history.log     # 迁移历史记录
 ├── backups/                       # 配置备份存储 (v2.3 新增)
+├── CODEMAP.json                   # 项目结构映射 (机器可读)
+├── FUNCTION_INDEX.md              # 函数快速索引
+├── TYPES.md                       # 类型定义标准
+├── SEMANTIC_TAGS.md               # 语义标签标准
+├── DEPENDENCY_GRAPH.md            # 依赖关系图
+├── AI_OPTIMIZATION_GUIDE.md       # 大模型优化指南
 ├── scripts/                       # 脚本工具目录
 │   ├── install_zsh_config.sh     # 自动安装脚本
 │   ├── zsh_tools.sh              # 配置管理工具集
