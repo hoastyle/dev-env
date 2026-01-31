@@ -187,10 +187,13 @@ test_configuration_validation_workflow() {
 test_environment_detection_workflow() {
     local temp_dir="$(get_temp_dir)"
 
-    # Step 1: Detect shell
-    if [[ -n "$ZSH_VERSION" ]]; then
+    # Step 1: Detect shell (handle undefined variables gracefully)
+    local detected_shell="unknown"
+    if [[ "${ZSH_VERSION:-unset}" != "unset" ]]; then
+        detected_shell="ZSH"
         log_info "Detected shell: ZSH"
-    elif [[ -n "$BASH_VERSION" ]]; then
+    elif [[ "${BASH_VERSION:-unset}" != "unset" ]]; then
+        detected_shell="BASH"
         log_info "Detected shell: BASH"
     fi
 

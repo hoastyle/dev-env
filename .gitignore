@@ -85,6 +85,9 @@ coverage/
 .nyc_output/
 .coverage
 
+# Test Results
+test-results/
+
 # Documentation Build
 docs/_build/
 docs/build/

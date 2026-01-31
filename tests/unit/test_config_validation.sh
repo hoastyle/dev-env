@@ -3,9 +3,29 @@
 # Configuration Validation Unit Tests
 # =============================================================================
 
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/test_utils.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/assertions.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/fixtures.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+source "$SCRIPT_DIR/../lib/test_utils.sh"
+source "$SCRIPT_DIR/../lib/assertions.sh"
+source "$SCRIPT_DIR/../lib/fixtures.sh"
+
+# Source platform compatibility library for get_file_size function
+if [[ -f "$PROJECT_ROOT/scripts/lib_platform_compat.sh" ]]; then
+    source "$PROJECT_ROOT/scripts/lib_platform_compat.sh"
+fi
+
+# Fallback get_file_size if not available
+if ! command -v get_file_size &>/dev/null; then
+    get_file_size() {
+        local file="$1"
+        if [[ -f "$file" ]]; then
+            stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "0"
+        else
+            echo "0"
+        fi
+    }
+fi
 
 # =============================================================================
 # 测试函数

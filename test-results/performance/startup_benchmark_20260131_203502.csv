@@ -1,4 +1,0 @@
-mode,average_ms,min_ms,max_ms,stddev
-minimal,74,69,83,4.89
-fast,86,81,94,4.35
-normal,115,100,130,10.62
