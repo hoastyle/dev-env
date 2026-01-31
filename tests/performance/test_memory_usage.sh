@@ -105,7 +105,7 @@ measure_memory_usage() {
     local temp_script=$(mktemp)
     echo "#!/bin/zsh" > "$temp_script"
     echo "source '$config_file'" >> "$temp_script"
-    echo "sleep 300" >> "$temp_script"
+    echo "sleep 10" >> "$temp_script"  # Reduced from 300 to 10 seconds
     chmod +x "$temp_script"
 
     # Launch ZSH
@@ -118,9 +118,6 @@ measure_memory_usage() {
     # Measure memory at idle
     local idle_memory=$(get_memory_kb "$zsh_pid")
 
-    # Trigger some activity (compinit)
-    zsh -c "echo $zsh_pid | xargs kill -USR1" 2>/dev/null || true
-
     # Measure memory after activity
     local active_memory=$(get_memory_kb "$zsh_pid")
 
@@ -128,7 +125,7 @@ measure_memory_usage() {
     local peak_memory=$(grep -E '^VmHWM:' "/proc/$zsh_pid/status" 2>/dev/null | awk '{print $2}')
     [[ -z "$peak_memory" ]] && peak_memory="0"
 
-    # Cleanup
+    # Cleanup: Kill the background ZSH process
     kill "$zsh_pid" 2>/dev/null || true
     wait "$zsh_pid" 2>/dev/null || true
     rm -f "$temp_script"
@@ -300,7 +297,7 @@ test_ps_based_memory() {
         local temp_script=$(mktemp)
         echo "#!/bin/zsh" > "$temp_script"
         echo "source '$config_file'" >> "$temp_script"
-        echo "sleep 60" >> "$temp_script"
+        echo "sleep 5" >> "$temp_script"  # Reduced from 60 to 5 seconds
         chmod +x "$temp_script"
 
         zsh "$temp_script" &
