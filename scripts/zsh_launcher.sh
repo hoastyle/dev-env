@@ -1,37 +1,46 @@
 #!/bin/bash
 # ZSH Launcher - Multiple startup modes for different needs
 # ZSH启动器 - 提供多种启动模式以满足不同需求
+# 版本: 2.0 (集成日志和性能监控)
 
 set -e
 
-# 颜色定义
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-PURPLE='\033[0;35m'
-NC='\033[0m'
+# =============================================================================
+# 加载核心库
+# =============================================================================
 
-# 日志函数
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
+# 加载日志库
+if [[ -f "$SCRIPT_DIR/lib_logging.sh" ]]; then
+    source "$SCRIPT_DIR/lib_logging.sh"
+    # 初始化日志系统
+    init_logging 2>/dev/null || true
+else
+    echo "Warning: lib_logging.sh not found, using basic logging" >&2
+    # 基础日志函数（备用）
+    log_info() { echo "[INFO] $*"; }
+    log_success() { echo "[SUCCESS] $*"; }
+    log_warn() { echo "[WARN] $*" >&2; }
+    log_error() { echo "[ERROR] $*" >&2; }
+fi
 
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
+# 加载性能监控库
+if [[ -f "$SCRIPT_DIR/lib_performance.sh" ]]; then
+    source "$SCRIPT_DIR/lib_performance.sh"
+fi
 
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+# 加载跨平台兼容性库
+if [[ -f "$SCRIPT_DIR/lib_platform_compat.sh" ]]; then
+    source "$SCRIPT_DIR/lib_platform_compat.sh"
+fi
+
+# =============================================================================
+# 兼容性别名（保留原有API）
+# =============================================================================
 
 log_header() {
-    echo -e "${PURPLE}=== $1 ===${NC}"
+    log_section "$*"
 }
 
 # 获取项目根目录
@@ -172,6 +181,111 @@ launch_zsh() {
 }
 
 # 运行性能基准测试
+# =============================================================================
+# 精确性能测试函数（毫秒级，跨平台）
+# =============================================================================
+
+# 测量启动时间（精确到毫秒）
+measure_startup_time() {
+    local config_file=$1
+    local mode=$2
+
+    if [[ ! -f "$config_file" ]]; then
+        echo "N/A"
+        return 1
+    fi
+
+    # 使用跨平台的毫秒级时间测量
+    local start_time
+    local end_time
+
+    if command -v python &>/dev/null; then
+        # Python 方法（最精确）
+        start_time=$(python -c 'import time; print(int(time.time()*1000))' 2>/dev/null)
+        zsh -c "source $config_file && exit" 2>/dev/null || true
+        end_time=$(python -c 'import time; print(int(time.time()*1000))' 2>/dev/null)
+    elif command -v perl &>/dev/null; then
+        # Perl 方法
+        start_time=$(perl -MTime::HiRes -e 'printf("%d",Time::HiRes::time()*1000)' 2>/dev/null)
+        zsh -c "source $config_file && exit" 2>/dev/null || true
+        end_time=$(perl -MTime::HiRes -e 'printf("%d",Time::HiRes::time()*1000)' 2>/dev/null)
+    else
+        # Shell 内置时间（秒级精度）
+        start_time=$(date +%s)000
+        zsh -c "source $config_file && exit" 2>/dev/null || true
+        end_time=$(date +%s)000
+    fi
+
+    local duration=$((end_time - start_time))
+    echo "$duration"
+}
+
+# 快速性能测试（更精确，记录到性能监控系统）
+quick_benchmark() {
+    log_header "快速性能测试 (精确模式)"
+
+    local project_root="$(get_project_root)"
+    local results=()
+    local iterations=3
+
+    # 测试 minimal 模式
+    log_info "测试 minimal 模式..."
+    local total_time=0
+    for ((i=1; i<=iterations; i++)); do
+        local time=$(measure_startup_time "$project_root/config/.zshrc.ultra-optimized" "minimal")
+        total_time=$((total_time + time))
+    done
+    local avg_time=$((total_time / iterations))
+    results+=("Minimal: ${avg_time}ms")
+
+    # 记录性能数据
+    if command -v record_startup_time &>/dev/null; then
+        record_startup_time "minimal" "$avg_time"
+    fi
+
+    # 测试 fast 模式
+    log_info "测试 fast 模式..."
+    total_time=0
+    for ((i=1; i<=iterations; i++)); do
+        local time=$(measure_startup_time "$project_root/config/.zshrc.optimized" "fast")
+        total_time=$((total_time + time))
+    done
+    avg_time=$((total_time / iterations))
+    results+=("Fast: ${avg_time}ms")
+
+    if command -v record_startup_time &>/dev/null; then
+        record_startup_time "fast" "$avg_time"
+    fi
+
+    # 测试 normal 模式
+    log_info "测试 normal 模式..."
+    total_time=0
+    for ((i=1; i<=iterations; i++)); do
+        local time=$(measure_startup_time "$project_root/config/.zshrc" "normal")
+        total_time=$((total_time + time))
+    done
+    avg_time=$((total_time / iterations))
+    results+=("Normal: ${avg_time}ms")
+
+    if command -v record_startup_time &>/dev/null; then
+        record_startup_time "normal" "$avg_time"
+    fi
+
+    # 显示结果
+    echo ""
+    log_header "性能测试结果"
+    for result in "${results[@]}"; do
+        echo "  $result"
+    done
+
+    # 性能分析
+    echo ""
+    log_info "性能分析:"
+    echo "  Minimal模式用于快速命令执行"
+    echo "  Fast模式用于日常开发工作"
+    echo "  Normal模式用于复杂开发任务"
+}
+
 run_benchmark() {
     log_header "ZSH性能基准测试"
 
@@ -214,6 +328,11 @@ run_benchmark() {
 
     log_info "使用 '$0 minimal' 获得最快启动速度"
     log_info "使用 '$0 normal' 获得完整功能"
+
+    # 运行精确测试
+    echo ""
+    log_info "运行精确性能测试..."
+    quick_benchmark
 }
 
 # 启用补全系统

@@ -1,46 +1,55 @@
 #!/bin/bash
 # ZSH 配置管理工具集
-# 版本: 1.0
+# 版本: 2.0 (集成日志和性能监控)
 # 作者: Claude AI Assistant
 
 set -e
 
+# =============================================================================
+# 加载核心库
+# =============================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 加载日志库
+if [[ -f "$SCRIPT_DIR/lib_logging.sh" ]]; then
+    source "$SCRIPT_DIR/lib_logging.sh"
+    init_logging 2>/dev/null || true
+else
+    echo "Warning: lib_logging.sh not found, using basic logging" >&2
+    log_info() { echo "[INFO] $*"; }
+    log_success() { echo "[SUCCESS] $*"; }
+    log_warn() { echo "[WARN] $*" >&2; }
+    log_error() { echo "[ERROR] $*" >&2; }
+fi
+
+# 加载性能监控库
+if [[ -f "$SCRIPT_DIR/lib_performance.sh" ]]; then
+    source "$SCRIPT_DIR/lib_performance.sh"
+fi
+
+# 加载跨平台兼容性库
+if [[ -f "$SCRIPT_DIR/lib_platform_compat.sh" ]]; then
+    source "$SCRIPT_DIR/lib_platform_compat.sh"
+fi
+
+# =============================================================================
 # 全局标志
+# =============================================================================
+
 DRY_RUN=false
 
-# 颜色定义
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-PURPLE='\033[0;35m'
-NC='\033[0m'
-
-# 日志函数
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+# =============================================================================
+# 兼容性别名
+# =============================================================================
 
 log_header() {
-    echo -e "${PURPLE}=== $1 ===${NC}"
+    log_section "$*"
 }
 
 # 干运行模式输出
 dry_run_msg() {
-    echo -e "${CYAN}[DRY-RUN]${NC} $1"
+    log_info "[DRY-RUN] $*"
 }
 
 # 显示帮助信息
@@ -58,6 +67,9 @@ show_help() {
     echo "  benchmark         性能基准测试"
     echo "  benchmark-detailed 详细性能分析"
     echo "  doctor            系统诊断"
+    echo "  perf-report       显示性能趋势报告"
+    echo "  perf-trend        显示指定模式性能趋势 [模式] [天数]"
+    echo "  perf-info         显示性能数据信息"
     echo "  reset             重置配置到默认状态"
     echo ""
     echo "全局选项:"
@@ -690,6 +702,32 @@ main() {
             ;;
         "doctor")
             run_doctor
+            ;;
+        "perf-report")
+            if command -v perf_show_trend &>/dev/null; then
+                log_header "性能趋势报告"
+                perf_show_trend "normal" 7
+                perf_show_trend "fast" 7
+                perf_show_trend "minimal" 7
+            else
+                log_warn "性能监控库未加载"
+            fi
+            ;;
+        "perf-trend")
+            local mode=${2:-normal}
+            local days=${3:-7}
+            if command -v perf_show_trend &>/dev/null; then
+                perf_show_trend "$mode" "$days"
+            else
+                log_warn "性能监控库未加载"
+            fi
+            ;;
+        "perf-info")
+            if command -v perf_show_info &>/dev/null; then
+                perf_show_info
+            else
+                log_warn "性能监控库未加载"
+            fi
             ;;
         "reset")
             reset_config
