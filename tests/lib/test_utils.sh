@@ -349,10 +349,100 @@ restore_env() {
 }
 
 # ============================================================================
+# Test Suite Runner
+# ============================================================================
+
+# Run all test functions in the calling script
+run_test_suite() {
+    # Get the test file path - handle different sourcing scenarios
+    local test_file="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
+    local test_name="$(basename "$test_file" .sh)"
+
+    # Initialize test state
+    init_test_state
+
+    # Print test header
+    print_test_header "$test_name"
+
+    # Call setup if defined
+    if declare -f setup >/dev/null; then
+        setup
+    fi
+
+    # Discover and run all test functions
+    local test_functions=($(declare -F | awk '{print $3}' | grep '^test_'))
+    local test_count=${#test_functions[@]}
+
+    if [[ $test_count -eq 0 ]]; then
+        log_warn "No test functions found (functions starting with 'test_')"
+        return 1
+    fi
+
+    log_info "Found $test_count test function(s)"
+    echo ""
+
+    # Run each test function
+    for test_func in "${test_functions[@]}"; do
+        # Reset state for this test
+        TEST_CURRENT="$test_func"
+
+        # Call test setup if defined
+        if declare -f test_setup >/dev/null; then
+            test_setup
+        fi
+
+        # Run the test
+        if $test_func; then
+            record_pass
+            echo -e "${COLOR_GREEN}  ✓${COLOR_RESET} $test_func"
+        else
+            record_fail "$test_func" "returned non-zero exit code"
+            echo -e "${COLOR_RED}  ✗${COLOR_RESET} $test_func"
+        fi
+
+        # Call test teardown if defined
+        if declare -f test_teardown >/dev/null; then
+            test_teardown
+        fi
+    done
+
+    # Call teardown if defined
+    if declare -f teardown >/dev/null; then
+        teardown
+    fi
+
+    # Print summary
+    print_test_summary
+
+    # Cleanup temporary files
+    cleanup_temps
+
+    # Return exit code based on test results
+    if [[ $TEST_FAILED -gt 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+# ============================================================================
+# Compatibility Aliases
+# ============================================================================
+
+# Aliases for backward compatibility
+log_header() {
+    print_section "$@"
+}
+
+log_section() {
+    print_section "$@"
+}
+
+# ============================================================================
 # Exports for use in other scripts
 # ============================================================================
 
 export -f log_info log_success log_warn log_error log_debug
+export -f log_header log_section
 export -f print_test_header print_section print_summary print_test_summary
 export -f start_timer get_elapsed_time format_time
 export -f init_test_state record_pass record_fail record_skip get_test_stats
@@ -360,3 +450,4 @@ export -f create_temp_dir create_temp_file cleanup_temps
 export -f run_command run_silent command_exists
 export -f assert_file_exists assert_dir_exists assert_file_readable assert_file_writable assert_file_contains
 export -f save_env restore_env
+export -f run_test_suite

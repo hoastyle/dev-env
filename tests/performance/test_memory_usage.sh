@@ -234,7 +234,7 @@ compare_memory() {
 # =============================================================================
 
 test_memory_usage() {
-    log_header "ZSH Memory Usage Test"
+    print_section "ZSH Memory Usage Test"
 
     # Check if /proc is available (Linux only)
     if [[ ! -d "/proc" ]]; then
@@ -259,7 +259,7 @@ test_memory_usage() {
 }
 
 test_ps_based_memory() {
-    log_header "Memory Usage Test (ps-based fallback)"
+    print_section "Memory Usage Test (ps-based fallback)"
 
     # Create CSV header
     echo "mode,rss_mb,vsz_mb" > "$RESULTS_FILE"

@@ -227,7 +227,7 @@ compare_modes() {
 # =============================================================================
 
 test_startup_benchmark() {
-    log_header "ZSH Startup Performance Benchmark"
+    print_section "ZSH Startup Performance Benchmark"
 
     # Create CSV header
     echo "mode,average_ms,min_ms,max_ms,stddev" > "$RESULTS_FILE"
@@ -245,7 +245,7 @@ test_startup_benchmark() {
 }
 
 test_warm_startup() {
-    log_header "Warm Startup Benchmark (with cache)"
+    print_section "Warm Startup Benchmark (with cache)"
 
     # Pre-load compinit cache
     zsh -c "autoload -Uz compinit && compinit && exit" 2>/dev/null || true
@@ -263,7 +263,7 @@ test_warm_startup() {
 }
 
 test_cold_startup() {
-    log_header "Cold Startup Benchmark (clear cache)"
+    print_section "Cold Startup Benchmark (clear cache)"
 
     # Clear cache
     rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/dev-env"
