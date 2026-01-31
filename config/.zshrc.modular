@@ -1,0 +1,79 @@
+# ===============================================
+# ZSH Configuration - Development Environment (Modular)
+# ===============================================
+# Version: 2.0
+# Maintainer: dev-env project
+#
+# This configuration supports modular loading from ~/.zshrc.d/
+# Individual modules can be enabled/disabled by managing symlink
+# or by removing/adding files from the modules directory.
+# ===============================================
+
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+#
+# Note: Use quiet mode in tmux to suppress warnings about console output
+if [[ -n "$TMUX" ]]; then
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+fi
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Collapse nested launcher shells by exiting the previous instance when reopened.
+if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
+    trap 'builtin exit' USR1
+    if [[ -n "$ZSH_LAUNCHER_PREV_PID" && "$ZSH_LAUNCHER_PREV_PID" != "$$" ]]; then
+        if kill -0 "$ZSH_LAUNCHER_PREV_PID" 2>/dev/null; then
+            kill -USR1 "$ZSH_LAUNCHER_PREV_PID" 2>/dev/null || true
+        fi
+        unset ZSH_LAUNCHER_PREV_PID
+    fi
+fi
+
+# ===============================================
+# Modular Configuration Loading
+# ===============================================
+# Load configuration modules from ~/.zshrc.d/
+# Modules are loaded in alphabetical order (use numeric prefix for ordering)
+#
+# To disable a module:
+#   1. Remove the symlink from ~/.zshrc.d/
+#   2. Or rename the file to disable the prefix (e.g., .00-core.zsh.disabled)
+#
+# To enable custom modules:
+#   1. Create your module file in ~/.zshrc.d/
+#   2. Use numeric prefix for load order (e.g., 45-myconfig.zsh)
+# ===============================================
+
+# Define module directories (system + user)
+typeset -g _ZSH_MODULAR_SYSTEM_DIR="${HOME}/.zshrc.d"
+typeset -g _ZSH_MODULAR_USER_DIR="${HOME}/.zshrc.local.d"
+
+# Load system modules
+if [[ -d "$_ZSH_MODULAR_SYSTEM_DIR" ]]; then
+    for config_file in "$_ZSH_MODULAR_SYSTEM_DIR"/*.zsh(N); do
+        if [[ -f "$config_file" ]]; then
+            source "$config_file"
+        fi
+    done
+fi
+
+# Load user modules (optional, for user-specific customizations)
+if [[ -d "$_ZSH_MODULAR_USER_DIR" ]]; then
+    for config_file in "$_ZSH_MODULAR_USER_DIR"/*.zsh(N); do
+        if [[ -f "$config_file" ]]; then
+            source "$config_file"
+        fi
+    done
+fi
+
+# ===============================================
+# Configuration Complete
+# ===============================================
+# Welcome message disabled to support Powerlevel10k instant prompt
+# The theme provides its own visual feedback
+# To re-enable, uncomment the following line:
+# echo "🎉 Development Environment ZSH Configuration Loaded (Modular v2.0)"
