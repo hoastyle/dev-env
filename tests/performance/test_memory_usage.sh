@@ -39,6 +39,24 @@ else
 fi
 
 # =============================================================================
+# Local Helper Functions
+# =============================================================================
+
+# Print section header (local definition for performance tests)
+print_section() {
+    local section_name="$1"
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "$section_name"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+}
+
+# Load test utilities for print_section function
+if [[ -f "$SCRIPT_DIR/../lib/test_utils.sh" ]]; then
+    source "$SCRIPT_DIR/../lib/test_utils.sh"
+fi
+
+# =============================================================================
 # Helper Functions
 # =============================================================================
 
