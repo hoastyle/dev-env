@@ -113,21 +113,21 @@ measure_memory_usage() {
 
     # Start ZSH in background with config (isolated from user config)
     local temp_script=$(mktemp)
-    cat > "$temp_script" << 'TEMPEOF'
-#!/bin/zsh
-# Isolate from all user configuration
-ZDOTDIR=/dev/null
-setopt NO_GLOBAL_RCS
-setopt NO_RCS
-
-# Source the test config file
-source '$config_file'
-sleep 5
-TEMPEOF
+    # Write the temporary script using echo for proper variable expansion
+    echo "#!/bin/zsh" > "$temp_script"
+    echo "# Isolate from all user configuration" >> "$temp_script"
+    echo "ZDOTDIR=/dev/null" >> "$temp_script"
+    echo "setopt NO_GLOBAL_RCS" >> "$temp_script"
+    echo "setopt NO_RCS" >> "$temp_script"
+    echo "" >> "$temp_script"
+    echo "# Source the test config file" >> "$temp_script"
+    echo "source '$config_file'" >> "$temp_script"
+    echo "sleep 5" >> "$temp_script"
     chmod +x "$temp_script"
 
     # Launch ZSH - using -Z and -o NO_RCS for isolation
-    zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
+    # Use TERM=dumb to prevent terminal title sequences from interfering with output
+    TERM=dumb zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
     local zsh_pid=$!
 
     # Wait for initialization and check process is still running
@@ -245,7 +245,10 @@ compare_memory() {
     local fast_idle=0
     local minimal_idle=0
 
+    # Skip header line and read data
     while IFS=',' read -r mode idle active peak; do
+        # Skip header line
+        [[ "$mode" == "mode" ]] && continue
         case "$mode" in
             "normal") normal_idle=$idle ;;
             "fast") fast_idle=$idle ;;
@@ -255,11 +258,11 @@ compare_memory() {
 
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Memory Comparison (Idle)"
+    echo "Memory Comparison (Active)"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
 
-    # Convert to integers for comparison (remove decimal points)
+    # Convert to integers for comparison (KB values)
     local normal_idle_int=${normal_idle%.*}
     local fast_idle_int=${fast_idle%.*}
     local minimal_idle_int=${minimal_idle%.*}
@@ -330,18 +333,18 @@ test_ps_based_memory() {
 
         # Start ZSH and measure with ps (isolated from user config)
         local temp_script=$(mktemp)
-        cat > "$temp_script" << 'TEMPEOF'
-#!/bin/zsh
-ZDOTDIR=/dev/null
-setopt NO_GLOBAL_RCS
-setopt NO_RCS
-source '$config_file'
-sleep 3
-TEMPEOF
+        # Write the temporary script using echo for proper variable expansion
+        echo "#!/bin/zsh" > "$temp_script"
+        echo "ZDOTDIR=/dev/null" >> "$temp_script"
+        echo "setopt NO_GLOBAL_RCS" >> "$temp_script"
+        echo "setopt NO_RCS" >> "$temp_script"
+        echo "source '$config_file'" >> "$temp_script"
+        echo "sleep 3" >> "$temp_script"
         chmod +x "$temp_script"
 
         # Launch ZSH with isolation
-        zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
+        # Use TERM=dumb to prevent terminal title sequences from interfering with output
+        TERM=dumb zsh -Z -o NO_RCS -o NO_GLOBAL_RCS "$temp_script" &
         local zsh_pid=$!
         sleep 2
 
