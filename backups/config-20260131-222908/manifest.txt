@@ -1,0 +1,11 @@
+# Configuration Backup Manifest
+# Backup ID: config-20260131-222908
+# Created: 2026-01-31 22:29:08
+# Description: Integration workflow test
+# Hostname: machine-d
+# User: howie
+#
+
+FILE|.zshrc|/home/howie/.zshrc|2b8092d3b99caffef88e4c70eb5f1ef3950ce4471d4872dc3bdbf74922e30446
+FILE|.zshrc.version|/home/howie/Workspace/Utility/dev-env/config/.zshrc.version|7b5eea46daa18fa3351a9897279c99c7662b6906aa1c1149291e97bfb7f00dd0
+DIR|functions|/home/howie/.zsh/functions

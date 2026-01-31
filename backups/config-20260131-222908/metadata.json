@@ -1,0 +1,9 @@
+{
+  "backup_id": "config-20260131-222908",
+  "timestamp": "2026-01-31T22:29:08+08:00",
+  "description": "Integration workflow test",
+  "hostname": "machine-d",
+  "user": "howie",
+  "files_count": 3,
+  "version": "2.2.0"
+}

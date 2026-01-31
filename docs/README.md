@@ -79,6 +79,71 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 
 [→ 进入 ZSH 配置文档](zsh-config/)
 
+### 🔧 [配置生命周期管理 (CLM)](CONFIG_LIFECYCLE_MANAGEMENT.md)
+
+Configuration Lifecycle Management 系统提供完整的配置版本管理、迁移、健康检查和备份恢复功能。
+
+**功能特性**:
+
+- 📊 版本管理：语义化版本跟踪和比较
+- 🔄 自动迁移：配置变更的安全迁移机制
+- 🏥 健康检查：语法验证、插件状态、依赖检查
+- 💾 备份恢复：带清单和元数据的完整备份系统
+- ⏪ 回滚支持：安全回滚到之前的配置状态
+
+**关键文档**:
+
+* [用户指南](CONFIG_LIFECYCLE_MANAGEMENT.md) - CLM 系统使用手册
+* [系统设计文档](design/CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md) - 完整技术设计
+* [快速开始](design/QUICK_START_IMPLEMENTATION.md) - 开发者快速上手
+* [实施检查清单](design/IMPLEMENTATION_CHECKLIST.md) - 130+ 任务清单
+
+### 🏗️ [系统设计文档](design/)
+
+dev-env 系统架构和技术设计文档。
+
+**关键文档**:
+
+* [设计文档导航](design/README.md) - 设计文档索引
+* [CLM 技术设计](design/CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md) - 配置生命周期管理架构
+* [快速实施指南](design/QUICK_START_IMPLEMENTATION.md) - 开发快速入门
+* [实施检查清单](design/IMPLEMENTATION_CHECKLIST.md) - 详细任务列表
+
+### 🎨 [模板系统](../templates/README.md)
+
+4种预设配置模板，满足不同使用场景。
+
+**模板类型**:
+
+- `dev-full`: 完整开发环境 (~1.5s, ~35MB)
+- `dev-minimal`: 轻量开发环境 (~100ms, ~20MB)
+- `server`: 生产服务器环境 (~50ms, ~15MB)
+- `docker`: Docker 容器优化 (~20ms, ~10MB)
+
+**使用方式**:
+
+```bash
+./scripts/zsh_template_selector.sh           # 交互式选择
+./scripts/zsh_template_selector.sh list      # 列出模板
+./scripts/zsh_template_selector.sh benchmark # 性能对比
+```
+
+### 📖 [核心库 API 文档](CORE_LIBRARIES_API.md)
+
+可复用核心库的完整 API 参考文档。
+
+**包含的库**:
+
+- `lib_platform_compat.sh` - 跨平台兼容性层
+- `lib_logging.sh` - 结构化日志系统
+- `lib_performance.sh` - 性能监控和分析
+- `lib_version.sh` - 版本管理
+- `lib_migration.sh` - 迁移执行引擎
+- `lib_health.sh` - 健康检查系统
+- `lib_backup.sh` - 备份恢复系统
+
+**适合人群**: 开发者、脚本编写者
+
 ---
 
 ## 🎯 按用户类型快速导航
@@ -87,8 +152,10 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 
 1. 查看 [项目主文档](../README.md)
 2. 根据需求选择：
+   * 需要快速选择配置 → [模板系统](../templates/README.md)
    * 需要代理功能 → [代理快速参考](proxy/PROXY_QUICK_REFERENCE.md)
    * 需要配置 ZSH → [ZSH 配置模板](zsh-config/ZSH_CONFIG_TEMPLATE.md)
+   * 需要管理配置版本 → [CLM 用户指南](CONFIG_LIFECYCLE_MANAGEMENT.md)
 
 ### 🔧 **我需要集成和部署**
 
@@ -97,6 +164,7 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 
 ### 🛠️ **我需要故障排除**
 
+* [CLM 用户指南](CONFIG_LIFECYCLE_MANAGEMENT.md) - 配置管理相关问题
 * [代理功能快速参考](proxy/PROXY_QUICK_REFERENCE.md) - 代理相关问题
 * [ZSH 故障排除指南](zsh-config/TROUBLESHOOTING_DEBUG_GUIDE.md) - ZSH 相关问题
 
@@ -148,12 +216,23 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 
 | 文档 | 用途 |
 |------|------|
+| [CONFIG_LIFECYCLE_MANAGEMENT.md](CONFIG_LIFECYCLE_MANAGEMENT.md) | CLM 用户指南 |
+| [CORE_LIBRARIES_API.md](CORE_LIBRARIES_API.md) | 核心库 API 参考 |
 | [ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md](ENVIRONMENT_INDICATORS_IMPLEMENTATION_JOURNEY.md) | 环境指示符实现记录 |
 | [MODULAR_CONFIG.md](MODULAR_CONFIG.md) | 模块化配置系统 |
 | [KNOWLEDGE_BASE.md](KNOWLEDGE_BASE.md) | 技术知识库 |
 | [REFERENCE_ANALYSIS.md](REFERENCE_ANALYSIS.md) | 参考资料分析 |
 | [RELEASE_NOTES.md](RELEASE_NOTES.md) | 版本发布说明 |
 | [TEST_SUITE_PLAN.md](TEST_SUITE_PLAN.md) | 测试计划 |
+
+### 系统设计 (design/)
+
+| 文档 | 用途 |
+|------|------|
+| [README.md](design/README.md) | 设计文档导航 |
+| [CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md](design/CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md) | CLM 技术设计 |
+| [QUICK_START_IMPLEMENTATION.md](design/QUICK_START_IMPLEMENTATION.md) | 快速开始指南 |
+| [IMPLEMENTATION_CHECKLIST.md](design/IMPLEMENTATION_CHECKLIST.md) | 实施检查清单 |
 
 ### 存档文档 (archive/)
 
@@ -180,12 +259,18 @@ ZSH Shell 环境配置、性能优化、故障排除的完整指南。
 docs/
 ├── README.md (本文件 - 文档中心)
 ├── DOCUMENTATION_INDEX.md (文档总索引)
+├── CONFIG_LIFECYCLE_MANAGEMENT.md (CLM 用户指南)
 ├── management/ (项目管理文档)
 │   ├── PRD.md (产品需求)
 │   ├── PLANNING.md (技术规划)
 │   ├── TASK.md (任务追踪)
 │   ├── AGENTS.md (Agent配置)
 │   └── MCP_SETUP.md (MCP设置)
+├── design/ (系统设计文档)
+│   ├── README.md (设计文档导航)
+│   ├── CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md (CLM 技术设计)
+│   ├── QUICK_START_IMPLEMENTATION.md (快速开始)
+│   └── IMPLEMENTATION_CHECKLIST.md (实施检查清单)
 ├── proxy/ (代理功能相关文档)
 │   ├── README.md (代理模块导航)
 │   ├── PROXY_QUICK_REFERENCE.md
@@ -215,6 +300,6 @@ docs/
 
 ---
 
-**最后更新**: 2025-01-31
-**文档版本**: 2.0
+**最后更新**: 2026-01-31
+**文档版本**: 2.3
 **维护者**: Development Team

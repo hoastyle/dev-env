@@ -1,0 +1,10 @@
+# ZSH Configuration Version File
+# Auto-generated - DO NOT EDIT MANUALLY
+# This file tracks the configuration version and metadata
+
+VERSION="2.2.0"
+BUILD_DATE="2026-01-31"
+INSTALL_DATE=""
+LAST_MIGRATION=""
+USER_CUSTOMIZATIONS="false"
+CUSTOM_CONFIG_HASH=""
