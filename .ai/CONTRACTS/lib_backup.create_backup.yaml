@@ -1,0 +1,142 @@
+entity: lib_backup.create_backup
+stability: stable
+version: "2.3.0"
+description: 创建配置备份
+
+inputs:
+  - name: description
+    type: string
+    description: 备份描述信息
+    required: true
+    constraints:
+      - non_empty: true
+      - max_length: 200
+
+  - name: include_data
+    type: bool
+    description: 是否包含数据目录（性能数据、日志等）
+    required: false
+    default: true
+
+  - name: compress
+    type: bool
+    description: 是否压缩备份
+    required: false
+    default: true
+
+outputs:
+  type: backup_result
+  description: 备份操作结果
+  fields:
+    - name: backup_id
+      type: BackupId
+      description: 备份ID，格式为 YYYYMMDD-HHMMSS
+
+    - name: backup_path
+      type: path
+      description: 备份文件/目录路径
+
+    - name: size_bytes
+      type: int
+      description: 备份大小（字节）
+
+    - name: file_count
+      type: int
+      description: 备份的文件数量
+
+    - name: return_code
+      type: exitcode
+      description: 0=成功, 非0=失败
+
+errors:
+  - code: BACKUP_DIR_NOT_WRITABLE
+    condition: 备份目录不可写
+    message: "Backup directory is not writable: {BACKUP_DIR}"
+    retryable: false
+
+  - code: CONFIG_NOT_FOUND
+    condition: 配置文件不存在
+    message: "Configuration file not found: {CONFIG_FILE}"
+    retryable: false
+
+  - code: COPY_FAILED
+    condition: 文件复制失败
+    message: "Failed to copy file: {file_path}"
+    retryable: true
+
+  - code: COMPRESS_FAILED
+    condition: 压缩失败
+    message: "Failed to compress backup"
+    retryable: true
+
+side_effects:
+  - description: 在 backups/ 目录创建新备份
+    risk: low
+
+  - description: 可能触发清理旧备份
+    risk: low
+
+examples:
+  - description: 创建正常备份
+    input:
+      description: "Before upgrading to 2.4.0"
+    output:
+      backup_id: "20260201-083000"
+      backup_path: "backups/20260201-083000/"
+      size_bytes: 1048576
+      file_count: 15
+      return_code: 0
+      message: "✅ Backup created: 20260201-083000 (1.0 MB)"
+
+  - description: 创建不压缩的备份
+    input:
+      description: "Quick backup before changes"
+      compress: false
+    output:
+      backup_id: "20260201-083100"
+      backup_path: "backups/20260201-083100/"
+      compress: false
+      return_code: 0
+
+dependencies:
+  required:
+    - lib_logging
+    - lib_platform_compat
+    - BACKUP_DIR directory
+    - CONFIG_FILE
+  optional:
+    - DATA_DIR (if include_data=true)
+
+implementation_notes: |
+  备份内容：
+  1. config/.zshrc - 主配置文件
+  2. config/.zshrc.* - 其他配置文件
+  3. config/.zshrc.version - 版本元数据
+  4. zsh-functions/ - 自定义函数目录
+  5. data/ - 数据目录（如果 include_data=true）
+
+  备份结构：
+  backups/
+  ├── 20260201-083000/
+  │   ├── metadata.json (备份元数据)
+  │   ├── config/
+  │   ├── zsh-functions/
+  │   └── data/ (可选)
+  └── .metadata.json (备份索引)
+
+  元数据包含：
+  - backup_id: 备份ID
+  - timestamp: 创建时间
+  - description: 描述信息
+  - size_bytes: 备份大小
+  - file_count: 文件数量
+  - compressed: 是否压缩
+
+  清理策略：
+  - 默认保留最近 10 个备份
+  - 可通过配置调整
+  - 清理操作在创建新备份后执行
+
+  压缩格式：
+  - 使用 tar.gz 格式
+  - 压缩后删除原始目录

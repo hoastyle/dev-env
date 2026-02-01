@@ -1,0 +1,270 @@
+# dev-env Coding Style Rules
+
+## Purpose
+定义 dev-env 项目的代码风格规范，确保 AI 辅助开发生成的代码符合项目标准。
+
+## General Principles
+
+1. **Clarity over cleverness** - 代码应易于理解，避免过于复杂的技巧
+2. **Explicit over implicit** - 依赖和副作用应该显式声明
+3. **Fail fast and loudly** - 早期验证输入，清晰的错误信息
+4. **Document intent** - 解释为什么，而不仅仅是做什么
+
+## Code Organization
+
+### 文件结构
+- 遵循项目的现有结构和约定
+- 相关函数分组在一起
+- 文件保持单一职责
+- 使用 MANIFEST.json 作为模块边界的真相来源
+
+### 函数定义
+```bash
+# 函数文档注释
+# @tag public/internal/cli
+# @category <category_name>
+# @param <Type> $param_name 参数说明
+# @return <Type> 返回值说明
+function_name() {
+    local param_name="$1"
+    ...
+}
+```
+
+### 库文件模板
+```bash
+#!/bin/bash
+# =============================================================================
+# <Library Name> - <Brief Description>
+# =============================================================================
+# Version: <version>
+# Created: <date>
+# =============================================================================
+
+# Dependencies
+source "${SCRIPT_DIR}/lib_logging.sh"
+# ... 其他依赖
+
+# Public Functions
+# =============================================================================
+
+# @tag public
+# @category <category>
+# @param Type $param
+# @return exitcode
+function_name() {
+    ...
+}
+
+# Internal Functions
+# =============================================================================
+
+# @tag internal
+_internal_function() {
+    ...
+}
+```
+
+## Comments and Documentation
+
+- 公共 API 必须有文档注释
+- 解释非显而易见的决策原因
+- 注释靠近它们引用的代码
+- 代码变更时更新注释
+- 使用语义标签 (@tag, @category)
+
+## Error Handling
+
+### 错误码约定
+```bash
+# 退出码约定
+# 0 - 成功
+# 1 - 一般错误
+# 2 - 参数错误
+# 3 - 依赖缺失
+# 4 - 文件不存在
+# 5 - 权限错误
+```
+
+### 错误处理模式
+```bash
+# 定义错误信息
+error_msg() {
+    echo "❌ Error: $1" >&2
+}
+
+# 早期验证
+if [[ -z "$1" ]]; then
+    error_msg "Parameter required"
+    return 1
+fi
+
+# 文件检查
+if [[ ! -f "$file_path" ]]; then
+    error_msg "File not found: $file_path"
+    return 4
+fi
+
+# 命令执行
+if ! command -v required_cmd &>/dev/null; then
+    error_msg "Required command not found: required_cmd"
+    return 3
+fi
+```
+
+### 在 CONTRACTS/ 中定义错误
+- 公共 API 的错误应在 CONTRACTS/ 中定义
+- 包含错误码、条件、消息、可重试性
+
+## Logging
+
+### 日志级别
+```bash
+log_debug "调试信息"    # 开发调试
+log_info "一般信息"     # 正常流程
+log_success "成功信息"  # 操作成功（绿色）
+log_warn "警告信息"     # 非关键问题（黄色）
+log_error "错误信息"    # 操作失败（红色）
+```
+
+### 日志内容
+- 包含相关上下文（文件路径、操作对象）
+- 使用结构化格式
+- 避免记录敏感数据
+
+### 日志模式
+```bash
+# 章节标记
+log_section "安装配置"
+
+# 开始/结束
+log_start "执行迁移"
+# ... 操作 ...
+log_end "执行迁移" $?  # 传入退出码
+
+# 成功/失败
+if validate_config; then
+    log_success "配置验证通过"
+else
+    log_error "配置验证失败"
+    return 1
+fi
+```
+
+## Variable Naming
+
+### 常量（大写）
+```bash
+readonly VERSION_FILE="config/.zshrc.version"
+readonly MAX_BACKUPS=10
+readonly DEFAULT_MODE="normal"
+```
+
+### 局部变量（小写+下划线）
+```bash
+local current_version
+local backup_id
+local file_size
+```
+
+### 函数名（小写+下划线）
+```bash
+get_current_version
+set_version
+compare_versions
+needs_migration
+```
+
+### 私有函数（前缀下划线）
+```bash`
+_internal_helper
+_validate_format
+_check_dependencies
+```
+
+## Type Annotations
+
+### 使用语义类型
+```bash
+# @param VersionString $version
+# @param BackupId $backup_id
+# @param Timestamp $timestamp_ms
+# @param exitcode (返回值)
+# @param bool (返回值: 0=true, 1=false)
+```
+
+### 类型定义
+- 参见 TYPES.md
+- 公共函数必须注解类型
+- 内部函数建议注解类型
+
+## Boundary Conditions
+
+### 输入验证
+```bash
+# 模块边界总是验证输入
+if [[ -z "$1" ]]; then
+    error_msg "Parameter cannot be empty"
+    return 2
+fi
+
+# 类型验证
+if ! [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error_msg "Invalid version format"
+    return 2
+fi
+```
+
+### 边界情况处理
+- 显式处理边界情况（null、empty、overflow）
+- 使用契约定义有效输入/输出范围
+- 为边界条件编写测试
+
+## Platform Compatibility
+
+### 跨平台工具
+```bash
+# 使用平台兼容层
+local sed_cmd=$(get_compat_sed)
+local time_cmd=$(get_time_command)
+
+# OS 检测
+if is_macos; then
+    # macOS 特定逻辑
+elif is_linux; then
+    # Linux 特定逻辑
+fi
+```
+
+### 依赖检测
+```bash
+# 检查命令可用性
+if ! command_exists "fzf"; then
+    log_warn "fzf not installed, some features unavailable"
+fi
+
+# 检测包管理器
+local pkg_manager=$(detect_package_manager)
+```
+
+## AIRS-Specific Rules
+
+- 公共 API 变更时更新 CONTRACTS/
+- 结构变更后重新生成 MANIFEST.json
+- 为新功能添加 EVAL/ 评估任务
+- 遵循 "契约优先，然后代码" 工作流
+
+## Code Quality Checklist
+
+- [ ] 函数有语义标签 (@tag, @category)
+- [ ] 参数和返回值有类型注解
+- [ ] 有适当的错误处理和日志
+- [ ] 遵循命名约定
+- [ ] 文件头有版本和创建日期
+- [ ] 更新相关文档（FUNCTION_INDEX.md, CONTRACTS/）
+
+---
+
+**Version**: 1.0
+**Last Updated**: 2026-02-01
+**Project**: dev-env

@@ -1,0 +1,125 @@
+entity: lib_health.run_health_check
+stability: stable
+version: "2.3.0"
+description: 运行完整的 ZSH 配置健康检查
+
+inputs:
+  - name: verbose
+    type: bool
+    description: 显示详细检查信息
+    required: false
+    default: false
+
+  - name: fix_auto
+    type: bool
+    description: 自动修复可修复的问题
+    required: false
+    default: false
+
+outputs:
+  type: health_report
+  description: 健康检查报告
+  fields:
+    - name: overall_status
+      type: string
+      description: 总体状态: healthy, warning, critical
+      values: ["healthy", "warning", "critical"]
+
+    - name: checks_total
+      type: int
+      description: 总检查项数量
+
+    - name: checks_passed
+      type: int
+      description: 通过的检查项数量
+
+    - name: checks_failed
+      type: int
+      description: 失败的检查项数量
+
+    - name: return_code
+      type: exitcode
+      description: 0=healthy, 1=warning, 2=critical
+
+    - name: issues
+      type: issue[]
+      description: 发现的问题列表
+
+errors:
+  - code: CHECK_TIMEOUT
+    condition: 单项检查超时
+    message: "Health check '{check_name}' timed out"
+    retryable: true
+
+side_effects:
+  - description: 读取配置文件（只读）
+    risk: none
+
+  - description: 如果 fix_auto=true，可能修改配置
+    risk: low
+
+examples:
+  - description: 健康的系统
+    input: {}
+    output:
+      overall_status: "healthy"
+      checks_total: 5
+      checks_passed: 5
+      checks_failed: 0
+      return_code: 0
+      message: "✅ All health checks passed"
+
+  - description: 有警告的系统
+    input: {}
+    output:
+      overall_status: "warning"
+      checks_total: 5
+      checks_passed: 4
+      checks_failed: 1
+      return_code: 1
+      issues:
+        - check: "check_plugins"
+          severity: "warning"
+          message: "1 plugin update available"
+
+  - description: 严重问题
+    input: {}
+    output:
+      overall_status: "critical"
+      checks_total: 5
+      checks_passed: 2
+      checks_failed: 3
+      return_code: 2
+      issues:
+        - check: "check_syntax"
+          severity: "critical"
+          message: ".zshrc syntax error on line 42"
+
+dependencies:
+  required:
+    - lib_logging
+    - lib_platform_compat
+    - CONFIG_FILE
+  optional: []
+
+implementation_notes: |
+  执行的检查项：
+  1. check_syntax: 检查 .zshrc 语法
+  2. check_plugins: 检查 Antigen 插件状态
+  3. check_dependencies: 检查必需工具可用性
+  4. check_version_file: 检查版本文件完整性
+  5. check_config_paths: 检查配置路径有效性
+
+  检查结果分类：
+  - healthy: 所有检查通过
+  - warning: 非关键问题（如插件更新可用）
+  - critical: 关键问题（如语法错误、依赖缺失）
+
+  返回码：
+  - 0: healthy
+  - 1: warning（需要关注但不影响使用）
+  - 2: critical（需要立即修复）
+
+  自动修复（fix_auto=true）：
+  - 可以修复：插件更新、路径创建等
+  - 不能修复：语法错误、依赖缺失

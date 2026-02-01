@@ -1,0 +1,95 @@
+entity: lib_version.set_version
+stability: stable
+version: "2.3.0"
+description: 设置配置版本号
+
+inputs:
+  - name: new_version
+    type: VersionString
+    description: 新版本号，格式为 MAJOR.MINOR.PATCH
+    required: true
+    constraints:
+      - format: "^\\d+\\.\\d+\\.\\d+$"
+      - non_empty: true
+
+  - name: build_date
+    type: string
+    description: 构建日期，格式 YYYY-MM-DD（可选）
+    required: false
+    default: "$(date +%Y-%m-%d)"
+    constraints:
+      - format: "^\\d{4}-\\d{2}-\\d{2}$"
+
+outputs:
+  type: exitcode
+  description: 退出码，0 表示成功，非 0 表示失败
+  values:
+    - code: 0
+      description: 版本设置成功
+    - code: 1
+      description: 版本格式无效
+    - code: 2
+      description: 文件写入失败
+
+errors:
+  - code: InvalidVersion
+    condition: 版本号格式不符合 MAJOR.MINOR.PATCH
+    message: "InvalidVersion: Expected MAJOR.MINOR.PATCH format, got '{new_version}'"
+    retryable: false
+
+  - code: FileWriteError
+    condition: VERSION_FILE 写入失败
+    message: "Failed to write version to file: {VERSION_FILE}"
+    retryable: true
+
+side_effects:
+  - description: 创建或覆盖 VERSION_FILE
+    risk: low
+
+  - description: 更新内部版本状态
+    risk: low
+
+examples:
+  - description: 正常设置版本号
+    input:
+      new_version: "2.3.0"
+    output:
+      return_code: 0
+      message: "✅ Version set to: 2.3.0"
+
+  - description: 使用自定义日期
+    input:
+      new_version: "2.4.0"
+      build_date: "2026-02-01"
+    output:
+      return_code: 0
+      message: "✅ Version set to: 2.4.0 (2026-02-01)"
+
+  - description: 无效版本号
+    input:
+      new_version: "2.3"
+    output:
+      return_code: 1
+      error: "InvalidVersion: Expected MAJOR.MINOR.PATCH format, got '2.3'"
+
+dependencies:
+  required:
+    - VERSION_FILE environment variable
+    - VERSION_DIR directory
+  optional: []
+
+implementation_notes: |
+  该函数执行以下操作：
+  1. 验证 new_version 格式（使用正则 ^\d+\.\d+\.\d+$）
+  2. 确保 VERSION_DIR 存在
+  3. 写入 VERSION 文件，格式：
+     VERSION="2.3.0"
+     BUILD_DATE="2026-02-01"
+  4. 记录日志
+
+  错误处理：
+  - 版本格式无效：返回 1，不写文件
+  - 目录不存在：尝试创建
+  - 写入失败：返回 2，记录错误
+
+  这是版本管理的核心写入操作，所有版本更新都通过此函数。

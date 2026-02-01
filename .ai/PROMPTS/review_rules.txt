@@ -1,0 +1,234 @@
+# dev-env Review Rules
+
+## Purpose
+代码审查检查清单，用于审查 dev-env 项目的代码变更。
+
+## Pre-Merge Checklist
+
+### Contract Compliance
+- [ ] 所有公共 API 变更有对应的 CONTRACTS/ 更新
+- [ ] 契约指定了输入、输出、错误、副作用
+- [ ] 契约包含示例（成功和失败情况）
+- [ ] 稳定性级别已标记（stable/experimental/internal）
+
+### MANIFEST Updates
+- [ ] MANIFEST.json 反映了新/修改的模块
+- [ ] 入口点是最新的
+- [ ] 依赖关系准确
+- [ ] 风险标签已应用到适当位置
+
+### Documentation
+- [ ] `.ai/README.md` 已更新（如果项目范围变更）
+- [ ] FUNCTION_INDEX.md 已更新（如果函数变更）
+- [ ] TYPES.md 已更新（如果新增类型）
+- [ ] CHANGELOG.md 已更新
+
+### Code Quality
+- [ ] 代码遵循 PROMPTS/style_rules.txt
+- [ ] 所有测试通过
+- [ ] 为新功能添加了测试
+- [ ] 没有 linting 错误或警告
+- [ ] 安全审查用于高风险模块
+
+### AI Evaluation
+- [ ] EVAL/tasks/ 包含代表性测试场景
+- [ ] EVAL/golden/ 有期望输出
+- [ ] 变更可由 AI 代理验证
+- [ ] 可为受影响模块生成上下文包
+
+## Risk-Based Review Intensity
+
+### High Risk (高风险)
+**标签**: `security-critical`, `compatibility-critical`, `data-loss-risk`
+
+**审查要求**:
+- 两人审查
+- 安全专家审查（用于 security-critical）
+- 全面的测试覆盖
+- 需要架构决策记录 (ADR)
+
+**示例模块**:
+- lib_version.sh (compatibility-critical)
+- lib_migration.sh (compatibility-critical, data-loss-risk)
+- lib_backup.sh (data-loss-risk)
+
+### Medium Risk (中等风险)
+**标签**: `performance-critical`, `user-facing`
+
+**审查要求**:
+- 标准审查流程
+- 包含性能基准测试
+- 压力测试覆盖
+
+**示例模块**:
+- lib_performance.sh (performance-critical)
+- zsh_config_manager.sh (user-facing)
+- zsh_launcher.sh (user-facing, performance-critical)
+
+### Low Risk (低风险)
+**标签**: 无风险标签或 `internal`
+
+**审查要求**:
+- 轻量级审查流程
+- 基本测试覆盖
+- Manifest 验证
+
+**示例模块**:
+- lib_dryrun.sh
+- lib_logging.sh
+- 内部辅助函数
+
+## Specific Review Points
+
+### Core Libraries (scripts/lib_*.sh)
+
+#### lib_version.sh
+- [ ] 版本格式验证正则表达式正确
+- [ ] 文件操作有适当的错误处理
+- [ ] 版本比较算法正确处理所有情况
+
+#### lib_migration.sh
+- [ ] 迁移脚本命名约定遵循 XXX_description.sh
+- [ ] 每个迁移有 migrate_up() 函数
+- [ ] 迁移失败时适当停止
+- [ ] 迁移历史正确记录
+
+#### lib_health.sh
+- [ ] 所有检查项有清晰的通过/失败标准
+- [ ] 健康检查输出结构化
+- [ ] 可自动修复的问题有 clear 标记
+
+#### lib_backup.sh
+- [ ] 备份包含所有必要文件
+- [ ] 元数据正确记录
+- [ ] 旧备份清理安全执行
+
+### CLI Tools (scripts/zsh_*.sh)
+
+#### zsh_config_manager.sh
+- [ ] 所有命令有 --help 输出
+- [ ] 错误消息用户友好
+- [ ] 危险操作有确认提示
+
+#### zsh_tools.sh
+- [ ] 命令命名一致性
+- [ ] 输出格式统一
+- [ ] 支持干运行模式
+
+#### zsh_launcher.sh
+- [ ] 所有启动模式正确加载配置
+- [ ] 性能测量准确
+- [ ] 模式切换无副作用
+
+### ZSH Functions (zsh-functions/*.zsh)
+
+#### search.zsh
+- [ ] 搜索工具可用性检查
+- [ ] 参数验证完整
+- [ ] 错误消息清晰
+
+#### utils.zsh
+- [ ] 代理配置验证
+- [ ] 环境检测准确
+- [ ] 副作用清晰记录
+
+#### help.zsh
+- [ ] 帮助数据库更新
+- [ ] 分类一致性
+- [ ] 示例准确
+
+## Forbidden Patterns
+
+**禁止**:
+- ❌ CI 未通过时合并
+- ❌ 公共 API 变更时不更新契约
+- ❌ 提交过时的 MANIFEST.json
+- ❌ 使用 TODOs 而不跟踪 issue
+- ❌ 抑制错误而不记录日志
+
+**必须**:
+- ✅ 所有变更有相应的测试
+- ✅ 文档与代码同步
+- ✅ 遵循语义化版本控制
+- ✅ 使用类型注解和语义标签
+
+## Testing Requirements
+
+### Unit Tests
+- [ ] 核心库函数有单元测试
+- [ ] 边界条件有测试覆盖
+- [ ] 错误路径有测试
+
+### Integration Tests
+- [ ] CLI 工具有集成测试
+- [ ] 迁移流程有端到端测试
+- [ ] 备份/恢复有完整测试
+
+### Performance Tests
+- [ ] 启动时间有基准测试
+- [ ] 性能回归检测
+- [ ] 内存使用监控
+
+## Documentation Requirements
+
+### Code Documentation
+- [ ] 公共函数有完整注释
+- [ ] 复杂逻辑有解释
+- [ ] 使用语义标签
+
+### API Documentation
+- [ ] CONTRACTS/ 更新
+- [ ] FUNCTION_INDEX.md 更新
+- [ ] 使用示例包含
+
+### User Documentation
+- [ ] README.md 更新（如需要）
+- [ ] CLAUDE.md 更新（如需要）
+- [ ] 变更日志更新
+
+## AI-Specific Checks
+
+### Discoverability
+- [ ] 新函数有 @category 标签
+- [ ] MANIFEST.json 更新
+- [ ] 可通过关键词定位
+
+### Determinism
+- [ ] 接口在 CONTRACTS/ 中定义
+- [ ] 类型注解完整
+- [ ] 依赖关系清晰
+
+### Freshness
+- [ ] MANIFEST.json 可自动生成
+- [ ] 文档与代码同步
+- [ ] CI 验证一致性
+
+### Verifiability
+- [ ] 有自动化测试
+- [ ] EVAL/ 任务覆盖
+- [ ] 可回归测试
+
+## Merge Approval Criteria
+
+### 自动检查（必须全部通过）
+- [ ] CI pipeline 成功
+- [ ] MANIFEST.json 无差异
+- [ ] 所有测试通过
+- [ ] 代码覆盖率不降低
+
+### 人工审查（根据风险级别）
+- [ ] 至少一人审查批准
+- [ ] High Risk 需要两人批准
+- [ ] 安全相关需要安全专家批准
+
+### 文档审查
+- [ ] CONTRACTS/ 变更已审查
+- [ ] 用户文档已审查
+- [ ] 变更日志已审查
+
+---
+
+**Version**: 1.0
+**Last Updated**: 2026-02-01
+**Project**: dev-env
+**Based on**: AIRS v1.0 Review Rules

@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-02-01T08:00:00Z",
+  "project": {
+    "name": "dev-env",
+    "type": ["cli", "library", "configuration"],
+    "languages": ["bash", "zsh"],
+    "entrypoints": [
+      "scripts/install_zsh_config.sh",
+      "scripts/zsh_config_manager.sh",
+      "scripts/zsh_tools.sh",
+      "scripts/zsh_launcher.sh"
+    ],
+    "description": "ZSH 配置生命周期管理系统 - Configuration Lifecycle Management for ZSH with version control, migrations, health checks, and backup/restore capabilities"
+  },
+  "modules": [
+    {
+      "id": "lib_version",
+      "path": "scripts/lib_version.sh",
+      "provides": ["version_management", "version_tracking", "version_comparison"],
+      "public_api": [
+        "get_current_version",
+        "set_version",
+        "compare_versions",
+        "needs_migration",
+        "generate_version_report"
+      ],
+      "depends_on": [],
+      "risk": ["compatibility-critical"]
+    },
+    {
+      "id": "lib_logging",
+      "path": "scripts/lib_logging.sh",
+      "provides": ["logging", "structured_logging", "log_rotation"],
+      "public_api": [
+        "init_logging",
+        "log_info",
+        "log_success",
+        "log_warn",
+        "log_error",
+        "log_debug",
+        "log_section",
+        "log_start",
+        "log_end",
+        "rotate_logs",
+        "view_logs",
+        "tail_logs"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "lib_platform_compat",
+      "path": "scripts/lib_platform_compat.sh",
+      "provides": ["platform_abstraction", "cross_platform", "os_detection"],
+      "public_api": [
+        "get_os_type",
+        "is_macos",
+        "is_linux",
+        "get_os_version",
+        "get_file_size",
+        "get_file_perms",
+        "get_file_mtime",
+        "get_timestamp_ms",
+        "get_date_relative",
+        "realpath_compat",
+        "get_gnu_tool",
+        "get_compat_sed",
+        "get_time_command",
+        "supports_color",
+        "set_color_support",
+        "get_current_shell",
+        "get_shell_version",
+        "detect_package_manager",
+        "install_package",
+        "command_exists"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "lib_performance",
+      "path": "scripts/lib_performance.sh",
+      "provides": ["performance_monitoring", "performance_analysis", "benchmarking"],
+      "public_api": [
+        "record_startup_time",
+        "get_performance_stats",
+        "detect_performance_regression",
+        "perf_show_info",
+        "perf_show_trend",
+        "perf_has_data",
+        "perf_get_record_count",
+        "perf_get_recent_time",
+        "perf_get_best_time",
+        "perf_calculate_stats",
+        "perf_compare_modes",
+        "perf_detect_regression",
+        "perf_export_json",
+        "perf_cleanup",
+        "ensure_perf_dir"
+      ],
+      "depends_on": ["lib_platform_compat"],
+      "risk": ["performance-critical"]
+    },
+    {
+      "id": "lib_dryrun",
+      "path": "scripts/lib_dryrun.sh",
+      "provides": ["dry_run", "testing_support", "safe_execution"],
+      "public_api": [
+        "is_dry_run",
+        "dry_run_notice",
+        "dry_exec",
+        "dry_chmod",
+        "dry_chown",
+        "dry_mkdir",
+        "dry_cp",
+        "dry_mv",
+        "dry_rm",
+        "dry_ln",
+        "dry_cat",
+        "dry_echo",
+        "dry_export",
+        "dry_print_action",
+        "dry_print_command",
+        "dry_run_get_count",
+        "dry_run_increment",
+        "dry_run_complete",
+        "dry_run_print_stats"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "lib_migration",
+      "path": "scripts/lib_migration.sh",
+      "provides": ["migration_engine", "version_migration", "config_migration"],
+      "public_api": [
+        "get_pending_migrations",
+        "execute_migration",
+        "run_migrations",
+        "rollback_migration",
+        "log_migration",
+        "create_migration",
+        "get_migration_history",
+        "get_migration_version",
+        "migration_was_executed"
+      ],
+      "depends_on": ["lib_version", "lib_logging"],
+      "risk": ["compatibility-critical", "data-loss-risk"]
+    },
+    {
+      "id": "lib_health",
+      "path": "scripts/lib_health.sh",
+      "provides": ["health_checking", "validation", "diagnostics"],
+      "public_api": [
+        "run_health_check",
+        "check_syntax",
+        "check_plugins",
+        "check_dependencies",
+        "check_version_file",
+        "generate_health_report",
+        "display_health_report"
+      ],
+      "depends_on": ["lib_logging", "lib_platform_compat"],
+      "risk": []
+    },
+    {
+      "id": "lib_backup",
+      "path": "scripts/lib_backup.sh",
+      "provides": ["backup_restore", "config_backup", "disaster_recovery"],
+      "public_api": [
+        "create_backup",
+        "list_backups",
+        "get_backup_info",
+        "restore_backup",
+        "delete_backup",
+        "cleanup_old_backups"
+      ],
+      "depends_on": ["lib_logging", "lib_platform_compat"],
+      "risk": ["data-loss-risk"]
+    },
+    {
+      "id": "zsh_config_manager",
+      "path": "scripts/zsh_config_manager.sh",
+      "provides": ["clm_cli", "config_lifecycle_management"],
+      "public_api": [
+        "show_help",
+        "cmd_version",
+        "cmd_migrate",
+        "cmd_health",
+        "cmd_backup",
+        "cmd_list_backups",
+        "cmd_restore",
+        "cmd_rollback",
+        "cmd_history",
+        "cmd_validate",
+        "main"
+      ],
+      "depends_on": ["lib_version", "lib_migration", "lib_health", "lib_backup"],
+      "risk": ["user-facing"]
+    },
+    {
+      "id": "zsh_tools",
+      "path": "scripts/zsh_tools.sh",
+      "provides": ["config_tools", "maintenance_tools"],
+      "public_api": [
+        "show_help",
+        "validate_config",
+        "backup_config",
+        "restore_config",
+        "update_plugins",
+        "clean_cache",
+        "run_benchmark",
+        "run_detailed_benchmark",
+        "run_doctor",
+        "show_perf_report",
+        "show_perf_trend",
+        "show_perf_info",
+        "reset_config",
+        "main"
+      ],
+      "depends_on": ["lib_logging", "lib_performance", "lib_platform_compat", "lib_dryrun"],
+      "risk": ["user-facing"]
+    },
+    {
+      "id": "zsh_launcher",
+      "path": "scripts/zsh_launcher.sh",
+      "provides": ["mode_launcher", "multi_mode_startup"],
+      "public_api": ["main"],
+      "depends_on": ["lib_performance", "lib_logging"],
+      "risk": ["user-facing", "performance-critical"]
+    },
+    {
+      "id": "zsh_optimizer",
+      "path": "scripts/zsh_optimizer.sh",
+      "provides": ["optimizer", "performance_optimization"],
+      "public_api": ["main"],
+      "depends_on": ["lib_performance", "lib_logging"],
+      "risk": ["user-facing"]
+    },
+    {
+      "id": "zsh_functions_search",
+      "path": "zsh-functions/search.zsh",
+      "provides": ["search_enhancement", "file_search", "content_search"],
+      "public_api": ["hg", "hig", "hrg", "hirg"],
+      "depends_on": ["zsh_functions_validation"],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_utils",
+      "path": "zsh-functions/utils.zsh",
+      "provides": ["utilities", "proxy_management", "environment_detection"],
+      "public_api": [
+        "proxy",
+        "unproxy",
+        "proxy_status",
+        "check_environment",
+        "reload_zsh"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_help",
+      "path": "zsh-functions/help.zsh",
+      "provides": ["help_system", "command_documentation"],
+      "public_api": [
+        "zsh_help",
+        "handle_help_param",
+        "init_help_database",
+        "show_help_overview",
+        "show_category_help",
+        "show_command_help",
+        "show_help_usage",
+        "validate_command"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_performance",
+      "path": "zsh-functions/performance.zsh",
+      "provides": ["performance_analysis", "startup_analysis"],
+      "public_api": [
+        "performance_detailed",
+        "test_segmented_startup",
+        "test_plugin_performance",
+        "test_memory_usage",
+        "generate_performance_report",
+        "provide_optimization_suggestions"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_validation",
+      "path": "zsh-functions/validation.zsh",
+      "provides": ["validation", "parameter_validation", "assertion"],
+      "public_api": [
+        "assert_param",
+        "assert_directory",
+        "assert_file",
+        "assert_command",
+        "assert_pattern",
+        "validate_directory",
+        "validate_file",
+        "validate_not_empty",
+        "validate_param_count",
+        "validate_pattern"
+      ],
+      "depends_on": [],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_context",
+      "path": "zsh-functions/context.zsh",
+      "provides": ["context_display", "prompt_indicators"],
+      "public_api": [
+        "_get_env_indicators",
+        "prompt_env_indicators",
+        "_is_in_container",
+        "_is_in_ssh",
+        "_is_using_proxy",
+        "check_proxy"
+      ],
+      "depends_on": ["zsh_functions_utils"],
+      "risk": []
+    },
+    {
+      "id": "zsh_functions_claude",
+      "path": "zsh-functions/claude.zsh",
+      "provides": ["claude_integration", "ai_assistant"],
+      "public_api": [
+        "claude",
+        "_claude_with_config",
+        "_setup_claude_aliases",
+        "_cc_list",
+        "_cc_create",
+        "_cc_edit",
+        "_cc_copy",
+        "_cc_delete",
+        "_cc_current",
+        "_cc_refresh",
+        "_cc_validate",
+        "_ccfg_completion"
+      ],
+      "depends_on": [],
+      "risk": []
+    }
+  ],
+  "docs": {
+    "specification": ["CLAUDE.md"],
+    "architecture": ["DEPENDENCY_GRAPH.md"],
+    "api": ["FUNCTION_INDEX.md"],
+    "types": ["TYPES.md"],
+    "tags": ["SEMANTIC_TAGS.md"],
+    "ai_guide": ["AI_OPTIMIZATION_GUIDE.md"],
+    "contracts": [".ai/CONTRACTS/"]
+  },
+  "airs_version": "1.0",
+  "airs_compliance": "full"
+}

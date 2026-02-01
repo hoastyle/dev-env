@@ -1,0 +1,141 @@
+entity: lib_migration.run_migrations
+stability: stable
+version: "2.3.0"
+description: 执行所有待处理的配置迁移
+
+inputs:
+  - name: dry_run
+    type: bool
+    description: 是否为干运行模式（不实际执行迁移）
+    required: false
+    default: false
+    constraints:
+      - type: boolean
+
+  - name: force
+    type: bool
+    description: 强制执行迁移，跳过健康检查
+    required: false
+    default: false
+    constraints:
+      - type: boolean
+
+outputs:
+  type: migration_result
+  description: 迁移执行结果
+  fields:
+    - name: executed_count
+      type: int
+      description: 成功执行的迁移数量
+
+    - name: failed_count
+      type: int
+      description: 失败的迁移数量
+
+    - name: pending_count
+      type: int
+      description: 仍未执行的迁移数量
+
+    - name: return_code
+      type: exitcode
+      description: 0=全部成功, 1=部分失败, 2=全部失败
+
+errors:
+  - code: MIGRATION_NOT_FOUND
+    condition: 迁移脚本文件不存在
+    message: "Migration script not found: {migration_file}"
+    retryable: false
+
+  - code: MIGRATION_FAILED
+    condition: 迁移脚本执行失败
+    message: "Migration {migration_id} failed with exit code {exit_code}"
+    retryable: false
+
+  - code: HEALTH_CHECK_FAILED
+    condition: 执行前健康检查失败
+    message: "Pre-migration health check failed"
+    retryable: true
+
+  - code: VERSION_UPDATE_FAILED
+    condition: 更新版本记录失败
+    message: "Failed to update version after migration"
+    retryable: true
+
+side_effects:
+  - description: 执行迁移脚本（可能修改配置文件）
+    risk: medium
+
+  - description: 更新迁移历史记录
+    risk: low
+
+  - description: 更新版本文件
+    risk: low
+
+  - description: 创建备份（如果迁移支持）
+    risk: low
+
+examples:
+  - description: 正常执行所有待处理迁移
+    input:
+      dry_run: false
+    output:
+      executed_count: 2
+      failed_count: 0
+      pending_count: 0
+      return_code: 0
+      message: "✅ Executed 2 migrations successfully"
+
+  - description: 干运行模式
+    input:
+      dry_run: true
+    output:
+      executed_count: 0
+      pending_count: 2
+      return_code: 0
+      message: "🔍 Would execute 2 migrations: 001_initial, 002_add_template_system"
+
+  - description: 部分迁移失败
+    input:
+      dry_run: false
+    output:
+      executed_count: 1
+      failed_count: 1
+      pending_count: 0
+      return_code: 1
+      message: "⚠️ Migration 002_add_template_system failed"
+
+dependencies:
+  required:
+    - lib_version
+    - lib_logging
+    - MIGRATIONS_DIR directory
+    - MIGRATION_HISTORY log file
+  optional:
+    - lib_backup (用于迁移前备份)
+
+implementation_notes: |
+  执行流程：
+  1. 获取当前版本 (get_current_version)
+  2. 获取待处理迁移列表 (get_pending_migrations)
+  3. 对于干运行模式，只显示将要执行的迁移
+  4. 对于实际执行：
+     a. 可选：执行健康检查
+     b. 可选：创建备份
+     c. 按顺序执行每个迁移
+     d. 记录迁移历史
+     e. 更新版本文件
+  5. 返回执行结果统计
+
+  迁移脚本命名约定：XXX_description.sh
+  - XXX: 三位数字序号（如 001, 002）
+  - description: 简短描述（小写+下划线）
+
+  每个迁移脚本需要定义：
+  - migrate_up(): 执行迁移
+  - migrate_down(): 回滚迁移（可选）
+  - DESCRIPTION: 迁移描述
+
+  错误处理策略：
+  - 单个迁移失败：停止执行后续迁移
+  - 已执行的迁移记录在历史中
+  - 用户需要手动修复或回滚

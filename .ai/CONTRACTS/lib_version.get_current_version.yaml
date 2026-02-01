@@ -1,0 +1,59 @@
+entity: lib_version.get_current_version
+stability: stable
+version: "2.3.0"
+description: 获取当前配置版本号
+
+inputs:
+  - name: none
+    type: void
+    description: 无参数
+
+outputs:
+  type: VersionString
+  description: 当前版本号，格式为 MAJOR.MINOR.PATCH
+  default_value: "0.0.0"
+  constraints:
+    - format: "^\\d+\\.\\d+\\.\\d+$"
+
+errors:
+  - code: VERSION_FILE_NOT_FOUND
+    condition: VERSION_FILE 不存在
+    message: "Version file not found: {VERSION_FILE}"
+    retryable: false
+
+  - code: VERSION_INVALID
+    condition: VERSION_FILE 内容格式错误
+    message: "Invalid version format in file"
+    retryable: false
+
+side_effects:
+  - none
+
+examples:
+  - description: 正常获取版本号
+    input: {}
+    output:
+      value: "2.3.0"
+      type: VersionString
+
+  - description: 版本文件不存在时返回默认值
+    input:
+      context: "VERSION_FILE does not exist"
+    output:
+      value: "0.0.0"
+      type: VersionString
+    return_code: 1
+
+dependencies:
+  required:
+    - VERSION_FILE environment variable
+  optional: []
+
+implementation_notes: |
+  该函数是版本管理的核心入口，用于：
+  1. 检查 VERSION_FILE 是否存在
+  2. 解析文件中的 VERSION 变量
+  3. 验证版本号格式
+  4. 返回版本号或默认值 "0.0.0"
+
+  返回码：0 表示成功找到版本，1 表示使用默认值
