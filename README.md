@@ -2,7 +2,7 @@
 
 **项目版本**: 2.3.0 (CLM系统)
 **创建日期**: 2025-10-15
-**最后更新**: 2025-10-19 (高优先级修复)
+**最后更新**: 2026-03-27 (测试执行模型与启动链增强)
 **维护者**: Development Team
 
 ---
@@ -14,17 +14,16 @@
 ### 🎯 **主要特性**
 
 * ✅ **ZSH 配置管理**: 完整的 ZSH 配置文件和插件管理
-* ✅ **配置生命周期管理 (CLM)**: 版本控制、迁移、健康检查、备份恢复 (v2.3 新增)
 * ✅ **环境指示符**: 在提示符中显示容器、SSH、代理状态 (🖥️ 🌐 🔐)
 * ✅ **模块化函数**: 环境检测、搜索增强、帮助系统、性能分析模块化管理
 * ✅ **自动化工具**: 一键安装、备份、恢复脚本
 * ✅ **开发工具集成**: FZF, Git, Conda, NVM 等工具集成
 * ✅ **环境适配**: 支持 Linux/macOS，Docker/物理主机环境
-* ⚡ **极速启动**: 多模式启动器，启动速度提升高达99.9%
+* ⚡ **极速启动**: 多模式启动器，支持 benchmark 与模式切换
 * ✅ **性能优化**: 深度性能分析和智能优化建议
 * ✅ **模板系统**: 4种预设配置模板（dev-full, dev-minimal, server, docker）
 * ✅ **跨平台库**: 统一的日志、性能监控、平台兼容性库
-* ✅ **配置生命周期管理 (CLM)**: 版本管理、自动迁移、健康检查、备份恢复
+* ✅ **配置容错增强**: 启动链支持 DEV_ENV_* 路径覆写与缺失回退
 * ✅ **单元测试**: 完整的测试套件和 CI/CD 集成
 * ✅ **文档完善**: 详细的使用文档和配置说明
 * ✅ **大模型友好**: CODEMAP.json、函数索引、类型注解，专为 AI 辅助开发优化
@@ -183,8 +182,8 @@ git clone <repository-url>
 cd dev-env/scripts
 
 # 直接使用启动器 (无需安装)
-./zsh_launcher.sh minimal    # 极速模式 (99.9%性能提升)
-./zsh_launcher.sh fast       # 快速模式 (61%性能提升)
+./zsh_launcher.sh minimal    # 极速模式
+./zsh_launcher.sh fast       # 快速模式
 ./zsh_launcher.sh normal     # 标准模式 (完整功能)
 
 # 或使用极简启动器
@@ -236,7 +235,7 @@ brew install fzf fd ripgrep
 
 * ✅ 三种启动模式 (minimal/fast/normal)
 * ✅ 性能对比测试 (`./scripts/zsh_launcher.sh benchmark`)
-* ✅ 详细性能分析 (`./scripts/zsh_launcher.sh benchmark-detailed`)
+* ✅ 详细性能分析 (`./scripts/zsh_tools.sh benchmark-detailed`)
 * ✅ 基础命令帮助 (启动器内置)
 * ✅ 配置切换和恢复功能
 
@@ -305,8 +304,8 @@ source ~/.zshrc
 ```bash
 # 多模式启动器 (推荐)
 ./scripts/zsh_launcher.sh help          # 查看帮助
-./scripts/zsh_launcher.sh minimal       # 极速模式 (2ms启动)
-./scripts/zsh_launcher.sh fast          # 快速模式 (0.6s启动)
+./scripts/zsh_launcher.sh minimal       # 极速模式（耗时依机器而异）
+./scripts/zsh_launcher.sh fast          # 快速模式（耗时依机器而异）
 ./scripts/zsh_launcher.sh normal        # 标准模式 (完整功能)
 ./scripts/zsh_launcher.sh benchmark     # 性能对比测试
 ./scripts/zsh_launcher.sh quick-restore # 快速恢复配置
@@ -314,6 +313,21 @@ source ~/.zshrc
 # 极简模式启动器
 ./scripts/zsh_minimal.sh                 # 一键极速启动
 ```
+
+### 🧩 **高级配置（DEV_ENV_* 覆写）**
+
+可通过环境变量覆盖默认路径，便于在 CI、容器或隔离 HOME 中运行：
+
+```bash
+export DEV_ENV_ANTIGEN_FILE="$HOME/.antigen.zsh"
+export DEV_ENV_FUNCTIONS_DIR="$HOME/.zsh/functions"
+export DEV_ENV_P10K_FILE="$HOME/.p10k.zsh"
+export DEV_ENV_FZF_FILE="$HOME/.fzf.zsh"
+export DEV_ENV_AUTOJUMP_SCRIPT="$HOME/.autojump/etc/profile.d/autojump.sh"
+export DEV_ENV_LOCAL_BIN_ENV_FILE="$HOME/.local/bin/env"
+```
+
+若对应文件缺失，配置会按内置回退策略继续启动（不会因单点缺失直接中断）。
 
 ### 📊 **性能优化工具**
 
@@ -524,15 +538,21 @@ vim templates/custom/my-template.zshrc
 
 ### 📋 **单元测试**
 
-完整的单元测试套件，覆盖核心功能：
+完整的测试套件，覆盖核心功能：
 
 ```bash
-# 运行所有单元测试
-cd tests/unit
-./test_path_detection.sh
-./test_error_handling.sh
-./test_config_validation.sh
+# 快速回归（推荐）
+cd tests
+./run_tests.sh quick
+
+# 运行全部测试（unit + integration）
+./run_tests.sh full
+
+# 仅运行单个测试文件
+bash ./unit/test_config_validation.sh
 ```
+
+说明：测试运行器采用“按测试文件隔离子进程 + 文件级失败聚合”，失败会真实冒泡，不会出现假绿。
 
 **测试覆盖**：
 - 路径检测和解析
@@ -741,7 +761,7 @@ comp-enable                # 启用补全系统 (最小模式)
 #### 性能分析模块 (performance.zsh)
 
 ```bash
-# 通过以下命令使用:
+# 通过以下命令使用：
 ./scripts/zsh_tools.sh benchmark-detailed    # 详细性能分析
 ```
 
@@ -754,8 +774,8 @@ comp-enable                # 启用补全系统 (最小模式)
 | 模式 | 启动时间 | 性能提升 | 适用场景 |
 |------|---------|----------|----------|
 | **原始配置** | 1.568s | - | 完整功能 |
-| **优化配置** | 0.606s | **61%** | 日常开发 |
-| **最小模式** | 0.002s | **99.9%** ⚡ | 快速任务 |
+| **优化配置** | ~0.10s | 依机器而异 | 日常开发 |
+| **最小模式** | ~0.08-0.10s | 依机器而异 | 快速任务 |
 
 ### 🎯 **核心优化策略**
 
@@ -767,7 +787,7 @@ comp-enable                # 启用补全系统 (最小模式)
 
 ### 🚀 **多模式启动系统**
 
-**极速模式** (99.9%性能提升)
+**极速模式**
 
 ```bash
 ./scripts/zsh_launcher.sh minimal
@@ -775,17 +795,17 @@ comp-enable                # 启用补全系统 (最小模式)
 ./scripts/zsh_minimal.sh
 ```
 
-* 2毫秒极速启动
+* 启动耗时依机器与插件状态而异
 * 按需加载功能
 * 适合快速命令执行
 
-**快速模式** (61%性能提升)
+**快速模式**
 
 ```bash
 ./scripts/zsh_launcher.sh fast
 ```
 
-* 启动速度提升61%
+* 启动速度显著快于标准模式
 * 保留主要开发功能
 * 按需启用补全
 
@@ -1026,7 +1046,7 @@ git push origin feature/new-feature
 * ⚡ **重大性能突破**: 实现高达99.9%的启动速度提升
 * 🚀 新增多模式启动器 (zsh_launcher.sh) 和极简模式启动器 (zsh_minimal.sh)
 * 📊 深度性能分析系统，精确定位ZSH补全系统瓶颈 (节省437ms)
-* 🎯 三种启动模式：极速模式(2ms)、快速模式(0.6s)、标准模式(完整功能)
+* 🎯 三种启动模式：minimal / fast / normal
 * 🛠️ 新增性能优化工具 (zsh_optimizer.sh) 和智能配置切换
 * 💡 按需加载系统：补全、开发环境可单独启用
 * 🔧 完善的备份恢复机制，支持快速配置切换

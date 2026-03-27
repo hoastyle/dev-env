@@ -14,9 +14,9 @@ The repository provides a modular ZSH development environment. Key directories:
 Execute commands from the repository root:
 
 * `./scripts/install_zsh_config.sh` installs the selected configuration into `~/.zshrc` with safety backups.
-* `./scripts/zsh_launcher.sh normal|fast|minimal` launches ZSH in different performance profiles; append `benchmark` for startup timing.
+* `./scripts/zsh_launcher.sh normal|fast|minimal|benchmark` launches ZSH in different performance profiles and captures startup timing.
 * `./scripts/zsh_optimizer.sh analyze|optimize|restore|benchmark` inspects startup cost, applies tuned configs, and compares before/after metrics.
-* `./scripts/zsh_tools.sh help` surfaces additional maintenance commands (`benchmark-detailed`, `quick-restore`).
+* `./scripts/zsh_tools.sh help` surfaces additional maintenance commands (including `benchmark-detailed`).
 
 ## Coding Style & Naming Conventions
 
@@ -24,7 +24,7 @@ Shell and ZSH scripts use `#!/bin/bash` or `#!/usr/bin/env zsh`, `set -e`, and f
 
 ## Testing Guidelines
 
-No automated test harness exists; rely on scripted probes. Run `./scripts/zsh_launcher.sh benchmark` after changes to capture startup deltas, and include the summary table in review notes. Validate config syntax with `zsh -n config/.zshrc` (repeat for optimized variants). When touching helper modules, exercise the relevant command via an interactive shell and record observed output or regressions.
+An automated harness exists. Use `cd tests && ./run_tests.sh quick` for fast regression, and `./run_tests.sh full` before major merges. Run `./scripts/zsh_launcher.sh benchmark` after startup-related changes to capture timing deltas, and include key numbers in review notes. Validate config syntax with `zsh -n config/.zshrc` (repeat for optimized variants). When touching helper modules, exercise the relevant command via an interactive shell and record observed output or regressions.
 
 ## Commit & Pull Request Guidelines
 
