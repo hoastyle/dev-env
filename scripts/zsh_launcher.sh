@@ -292,19 +292,37 @@ run_benchmark() {
     local project_root="$(get_project_root)"
     local results=()
 
+    # 用 date +%s%N 进行毫秒测量，避免依赖 shell time 输出格式（zsh/bash/macOS/GNU 差异）。
+    measure_config_startup_seconds() {
+        local config_file="$1"
+        local start_ms
+        local end_ms
+        local duration_ms
+
+        start_ms=$(date +%s%3N 2>/dev/null || date +%s000)
+        zsh -c "source \"$config_file\" && exit" 2>/dev/null || true
+        end_ms=$(date +%s%3N 2>/dev/null || date +%s000)
+
+        duration_ms=$((end_ms - start_ms))
+        awk -v ms="$duration_ms" 'BEGIN { printf "%.3fs", ms/1000 }'
+    }
+
     # 测试标准模式
     log_info "测试标准模式启动时间..."
-    local normal_time=$(time (zsh -c "source $project_root/config/.zshrc && exit" 2>/dev/null) 2>&1 | grep real | awk '{print $2}' || echo "N/A")
+    local normal_time
+    normal_time=$(measure_config_startup_seconds "$project_root/config/.zshrc")
     results+=("标准模式: $normal_time")
 
     # 测试优化模式
     log_info "测试优化模式启动时间..."
-    local optimized_time=$(time (zsh -c "source $project_root/config/.zshrc.optimized && exit" 2>/dev/null) 2>&1 | grep real | awk '{print $2}' || echo "N/A")
+    local optimized_time
+    optimized_time=$(measure_config_startup_seconds "$project_root/config/.zshrc.optimized")
     results+=("优化模式: $optimized_time")
 
     # 测试超优化模式 (快速)
     log_info "测试超优化模式启动时间..."
-    local ultra_time=$(time (FAST_MODE=true zsh -c "source $project_root/config/.zshrc.ultra-optimized && exit" 2>/dev/null) 2>&1 | grep real | awk '{print $2}' || echo "N/A")
+    local ultra_time
+    ultra_time=$(measure_config_startup_seconds "$project_root/config/.zshrc.ultra-optimized")
     results+=("超优化模式: $ultra_time")
 
     # 显示结果

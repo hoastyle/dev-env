@@ -151,8 +151,8 @@ init_test_state() {
 
 # Record a passed test
 record_pass() {
-    ((TEST_TOTAL++))
-    ((TEST_PASSED++))
+    ((TEST_TOTAL += 1))
+    ((TEST_PASSED += 1))
 }
 
 # Record a failed test
@@ -160,15 +160,15 @@ record_fail() {
     local test_name="$1"
     local reason="${2:-Unknown reason}"
 
-    ((TEST_TOTAL++))
-    ((TEST_FAILED++))
+    ((TEST_TOTAL += 1))
+    ((TEST_FAILED += 1))
     TEST_FAILURES+=("$test_name: $reason")
 }
 
 # Record a skipped test
 record_skip() {
-    ((TEST_TOTAL++))
-    ((TEST_SKIPPED++))
+    ((TEST_TOTAL += 1))
+    ((TEST_SKIPPED += 1))
 }
 
 # Get test statistics

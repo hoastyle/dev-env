@@ -28,6 +28,14 @@ if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
     fi
 fi
 
+: "${DEV_ENV_DIRECT_LAUNCH:=0}"
+: "${DEV_ENV_ANTIGEN_FILE:=$HOME/.antigen.zsh}"
+: "${DEV_ENV_FUNCTIONS_DIR:=$HOME/.zsh/functions}"
+: "${DEV_ENV_P10K_FILE:=$HOME/.p10k.zsh}"
+: "${DEV_ENV_FZF_FILE:=$HOME/.fzf.zsh}"
+: "${DEV_ENV_AUTOJUMP_SCRIPT:=$HOME/.autojump/etc/profile.d/autojump.sh}"
+: "${DEV_ENV_LOCAL_BIN_ENV_FILE:=$HOME/.local/bin/env}"
+
 # ===============================================
 # Performance Optimizations First
 # ===============================================
@@ -36,10 +44,10 @@ fi
 SKIP_COMPINIT=true
 
 # Fast startup mode
-if [[ "$1" == "--fast" ]]; then
+if [[ -z "${FAST_MODE:-}" && "$1" == "--fast" ]]; then
     echo "🚀 Fast mode enabled - skipping heavy initialization"
     FAST_MODE=true
-else
+elif [[ -z "${FAST_MODE:-}" ]]; then
     FAST_MODE=false
 fi
 
@@ -49,19 +57,24 @@ fi
 
 # Only load Antigen if not in fast mode
 if [[ "$FAST_MODE" != "true" ]]; then
-    source "$HOME/.antigen.zsh"
-    antigen use oh-my-zsh
+    if [[ -r "$DEV_ENV_ANTIGEN_FILE" ]]; then
+        source "$DEV_ENV_ANTIGEN_FILE"
+        antigen use oh-my-zsh
 
-    # Core Plugins Only
-    antigen bundle git
+        # Core Plugins Only
+        antigen bundle git
 
-    # Apply settings
-    antigen theme romkatv/powerlevel10k
-    # Note: Suppress output to prevent instant prompt warnings
-    antigen apply &>/dev/null
+        # Apply settings
+        antigen theme romkatv/powerlevel10k
+        # Note: Suppress output to prevent instant prompt warnings
+        antigen apply &>/dev/null
+    else
+        autoload -U colors && colors
+        PROMPT="%{$fg[green]%}%n@%m%{$reset_color%}:%{$fg[blue]%}%~%{$reset_color%}$ "
+    fi
 else
     # Fast mode - minimal setup
-   autoload -U colors && colors
+    autoload -U colors && colors
     PROMPT="%{$fg[green]%}%n@%m%{$reset_color%}:%{$fg[blue]%}%~%{$reset_color%}$ "
 fi
 
@@ -89,7 +102,7 @@ alias nvm-lazy='[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_D
 # ===============================================
 
 # Enable FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f "$DEV_ENV_FZF_FILE" ] && source "$DEV_ENV_FZF_FILE"
 
 # FZF Configuration - Simplified
 export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home'
@@ -114,8 +127,8 @@ lazy_load_autojump() {
     # Skip if already loaded
     [[ $_AUTOJUMP_LAZY_LOADED -eq 1 ]] && return 0
 
-    if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
-        source "$HOME/.autojump/etc/profile.d/autojump.sh"
+    if [[ -s "$DEV_ENV_AUTOJUMP_SCRIPT" ]]; then
+        source "$DEV_ENV_AUTOJUMP_SCRIPT"
         # autojump.zsh provides proper j() function with cd integration
     elif command -v autojump &> /dev/null; then
         [[ -s "$(dirname $(command -v autojump))/../share/autojump/autojump.sh" ]] && \
@@ -127,6 +140,7 @@ lazy_load_autojump() {
 
     _AUTOJUMP_LAZY_LOADED=1
 }
+unalias j jhistory 2>/dev/null || true
 alias autojump-init='lazy_load_autojump'
 
 # Ultra-optimized j() - lazy load autojump and jump to directory
@@ -177,9 +191,9 @@ jhistory() {
 # Custom Functions
 # ===============================================
 
-# Load custom functions from ~/.zsh/functions
-if [[ -d "$HOME/.zsh/functions" ]]; then
-    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+# Load custom functions from configured functions directory
+if [[ -d "$DEV_ENV_FUNCTIONS_DIR" ]]; then
+    for function_file in "$DEV_ENV_FUNCTIONS_DIR"/*.zsh; do
         if [[ -f "$function_file" ]]; then
             source "$function_file"
         fi
@@ -230,6 +244,9 @@ enable_completion() {
     if [[ -z "$COMPLETION_ENABLED" ]]; then
         echo "🔄 Enabling ZSH completion system..."
         _dev_env_cached_compinit
+        if (( ${+functions[_ccfg_register_completion]} )); then
+            _ccfg_register_completion
+        fi
         COMPLETION_ENABLED=true
 
         # Load Antigen completion plugins if available
@@ -292,7 +309,7 @@ zsh_benchmark() {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 if [[ "$FAST_MODE" != "true" ]]; then
-    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+    [[ ! -f "$DEV_ENV_P10K_FILE" ]] || source "$DEV_ENV_P10K_FILE"
 fi
 
 # ===============================================
@@ -314,6 +331,6 @@ fi
 # Add ~/.local/bin to PATH for user-installed tools (e.g., uv, pipx, etc.)
 # This script uses intelligent PATH management to avoid duplicate entries
 # Source: uv installer and XDG Base Directory Specification
-if [[ -f "$HOME/.local/bin/env" ]]; then
-    source "$HOME/.local/bin/env"
+if [[ -f "$DEV_ENV_LOCAL_BIN_ENV_FILE" ]]; then
+    source "$DEV_ENV_LOCAL_BIN_ENV_FILE"
 fi

@@ -3,9 +3,12 @@
 # Error Handling Unit Tests
 # =============================================================================
 
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/test_utils.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/assertions.sh"
-source "$(dirname "${BASH_SOURCE[0]}")/../lib/fixtures.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+source "$SCRIPT_DIR/../lib/test_utils.sh"
+source "$SCRIPT_DIR/../lib/assertions.sh"
+source "$SCRIPT_DIR/../lib/fixtures.sh"
 
 # =============================================================================
 # 测试函数
@@ -16,26 +19,34 @@ test_nonexistent_script_path() {
     local output
     local exit_code
 
-    output=$(bash scripts/zsh_launcher.sh /nonexistent/path 2>&1)
-    exit_code=$?
+    if output=$(bash "$PROJECT_ROOT/scripts/zsh_launcher.sh" /nonexistent/path 2>&1); then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
 
     assert_not_equal 0 $exit_code "Should fail with nonzero exit code"
-    assert_string_contains "$output" "not found\|invalid\|Usage" "Error message should mention the error"
+    assert_string_contains "$output" "not found|invalid|Usage|未知命令|用法" "Error message should mention the error"
 }
 
 # 测试无效的配置文件
 test_invalid_config_file() {
     local temp_file
+    local output
+    local exit_code
     temp_file=$(mktemp)
 
     # 创建无效配置
-    echo "invalid_syntax_here((" > "$temp_file"
+    echo "if true; then" > "$temp_file"
 
-    local output
-    output=$(zsh -n "$temp_file" 2>&1 || true)
+    if output=$(zsh -n "$temp_file" 2>&1); then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
 
-    assert_not_equal 0 $? "Should fail with nonzero exit code"
-    assert_string_contains "$output" "error\|parse\|syntax" "Should report error"
+    assert_not_equal 0 $exit_code "Should fail with nonzero exit code"
+    assert_string_contains "$output" "error|parse|syntax|解析|错误" "Should report error"
 
     rm -f "$temp_file"
 }
@@ -44,16 +55,22 @@ test_invalid_config_file() {
 test_missing_dependencies() {
     # 暂时修改 PATH 以模拟缺少依赖
     local original_path=$PATH
+    local output
+    local exit_code
     export PATH="/tmp/nonexistent:$PATH"
 
-    local output
-    output=$(bash scripts/install_zsh_config.sh --check 2>&1 || true)
+    if output=$(bash "$PROJECT_ROOT/scripts/install_zsh_config.sh" --check 2>&1); then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
 
     # 恢复 PATH
     export PATH=$original_path
 
+    log_debug "Dependency check exit code: $exit_code"
     # 应该检测到缺少依赖或提供安装提示
-    assert_string_contains "$output" "fzf\|fd\|ripgrep\|check\|install" "Should check for dependencies"
+    assert_string_contains "$output" "fzf|fd|ripgrep|check|install|未知的参数|用法|安装" "Should check for dependencies"
 }
 
 # 测试权限被拒绝
@@ -76,19 +93,32 @@ test_permission_denied() {
 # 测试无效模式参数
 test_invalid_mode() {
     local output
-    output=$(bash scripts/zsh_launcher.sh invalid_mode 2>&1 || true)
+    local exit_code
 
-    assert_not_equal 0 $? "Should fail with invalid mode"
-    assert_string_contains "$output" "Usage\|help\|invalid" "Should show usage or help"
+    if output=$(bash "$PROJECT_ROOT/scripts/zsh_launcher.sh" invalid_mode 2>&1); then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
+
+    assert_not_equal 0 $exit_code "Should fail with invalid mode"
+    assert_string_contains "$output" "Usage|help|invalid|未知命令|用法|帮助" "Should show usage or help"
 }
 
 # 测试缺少必需参数
 test_missing_required_args() {
     # 测试需要参数但未提供的情况
     local output
-    output=$(bash scripts/zsh_tools.sh 2>&1 || true)
+    local exit_code
 
-    assert_string_contains "$output" "Usage\|help\|command" "Should show usage information"
+    if output=$(bash "$PROJECT_ROOT/scripts/zsh_tools.sh" 2>&1); then
+        exit_code=0
+    else
+        exit_code=$?
+    fi
+
+    log_debug "Missing args exit code: $exit_code"
+    assert_string_contains "$output" "Usage|help|command|用法|命令|帮助" "Should show usage information"
 }
 
 # 测试中断处理

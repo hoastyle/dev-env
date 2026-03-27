@@ -100,7 +100,7 @@ validate_config() {
 
     if [[ $(echo "$zsh_version" | cut -d'.' -f1) -lt 5 ]]; then
         log_error "ZSH 版本过低，建议升级到 5.0+"
-        ((issues++))
+        ((issues += 1))
     else
         log_success "ZSH 版本符合要求"
     fi
@@ -118,7 +118,7 @@ validate_config() {
             log_success "✓ $file (${size} bytes)"
         else
             log_error "✗ $file 不存在"
-            ((issues++))
+            ((issues += 1))
         fi
     done
 
@@ -129,7 +129,7 @@ validate_config() {
     else
         log_error "✗ .zshrc 语法错误"
         zsh -n "$HOME/.zshrc"
-        ((issues++))
+        ((issues += 1))
     fi
 
     # 检查 Antigen
@@ -146,7 +146,7 @@ validate_config() {
         fi
     else
         log_error "✗ Antigen 未安装"
-        ((issues++))
+        ((issues += 1))
     fi
 
     # 检查开发工具
@@ -157,7 +157,7 @@ validate_config() {
     for tool in "${tools[@]}"; do
         if command -v "$tool" &> /dev/null; then
             log_success "✓ $tool"
-            ((available_tools++))
+            ((available_tools += 1))
         fi
     done
 
@@ -169,10 +169,10 @@ validate_config() {
 
     # 检查主题
     log_info "检查主题设置..."
-    if zsh -i -c 'echo $PROMPT' 2>/dev/null | grep -q "➜"; then
-        log_success "✓ robbyrussell 主题已加载"
+    if zsh -i -c '(( $+functions[p10k] ))' 2>/dev/null; then
+        log_success "✓ Powerlevel10k 主题已加载"
     else
-        log_warn "主题可能未正确加载"
+        log_warn "未检测到 Powerlevel10k 主题，提示符可能已回退到简化样式"
     fi
 
     # 总结
@@ -217,7 +217,7 @@ backup_config() {
         if [[ -f "$HOME/$file" ]]; then
             cp "$HOME/$file" "$backup_dir/"
             log_success "✓ $file"
-            ((backed_up_files++))
+            ((backed_up_files += 1))
         fi
     done
 
@@ -228,7 +228,7 @@ backup_config() {
         if [[ -d "$HOME/$dir" ]]; then
             cp -r "$HOME/$dir" "$backup_dir/"
             log_success "✓ $dir/"
-            ((backed_up_dirs++))
+            ((backed_up_dirs += 1))
         fi
     done
 
@@ -295,7 +295,7 @@ restore_config() {
         if [[ -f "$file" ]] && [[ "$(basename "$file")" != "." ]] && [[ "$(basename "$file")" != ".." ]]; then
             cp "$file" "$HOME/"
             log_success "✓ $(basename "$file")"
-            ((restored_files++))
+            ((restored_files += 1))
         fi
     done
 
@@ -308,7 +308,7 @@ restore_config() {
             rm -rf "$HOME/$(basename "$dir")" 2>/dev/null || true
             cp -r "$dir" "$HOME/"
             log_success "✓ $(basename "$dir")/"
-            ((restored_dirs++))
+            ((restored_dirs += 1))
         fi
     done
 

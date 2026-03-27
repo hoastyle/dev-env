@@ -29,36 +29,50 @@ if [[ -n "$ZSH_LAUNCHER_ACTIVE" ]]; then
     fi
 fi
 
+: "${DEV_ENV_DIRECT_LAUNCH:=0}"
+: "${DEV_ENV_ANTIGEN_FILE:=$HOME/.antigen.zsh}"
+: "${DEV_ENV_FUNCTIONS_DIR:=$HOME/.zsh/functions}"
+: "${DEV_ENV_P10K_FILE:=$HOME/.p10k.zsh}"
+: "${DEV_ENV_FZF_FILE:=$HOME/.fzf.zsh}"
+: "${DEV_ENV_FZF_PREVIEW_SCRIPT:=$HOME/.fzf/fzf_preview.py}"
+: "${DEV_ENV_AUTOJUMP_SCRIPT:=$HOME/.autojump/etc/profile.d/autojump.sh}"
+: "${DEV_ENV_LOCAL_BIN_ENV_FILE:=$HOME/.local/bin/env}"
+
 # Antigen Plugin Manager
-source "$HOME/.antigen.zsh"
+if [[ -r "$DEV_ENV_ANTIGEN_FILE" ]]; then
+    source "$DEV_ENV_ANTIGEN_FILE"
 
-# Antigen Configuration
-antigen use oh-my-zsh
+    # Antigen Configuration
+    antigen use oh-my-zsh
 
-# Core Plugins
-antigen bundle git
-antigen bundle zsh-users/zsh-completions
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle srijanshetty/zsh-pip-completion
-antigen bundle MichaelAquilina/zsh-auto-notify
-antigen bundle unixorn/autoupdate-antigen.zshplugin
-antigen bundle iboyperson/pipenv-zsh
-antigen bundle trystan2k/zsh-tab-title
-antigen bundle zpm-zsh/undollar
-antigen bundle mafredri/zsh-async
+    # Core Plugins
+    antigen bundle git
+    antigen bundle zsh-users/zsh-completions
+    antigen bundle zsh-users/zsh-autosuggestions
+    antigen bundle zsh-users/zsh-syntax-highlighting
+    antigen bundle srijanshetty/zsh-pip-completion
+    antigen bundle MichaelAquilina/zsh-auto-notify
+    antigen bundle unixorn/autoupdate-antigen.zshplugin
+    antigen bundle iboyperson/pipenv-zsh
+    antigen bundle trystan2k/zsh-tab-title
+    antigen bundle zpm-zsh/undollar
+    antigen bundle mafredri/zsh-async
 
-# Theme Configuration
-antigen theme romkatv/powerlevel10k
-
-# Apply Antigen Settings
-# Note: Suppress output to prevent instant prompt warnings
-antigen apply &>/dev/null
-
-# Fallback theme loading (without sleep to support instant prompt)
-if [[ -z "$PROMPT" ]]; then
+    # Theme Configuration
     antigen theme romkatv/powerlevel10k
+
+    # Apply Antigen Settings
+    # Note: Suppress output to prevent instant prompt warnings
     antigen apply &>/dev/null
+
+    # Fallback theme loading (without sleep to support instant prompt)
+    if [[ -z "$PROMPT" ]]; then
+        antigen theme romkatv/powerlevel10k
+        antigen apply &>/dev/null
+    fi
+else
+    autoload -U colors && colors
+    PROMPT="%{$fg[green]%}%n@%m%{$reset_color%}:%{$fg[blue]%}%~%{$reset_color%}$ "
 fi
 
 # ===============================================
@@ -93,11 +107,15 @@ export NVM_DIR="$HOME/.nvm"
 # ===============================================
 
 # Enable FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f "$DEV_ENV_FZF_FILE" ] && source "$DEV_ENV_FZF_FILE"
 
 # FZF Configuration
 export FZF_DEFAULT_COMMAND='fdfind --hidden --follow -E ".git" -E "node_modules" . /etc /home'
-export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:up,alt-i:toggle+down --border --preview "echo {} | ~/.fzf/fzf_preview.py" --preview-window=down'
+if [[ -f "$DEV_ENV_FZF_PREVIEW_SCRIPT" ]]; then
+    export FZF_DEFAULT_OPTS="--height 90% --layout=reverse --bind=alt-j:down,alt-k:up,alt-i:toggle+down --border --preview \"echo {} | $DEV_ENV_FZF_PREVIEW_SCRIPT\" --preview-window=down"
+else
+    export FZF_DEFAULT_OPTS='--height 90% --layout=reverse --bind=alt-j:down,alt-k:up,alt-i:toggle+down --border'
+fi
 
 # FZF Completion Functions
 _fzf_compgen_path() {
@@ -124,8 +142,8 @@ export PATH=/usr/local/cuda-11.1/bin/:$PATH
 # Install: apt-get install autojump OR brew install autojump
 # NOTE: Do NOT create aliases j='autojump' as they override autojump.zsh function definitions!
 #       The autojump.sh script provides the j() function with proper cd integration.
-if [[ -s "$HOME/.autojump/etc/profile.d/autojump.sh" ]]; then
-    source "$HOME/.autojump/etc/profile.d/autojump.sh"
+if [[ -s "$DEV_ENV_AUTOJUMP_SCRIPT" ]]; then
+    source "$DEV_ENV_AUTOJUMP_SCRIPT"
     # Note: autojump.zsh defines j() function with cd integration
     # No need to create aliases - the function handles all j commands
 elif command -v autojump &> /dev/null; then
@@ -160,16 +178,16 @@ fi
 # Custom Functions
 # ===============================================
 
-# Load custom functions from ~/.zsh/functions
-if [[ -d "$HOME/.zsh/functions" ]]; then
+# Load custom functions from configured functions directory
+if [[ -d "$DEV_ENV_FUNCTIONS_DIR" ]]; then
     # Load validation module first (required by other functions)
-    if [[ -f "$HOME/.zsh/functions/validation.zsh" ]]; then
-        source "$HOME/.zsh/functions/validation.zsh"
+    if [[ -f "$DEV_ENV_FUNCTIONS_DIR/validation.zsh" ]]; then
+        source "$DEV_ENV_FUNCTIONS_DIR/validation.zsh"
     fi
 
     # Load all other function modules using autoload for lazy loading
     # This improves startup time by loading functions on-demand
-    for function_file in "$HOME/.zsh/functions"/*.zsh; do
+    for function_file in "$DEV_ENV_FUNCTIONS_DIR"/*.zsh; do
         if [[ -f "$function_file" ]] && [[ "$(basename "$function_file")" != "validation.zsh" ]]; then
             # Source for backward compatibility (immediate loading)
             # Uncomment the autoload line below for lazy loading (experimental)
@@ -331,6 +349,9 @@ _dev_env_init_completion() {
 }
 
 _dev_env_init_completion
+if (( ${+functions[_ccfg_register_completion]} )); then
+    _ccfg_register_completion
+fi
 unset -f _dev_env_init_completion
 
 # ===============================================
@@ -338,7 +359,7 @@ unset -f _dev_env_init_completion
 # ===============================================
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+[[ ! -f "$DEV_ENV_P10K_FILE" ]] || source "$DEV_ENV_P10K_FILE"
 
 # ===============================================
 # Environment Context Indicators
@@ -346,7 +367,7 @@ unset -f _dev_env_init_completion
 # Environment indicators are loaded from ~/.zsh/functions/context.zsh
 # and integrated into Powerlevel10k via the prompt_env_indicators segment
 #
-# To enable: Run: ./scripts/setup-p10k-env-indicators.sh
+# To enable: run ./scripts/install_zsh_config.sh
 # Or manually edit ~/.p10k.zsh and add 'env_indicators' to RIGHT_PROMPT_ELEMENTS
 #
 # See: docs/P10K_ENV_INDICATORS_SETUP.md for detailed setup instructions
@@ -366,8 +387,8 @@ unset -f _dev_env_init_completion
 # Add ~/.local/bin to PATH for user-installed tools (e.g., uv, pipx, etc.)
 # This script uses intelligent PATH management to avoid duplicate entries
 # Source: uv installer and XDG Base Directory Specification
-if [[ -f "$HOME/.local/bin/env" ]]; then
-    source "$HOME/.local/bin/env"
+if [[ -f "$DEV_ENV_LOCAL_BIN_ENV_FILE" ]]; then
+    source "$DEV_ENV_LOCAL_BIN_ENV_FILE"
 fi
 
 # ===============================================

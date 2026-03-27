@@ -118,13 +118,17 @@ test_backup_with_timestamp() {
 
 # Test multiple backups
 test_multiple_backups_rotation() {
-    local backup_dir="$(get_backup_dir)"
+    local backup_dir="$(get_backup_dir)/rotation_case_$$"
+    local prefix=".zshrc.backup.rotation."
+
+    mkdir -p "$backup_dir"
 
     for i in {1..5}; do
-        create_test_file ".zshrc.backup.$i" "backup $i" "$backup_dir"
+        create_test_file "${prefix}${i}" "backup $i" "$backup_dir"
     done
 
-    local count=$(find "$backup_dir" -name ".zshrc.backup.*" | wc -l)
+    local count
+    count=$(find "$backup_dir" -maxdepth 1 -type f -name "${prefix}*" | wc -l | tr -d ' ')
     assert_num_equal 5 "$count" "Should have 5 backup files"
 }
 
@@ -192,14 +196,17 @@ test_clean_removes_cache() {
 
 # Test clean lists files to remove
 test_clean_lists_files() {
-    local cache_dir="$(get_temp_dir)/.zsh/cache"
+    local cache_dir
+    cache_dir="$(mktemp -d "$(get_temp_dir)/cache_case_XXXXXX")"
+    local prefix="cache_test_file_"
 
     mkdir -p "$cache_dir"
     for i in {1..3}; do
-        create_test_file "cache_$i" "cache" "$cache_dir"
+        create_test_file "${prefix}${i}" "cache" "$cache_dir"
     done
 
-    local file_count=$(find "$cache_dir" -type f | wc -l)
+    local file_count
+    file_count=$(find "$cache_dir" -maxdepth 1 -type f -name "${prefix}*" | wc -l | tr -d ' ')
     assert_num_equal 3 "$file_count" "Should have 3 cache files"
 }
 
@@ -279,7 +286,7 @@ test_doctor_checks_dependencies() {
 
     for cmd in zsh bash git; do
         if command -v "$cmd" &>/dev/null; then
-            ((deps_found++))
+            ((deps_found += 1))
         fi
     done
 
@@ -355,17 +362,6 @@ test_state_persistence() {
 # Execution
 # ============================================================================
 
-# Run setup
-setup
-
-# Run all test functions
-for func in $(declare -F | grep " test_" | awk '{print $3}'); do
-    if ! run_test "$func" "$func"; then
-        true  # Continue to next test even on failure
-    fi
-done
-
-# Run teardown
-teardown
-
-exit 0
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_test_suite "$@"
+fi

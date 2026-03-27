@@ -236,8 +236,7 @@
 * [PLANNING.md](./PLANNING.md) - 技术架构规划
 * [CONTEXT.md](./CONTEXT.md) - 会话上下文（最新）
 * [KNOWLEDGE.md](./KNOWLEDGE.md) - 知识库和最佳实践
-* [DOCUMENTATION_MAINTENANCE_REPORT.md](../DOCUMENTATION_MAINTENANCE_REPORT.md) - 维护报告
-* [TASK_HISTORY.md](./TASK_HISTORY.md) - 历史任务记录（已完成的 93 个任务）
+* [HOTFIX_2_1_1.md](../archive/2025-Q4/HOTFIX_2_1_1.md) - 2025 Q4 历史修复记录
 
 ---
 

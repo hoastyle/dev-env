@@ -151,7 +151,7 @@ test_zshrc_content() {
 
     assert_file_contains "$zshrc_file" "#!/bin/zsh" ".zshrc should contain shebang"
     assert_file_contains "$zshrc_file" "antigen" ".zshrc should reference antigen"
-    assert_file_contains "$zshrc_file" "robbyrussell" ".zshrc should reference theme"
+    assert_file_contains "$zshrc_file" "powerlevel10k" ".zshrc should reference theme"
 }
 
 # Test functions directory creation
@@ -309,17 +309,6 @@ test_permission_error_handling() {
 # Execution
 # ============================================================================
 
-# Run setup
-setup
-
-# Run all test functions
-for func in $(declare -F | grep " test_" | awk '{print $3}'); do
-    if ! run_test "$func" "$func"; then
-        true  # Continue to next test even on failure
-    fi
-done
-
-# Run teardown
-teardown
-
-exit 0
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_test_suite "$@"
+fi

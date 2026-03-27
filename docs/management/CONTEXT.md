@@ -132,8 +132,7 @@
 * [KNOWLEDGE.md](./KNOWLEDGE.md) - 知识库和最佳实践
 
 ### 参考文档
-* [DOCUMENTATION_MAINTENANCE_REPORT.md](../DOCUMENTATION_MAINTENANCE_REPORT.md) - 维护报告
-* [TASK_HISTORY.md](../TASK_HISTORY.md) - 已完成任务历史（93 个）
+* [HOTFIX_2_1_1.md](../archive/2025-Q4/HOTFIX_2_1_1.md) - 2025 Q4 历史修复记录
 
 ### 技术文档
 * docs/zsh-config/ - ZSH 配置文档

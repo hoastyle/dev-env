@@ -376,17 +376,6 @@ test_string_regex_match() {
 # Execution
 # ============================================================================
 
-# Run setup
-setup
-
-# Run all test functions
-for func in $(declare -F | grep " test_" | awk '{print $3}'); do
-    if ! run_test "$func" "$func"; then
-        true  # Continue to next test even on failure
-    fi
-done
-
-# Run teardown
-teardown
-
-exit 0
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_test_suite "$@"
+fi

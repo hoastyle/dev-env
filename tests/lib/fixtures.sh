@@ -104,7 +104,12 @@ create_test_file() {
 # Create a test directory structure
 create_test_directory_structure() {
     local base_dir="${1:-$FIXTURE_TEMP_DIR}"
-    local structure="$2"
+    local structure="${2:-}"
+
+    if [[ -z "$structure" ]]; then
+        log_warn "No directory structure provided, skipping"
+        return 0
+    fi
 
     log_debug "Creating directory structure: $structure"
 
@@ -185,7 +190,7 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
 
 # Theme
-antigen theme robbyrussell
+antigen theme romkatv/powerlevel10k
 
 # Apply
 antigen apply

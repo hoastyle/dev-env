@@ -12,7 +12,7 @@
 # Environment indicators are loaded from ~/.zsh/functions/context.zsh
 # and integrated into Powerlevel10k via the prompt_env_indicators segment
 #
-# To enable: Run: ./scripts/setup-p10k-env-indicators.sh
+# To enable: run ./scripts/install_zsh_config.sh
 # Or manually edit ~/.p10k.zsh and add 'env_indicators' to RIGHT_PROMPT_ELEMENTS
 #
 # See: docs/P10K_ENV_INDICATORS_SETUP.md for detailed setup instructions

@@ -213,7 +213,7 @@ DRY_RUN_ACTION_COUNT=0
 
 # 增加操作计数
 dry_run_increment() {
-    ((DRY_RUN_ACTION_COUNT++))
+    ((DRY_RUN_ACTION_COUNT += 1))
 }
 
 # 获取操作计数

@@ -23,7 +23,7 @@ RUN_UNIT=1
 RUN_INTEGRATION=1
 STOP_ON_FAILURE=0
 
-# Global test state
+# Aggregated file-level test state
 declare -g TOTAL_TESTS=0
 declare -g PASSED_TESTS=0
 declare -g FAILED_TESTS=0
@@ -36,7 +36,7 @@ declare -a FAILED_TEST_LIST=()
 
 # Print usage
 usage() {
-    cat << EOF
+    cat << EOF_USAGE
 Usage: test_runner.sh [OPTIONS]
 
 OPTIONS:
@@ -62,7 +62,7 @@ EXAMPLES:
     # Run unit tests only and stop on first failure
     ./test_runner.sh --unit-only --stop-on-failure
 
-EOF
+EOF_USAGE
 }
 
 # Parse command line arguments
@@ -154,7 +154,6 @@ discover_tests() {
         return 0
     fi
 
-    local count=0
     for test_file in "$test_dir"/test_*.sh; do
         if [[ ! -f "$test_file" ]]; then
             continue
@@ -166,7 +165,6 @@ discover_tests() {
         fi
 
         echo "$test_file"
-        ((count++))
     done
 
     return 0
@@ -175,37 +173,31 @@ discover_tests() {
 # Execute a single test file
 execute_test_file() {
     local test_file="$1"
-    local test_name=$(basename "$test_file" .sh)
+    local test_name
+    local output=""
 
+    test_name=$(basename "$test_file" .sh)
     print_test_header "$test_name"
 
-    # Source the test file
-    if ! source "$test_file" 2>&1; then
-        log_error "Failed to source test file: $test_file"
-        return 1
-    fi
+    ((TOTAL_TESTS += 1))
 
-    # Get test functions from file
-    # Look for functions named test_*
-    local test_functions=$(bash -c "source '$test_file'; declare -F | grep 'test_' | awk '{print \$3}'")
-
-    if [[ -z "$test_functions" ]]; then
-        log_warn "No test functions found in $test_file"
+    # Execute each test file in an isolated process to avoid function/global-state leakage.
+    if output=$(bash "$test_file" 2>&1); then
+        if [[ -n "$output" ]]; then
+            printf "%s\n" "$output"
+        fi
+        ((PASSED_TESTS += 1))
         return 0
     fi
 
-    # Run each test function
-    local file_status=0
-    while IFS= read -r test_func; do
-        if ! run_test "$test_func" "$test_func" 2>&1; then
-            file_status=1
-            if [[ $STOP_ON_FAILURE -eq 1 ]]; then
-                return 1
-            fi
-        fi
-    done <<< "$test_functions"
+    if [[ -n "$output" ]]; then
+        printf "%s\n" "$output"
+    fi
 
-    return $file_status
+    ((FAILED_TESTS += 1))
+    FAILED_TEST_LIST+=("$test_file")
+    log_error "Test file failed: $test_file"
+    return 1
 }
 
 # Execute all unit tests
@@ -223,7 +215,8 @@ execute_unit_tests() {
     fi
 
     local failed=0
-    local test_files=$(discover_tests "$UNIT_DIR" "$FILTER")
+    local test_files
+    test_files=$(discover_tests "$UNIT_DIR" "$FILTER")
 
     if [[ -z "$test_files" ]]; then
         log_warn "No unit test files found"
@@ -259,7 +252,8 @@ execute_integration_tests() {
     fi
 
     local failed=0
-    local test_files=$(discover_tests "$INTEGRATION_DIR" "$FILTER")
+    local test_files
+    test_files=$(discover_tests "$INTEGRATION_DIR" "$FILTER")
 
     if [[ -z "$test_files" ]]; then
         log_warn "No integration test files found"
@@ -286,8 +280,29 @@ execute_integration_tests() {
 
 # Generate test report
 generate_report() {
+    local file_pass_rate=0
+
     echo ""
-    print_test_summary
+    echo -e "\033[1m\033[36mFile-level Summary\033[0m"
+    echo -e "\033[36m────────────────────────────────────────\033[0m"
+
+    if ((TOTAL_TESTS > 0)); then
+        file_pass_rate=$((PASSED_TESTS * 100 / TOTAL_TESTS))
+    fi
+
+    print_summary "Total Test Files" "$TOTAL_TESTS"
+    print_summary "Passed Files" "$PASSED_TESTS" "$COLOR_GREEN"
+    print_summary "Failed Files" "$FAILED_TESTS" "$COLOR_RED"
+    print_summary "Skipped Files" "$SKIPPED_TESTS" "$COLOR_YELLOW"
+    print_summary "Pass Rate" "${file_pass_rate}%"
+
+    if ((FAILED_TESTS > 0)); then
+        echo ""
+        echo -e "\033[1m\033[31mFailed Files:\033[0m"
+        for failed_file in "${FAILED_TEST_LIST[@]}"; do
+            echo "  - $failed_file"
+        done
+    fi
 
     # Print configuration summary
     echo ""
@@ -327,12 +342,11 @@ main() {
 
     # Initialize test state
     init_test_state
-
-    # Setup fixtures
-    if ! setup_fixtures; then
-        log_error "Failed to setup test fixtures"
-        return 1
-    fi
+    TOTAL_TESTS=0
+    PASSED_TESTS=0
+    FAILED_TESTS=0
+    SKIPPED_TESTS=0
+    FAILED_TEST_LIST=()
 
     # Execute tests
     local overall_status=0
@@ -347,9 +361,6 @@ main() {
 
     # Generate report
     generate_report
-
-    # Cleanup fixtures
-    teardown_fixtures
 
     # Exit with appropriate code
     if [[ $overall_status -eq 0 ]]; then

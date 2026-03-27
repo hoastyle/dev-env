@@ -319,8 +319,8 @@ test_multi_component_recovery() {
 
     # Step 3: Detect missing components
     local missing=0
-    [[ ! -f "$temp_dir/.zshrc" ]] && ((missing++))
-    [[ ! -f "$temp_dir/validation.zsh" ]] && ((missing++))
+    [[ ! -f "$temp_dir/.zshrc" ]] && ((missing += 1))
+    [[ ! -f "$temp_dir/validation.zsh" ]] && ((missing += 1))
 
     assert_num_equal 2 "$missing" "Should detect 2 missing components"
 
@@ -389,17 +389,6 @@ test_reliability_repeated_operations() {
 # Execution
 # ============================================================================
 
-# Run setup
-setup
-
-# Run all test functions
-for func in $(declare -F | grep " test_" | awk '{print $3}'); do
-    if ! run_test "$func" "$func"; then
-        true  # Continue to next test even on failure
-    fi
-done
-
-# Run teardown
-teardown
-
-exit 0
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_test_suite "$@"
+fi

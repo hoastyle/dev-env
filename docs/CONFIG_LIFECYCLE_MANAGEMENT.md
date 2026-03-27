@@ -347,9 +347,9 @@ migrate_down() {
 
 ## 相关文档
 
-- [CLM 技术设计](docs/design/CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md)
-- [快速实施指南](docs/design/QUICK_START_IMPLEMENTATION.md)
-- [实施检查清单](docs/design/IMPLEMENTATION_CHECKLIST.md)
+- [CLM 技术设计](design/CONFIG_LIFECYCLE_MANAGEMENT_DESIGN.md)
+- [快速实施指南](design/QUICK_START_IMPLEMENTATION.md)
+- [实施检查清单](design/IMPLEMENTATION_CHECKLIST.md)
 
 ---
 
