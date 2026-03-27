@@ -51,13 +51,9 @@ jobs:
 
       - name: Run unit tests
         run: |
-          echo "Running unit tests..."
-          for test in tests/unit/*.sh; do
-            if [[ -f "$test" ]]; then
-              echo "Running: $test"
-              bash "$test" || echo "Test failed: $test"
-            fi
-          done
+          echo "Running quick regression suite..."
+          cd tests
+          ./run_tests.sh quick
 
       - name: Validate configuration syntax
         run: |
@@ -295,6 +291,11 @@ jobs:
             echo "All documentation files present"
           fi
 
+      - name: Run documentation consistency lint
+        run: |
+          chmod +x scripts/lint_docs_consistency.sh
+          ./scripts/lint_docs_consistency.sh
+
   # -------------------------------------------------------------------------
   # Build Test (Simulate Installation)
   # -------------------------------------------------------------------------
@@ -355,7 +356,8 @@ jobs:
           # Fail if any required job failed
           if [[ "${{ needs.unit-tests.result }}" == "failure" ]] || \
              [[ "${{ needs.script-validation.result }}" == "failure" ]] || \
-             [[ "${{ needs.config-validation.result }}" == "failure" ]]; then
+             [[ "${{ needs.config-validation.result }}" == "failure" ]] || \
+             [[ "${{ needs.documentation-tests.result }}" == "failure" ]]; then
             echo "CRITICAL TESTS FAILED"
             exit 1
           fi

@@ -393,8 +393,8 @@ export DEV_ENV_LOCAL_BIN_ENV_FILE="$HOME/.local/bin/env"
 # 恢复指定备份
 ./scripts/zsh_tools.sh restore /path/to/backup
 
-# 重置配置
-./scripts/zsh_tools.sh reset
+# 清理缓存和临时数据
+./scripts/zsh_tools.sh clean
 ```
 
 ### 🔧 **配置生命周期管理 (CLM)**
@@ -550,6 +550,10 @@ cd tests
 
 # 仅运行单个测试文件
 bash ./unit/test_config_validation.sh
+
+# 文档一致性检查（命令示例与关键元信息）
+cd ..
+./scripts/lint_docs_consistency.sh
 ```
 
 说明：测试运行器采用“按测试文件隔离子进程 + 文件级失败聚合”，失败会真实冒泡，不会出现假绿。
